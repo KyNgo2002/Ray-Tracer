@@ -2,6 +2,7 @@
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 #include "windows.h"
+#include "../include/Shader.h"
 
 const unsigned WINDOW_SIZE = 900;
 
@@ -32,6 +33,8 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
+
+    Shader shader("../Shaders/vert.glsl", "../Shaders/frag.glsl");
 
     float vertices[] = {
     -0.5f, -0.5f, 0.0f,
