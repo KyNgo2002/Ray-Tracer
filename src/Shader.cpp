@@ -9,6 +9,7 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 	std::string fragString;
 
 	try {
+		std::cout << vertexSource << " " << fragSource << std::endl;
 		vShaderFile.open(vertexSource);
 		fShaderFile.open(fragSource);
 
