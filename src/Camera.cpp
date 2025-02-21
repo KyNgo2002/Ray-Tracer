@@ -2,8 +2,12 @@
 
 Camera::Camera()
 	: camPosition(glm::vec3(0.0f, 0.0f, 3.0f)),
-	  camDirection(glm::normalize(camPosition - glm::vec3(0.0f, 0.0f, 0.0f))),
-	  camRight(glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), camDirection))),
-	  camUp(glm::cross(camDirection, camRight)) {
+	  camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
+	  camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
+	  lookAt(glm::lookAt(camPosition, camPosition + camFront, camUp)) {
+	
+}
 
+void Camera::calculateLookAt() {
+	lookAt = glm::lookAt(camPosition, camPosition + camFront, camUp);
 }

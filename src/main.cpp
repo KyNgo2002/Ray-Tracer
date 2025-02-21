@@ -6,12 +6,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <../include/Camera.h>
 
 
-const unsigned WINDOW_SIZE = 900;
+const unsigned WINDOW_SIZE = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, Camera& camera);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 
 int main() {
@@ -40,7 +41,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     Shader shader("Shaders/vert.glsl", "Shaders/frag.glsl");
-
+    Camera camera;
     shader.use();
 
     float vertices[] = {
@@ -140,14 +141,21 @@ int main() {
 
     while (!glfwWindowShouldClose(window)) {
         // Inputs
-        processInput(window);
+        processInput(window, camera);
 
         //Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f) / 50, glm::vec3(0.5f, 1.0f, 0.0f));
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        /*model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f) / 50, glm::vec3(0.5f, 1.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));*/
+
+        const float radius = 10.0f;
+        float camX = sin(glfwGetTime()) * radius;
+        float camZ = cos(glfwGetTime()) * radius;
+       
+
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(camera.lookAt));
 
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -168,9 +176,22 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, Camera& camera) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.camPosition += camera.cameraSpeed * camera.camFront;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.camPosition -= camera.cameraSpeed * camera.camFront;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.camPosition -= glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.camPosition += glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.camPosition += glm::vec3(0.0f, 1.0f, 0.0f) * camera.cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.camPosition += glm::vec3(0.0f, -1.0f, 0.0f) * camera.cameraSpeed;
+    camera.calculateLookAt();
 }
 
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
