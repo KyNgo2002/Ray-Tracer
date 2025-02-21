@@ -14,7 +14,7 @@ public:
 
 	glm::mat4 lookAt;
 
-	const float cameraSpeed = 0.045f;
+	const float cameraSpeed = 0.01f;
 
 	void calculateLookAt();
 

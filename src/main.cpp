@@ -12,7 +12,7 @@
 const unsigned WINDOW_SIZE = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window, Camera& camera);
+void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 
 int main() {
@@ -140,8 +140,12 @@ int main() {
     long long totalFrames = 0;
 
     while (!glfwWindowShouldClose(window)) {
+
+        currTime = GetTickCount64();
+        float deltaTime = currTime - prevTime;
+        prevTime = currTime;
         // Inputs
-        processInput(window, camera);
+        processInput(window, camera, deltaTime);
 
         //Rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -176,21 +180,21 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window, Camera& camera) {
+void processInput(GLFWwindow* window, Camera& camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.camPosition += camera.cameraSpeed * camera.camFront;
+        camera.camPosition += camera.cameraSpeed * deltaTime * camera.camFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.camPosition -= camera.cameraSpeed * camera.camFront;
+        camera.camPosition -= camera.cameraSpeed * deltaTime * camera.camFront;
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.camPosition -= glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed;
+        camera.camPosition -= glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.camPosition += glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed;
+        camera.camPosition += glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.camPosition += glm::vec3(0.0f, 1.0f, 0.0f) * camera.cameraSpeed;
+        camera.camPosition += glm::vec3(0.0f, 1.0f, 0.0f) * camera.cameraSpeed * deltaTime;
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.camPosition += glm::vec3(0.0f, -1.0f, 0.0f) * camera.cameraSpeed;
+        camera.camPosition += glm::vec3(0.0f, -1.0f, 0.0f) * camera.cameraSpeed * deltaTime;
     camera.calculateLookAt();
 }
 
