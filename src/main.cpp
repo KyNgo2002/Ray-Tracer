@@ -37,6 +37,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
+    glEnable(GL_DEPTH_TEST);
 
     Shader shader("Shaders/vert.glsl", "Shaders/frag.glsl");
 
@@ -136,8 +137,6 @@ int main() {
 
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
-
-    glEnable(GL_DEPTH_TEST);
 
     while (!glfwWindowShouldClose(window)) {
         // Inputs
