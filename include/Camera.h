@@ -1,4 +1,5 @@
 #pragma once
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,13 +25,12 @@ public:
 
 	const float cameraSpeed = 0.01f;
 
-	float Yaw;
-	float Pitch;
+	float yaw;
+	float pitch;
 
-	Camera();
+	Camera(float scrWidth, float scrHeight);
 	void calculateLookAt();
 	void processKeyboard(CameraMovement direction, float deltaTime);
-
 
 };
 

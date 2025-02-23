@@ -1,11 +1,13 @@
 #include "Camera.h"
 
-Camera::Camera()
+Camera::Camera(float scrWidth, float scrHeight)
 	: camPosition(glm::vec3(0.0f, 0.0f, 3.0f)),
 	  camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
 	  camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
 	  lookAt(glm::lookAt(camPosition, camPosition + camFront, camUp)) {
-	
+
+    yaw = 0.0f;
+    pitch = 0.0f;
 }
 
 void Camera::calculateLookAt() {
@@ -21,9 +23,9 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
         camPosition -= glm::normalize(glm::cross(camFront, camUp)) * cameraSpeed * deltaTime;
     else if (direction == RIGHT)
         camPosition += glm::normalize(glm::cross(camFront, camUp)) * cameraSpeed * deltaTime;
-    if (direction == UP)
+    else if (direction == UP)
         camPosition += glm::vec3(0.0f, 1.0f, 0.0f) * cameraSpeed * deltaTime;
-    if (direction == DOWN)
+    else if (direction == DOWN)
         camPosition += glm::vec3(0.0f, -1.0f, 0.0f) * cameraSpeed * deltaTime;
     calculateLookAt();
 }

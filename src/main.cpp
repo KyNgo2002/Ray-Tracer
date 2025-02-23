@@ -9,12 +9,17 @@
 #include <../include/Camera.h>
 
 
-const unsigned WINDOW_SIZE = 800;
+const unsigned SCR_WIDTH = 1000;
+const unsigned SCR_HEIGHT = 800;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
 
 int main() {
     glfwInit();
@@ -23,7 +28,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow(WINDOW_SIZE, WINDOW_SIZE, "Ray Tracer", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Ray Tracer", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -40,12 +45,11 @@ int main() {
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
-    glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glEnable(GL_DEPTH_TEST);
 
     Shader shader("Shaders/vert.glsl", "Shaders/frag.glsl");
-    Camera camera;
+    Camera camera(SCR_WIDTH, SCR_HEIGHT);
     shader.use();
 
     float vertices[] = {
@@ -218,17 +222,20 @@ void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
     }
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
-    float lastX = 400, lastY = 300;
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse) {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+    float yoffset = lastY - ypos; 
+
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    /*yaw += xoffset;
-    pitch += yoffset;*/
 }
