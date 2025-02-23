@@ -14,6 +14,7 @@ const unsigned WINDOW_SIZE = 800;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 int main() {
     glfwInit();
@@ -36,6 +37,9 @@ int main() {
     }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 
     glViewport(0, 0, WINDOW_SIZE, WINDOW_SIZE);
     glEnable(GL_DEPTH_TEST);
@@ -184,17 +188,17 @@ void processInput(GLFWwindow* window, Camera& camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.camPosition += camera.cameraSpeed * deltaTime * camera.camFront;
+        camera.processKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.camPosition -= camera.cameraSpeed * deltaTime * camera.camFront;
+        camera.processKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.camPosition -= glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed * deltaTime;
+        camera.processKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.camPosition += glm::normalize(glm::cross(camera.camFront, camera.camUp)) * camera.cameraSpeed * deltaTime;
+        camera.processKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.camPosition += glm::vec3(0.0f, 1.0f, 0.0f) * camera.cameraSpeed * deltaTime;
+        camera.processKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.camPosition += glm::vec3(0.0f, -1.0f, 0.0f) * camera.cameraSpeed * deltaTime;
+        camera.processKeyboard(DOWN, deltaTime);
     camera.calculateLookAt();
 }
 
@@ -212,4 +216,19 @@ void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
         lastTime = currentTime;
         frames = 0;
     }
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+    float lastX = 400, lastY = 300;
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates range from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    /*yaw += xoffset;
+    pitch += yoffset;*/
 }
