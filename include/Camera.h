@@ -31,6 +31,7 @@ public:
 	Camera(float scrWidth, float scrHeight);
 	void calculateLookAt();
 	void processKeyboard(CameraMovement direction, float deltaTime);
+	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 
 };
 

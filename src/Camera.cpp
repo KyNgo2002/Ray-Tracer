@@ -29,3 +29,23 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
         camPosition += glm::vec3(0.0f, -1.0f, 0.0f) * cameraSpeed * deltaTime;
     calculateLookAt();
 }
+
+void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
+    xoffset *= MouseSensitivity;
+    yoffset *= MouseSensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (constrainPitch)
+    {
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+    }
+
+    // update Front, Right and Up Vectors using the updated Euler angles
+    updateCameraVectors();
+}

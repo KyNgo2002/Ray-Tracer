@@ -12,6 +12,8 @@
 const unsigned SCR_WIDTH = 1000;
 const unsigned SCR_HEIGHT = 800;
 
+Camera camera(SCR_WIDTH, SCR_HEIGHT);
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, Camera& camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
@@ -49,7 +51,6 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     Shader shader("Shaders/vert.glsl", "Shaders/frag.glsl");
-    Camera camera(SCR_WIDTH, SCR_HEIGHT);
     shader.use();
 
     float vertices[] = {
@@ -222,20 +223,23 @@ void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
     }
 }
 
-void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    if (firstMouse) {
+    if (firstMouse)
+    {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
     }
 
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; 
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
 
     lastX = xpos;
     lastY = ypos;
 
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
