@@ -137,6 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ObjectLoader.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="include\KHR\khrplatform.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\ObjectLoader.h" />
+    <ClInclude Include="include\OpenGL.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

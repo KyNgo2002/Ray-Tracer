@@ -8,7 +8,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <../include/Camera.h>
 
-
 const unsigned SCR_WIDTH = 1000;
 const unsigned SCR_HEIGHT = 800;
 
