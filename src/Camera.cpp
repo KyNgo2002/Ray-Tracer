@@ -18,14 +18,14 @@ void Camera::calculateLookAt() {
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
-    if (direction == FORWARD)
-        camPosition += cameraSpeed * deltaTime * camFront;
+    if (direction == FORWARD) 
+        camPosition += cameraSpeed * deltaTime * glm::normalize(glm::vec3(camFront[0], 0.0f, camFront[2]));
     else if (direction == BACKWARD)
-        camPosition -= cameraSpeed * deltaTime * camFront;
+        camPosition -= cameraSpeed * deltaTime * glm::normalize(glm::vec3(camFront[0], 0.0f, camFront[2]));
     else if (direction == LEFT)
-        camPosition -= glm::normalize(glm::cross(camFront, camUp)) * cameraSpeed * deltaTime;
+        camPosition -= cameraSpeed * deltaTime * camRight;
     else if (direction == RIGHT)
-        camPosition += glm::normalize(glm::cross(camFront, camUp)) * cameraSpeed * deltaTime;
+        camPosition += cameraSpeed * deltaTime * camRight;
     else if (direction == UP)
         camPosition += glm::vec3(0.0f, 1.0f, 0.0f) * cameraSpeed * deltaTime;
     else if (direction == DOWN)

@@ -1,18 +1,25 @@
 #include "OpenGL.h"
 
-OpenGL::OpenGL() : camera(Camera(SCR_WIDTH, SCR_HEIGHT)) {
+OpenGL::OpenGL(const char* vertexSource, const char* fragSource) 
+    : camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Ray Tracer", NULL, NULL);
+    window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Ray Tracer", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        
+    }
 
     lastX = SCR_WIDTH / 2.0f;
     lastY = SCR_HEIGHT / 2.0f;
@@ -27,28 +34,43 @@ OpenGL::OpenGL() : camera(Camera(SCR_WIDTH, SCR_HEIGHT)) {
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glEnable(GL_DEPTH_TEST);
+
+    shader = Shader(vertexSource, fragSource);
+    shader.use();
+}
+
+Camera* OpenGL::getCamera() {
+    return camera;
+}
+
+GLFWwindow* OpenGL::getWindow() {
+    return window;
+}
+
+Shader& OpenGL::getShader() {
+    return shader;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window, Camera& camera, float deltaTime) {
+void processInput(GLFWwindow* window, Camera* camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.processKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) 
+        camera->processKeyboard(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.processKeyboard(BACKWARD, deltaTime);
+        camera->processKeyboard(BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.processKeyboard(LEFT, deltaTime);
+        camera->processKeyboard(LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.processKeyboard(RIGHT, deltaTime);
+        camera->processKeyboard(RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.processKeyboard(UP, deltaTime);
+        camera->processKeyboard(UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.processKeyboard(DOWN, deltaTime);
-    camera.calculateLookAt();
+        camera->processKeyboard(DOWN, deltaTime);
+    camera->calculateLookAt();
 }
 
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
@@ -67,7 +89,7 @@ void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
     }
 }
 
-void OpenGL::mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     OpenGL* instance = static_cast<OpenGL*>(glfwGetWindowUserPointer(window));
 
     float xpos = static_cast<float>(xposIn);
@@ -86,5 +108,5 @@ void OpenGL::mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     instance->lastX = xpos;
     instance->lastY = ypos;
 
-    instance->camera.ProcessMouseMovement(xoffset, yoffset);
+    instance->getCamera()->ProcessMouseMovement(xoffset, yoffset);
 }

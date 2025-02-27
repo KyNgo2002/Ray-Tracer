@@ -2,6 +2,10 @@
 #include <iostream>
 #include <sstream>
 
+Shader::Shader() {
+	shaderProgramID = -1;
+}
+
 Shader::Shader(const char* vertexSource, const char* fragSource) {
 	std::ifstream vShaderFile;
 	std::ifstream fShaderFile;
@@ -42,7 +46,7 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 	const char* fragCode = fragString.c_str();
 
 	// Vertex Shader initialization
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	int vertexShader = glCreateShader(GL_VERTEX_SHADER); 
 	glShaderSource(vertexShader, 1, &vertCode, NULL);
 	glCompileShader(vertexShader);
 
@@ -84,6 +88,10 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 	// Clean up shader objects
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+}
+
+Shader::~Shader() {
+	shaderProgramID = -1;
 }
 
 void Shader::clean() {
