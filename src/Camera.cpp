@@ -1,13 +1,16 @@
 #include "Camera.h"
 
 Camera::Camera(float scrWidth, float scrHeight)
-	: camPosition(glm::vec3(0.0f, 0.0f, 3.0f)),
-	  camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
-	  camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
+    : camPosition(glm::vec3(0.0f, 0.0f, 0.0f)),
+      camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
+      camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
+      worldUp(camUp),
+      camRight(glm::vec3(0.0f, 0.0f, 0.0f)),
 	  lookAt(glm::lookAt(camPosition, camPosition + camFront, camUp)) {
 
-    yaw = 0.0f;
+    yaw = -90.0f;
     pitch = 0.0f;
+    updateCameraVectors();
 }
 
 void Camera::calculateLookAt() {
@@ -31,8 +34,8 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
 }
 
 void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
-    xoffset *= MouseSensitivity;
-    yoffset *= MouseSensitivity;
+    xoffset *= MOUSE_SENSITIVITY;
+    yoffset *= MOUSE_SENSITIVITY;
 
     yaw += xoffset;
     pitch += yoffset;
@@ -48,4 +51,16 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
 
     // update Front, Right and Up Vectors using the updated Euler angles
     updateCameraVectors();
+}
+
+void Camera::updateCameraVectors() {
+    // calculate the new Front vector
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    camFront = glm::normalize(front);
+    // also re-calculate the Right and Up vector
+    camRight = glm::normalize(glm::cross(camFront, camUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    camUp = glm::normalize(glm::cross(camRight, camFront));
 }

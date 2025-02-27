@@ -20,11 +20,13 @@ public:
 	glm::vec3 camPosition;
 	glm::vec3 camFront;
 	glm::vec3 camUp;
+	glm::vec3 camRight;
+	glm::vec3 worldUp;
 
 	glm::mat4 lookAt;
 
 	const float cameraSpeed = 0.01f;
-
+	const float MOUSE_SENSITIVITY = 0.05f;
 	float yaw;
 	float pitch;
 
@@ -32,6 +34,6 @@ public:
 	void calculateLookAt();
 	void processKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-
+	void updateCameraVectors();
 };
 
