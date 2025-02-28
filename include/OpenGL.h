@@ -17,8 +17,9 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 class OpenGL {
 private:
 	GLFWwindow* window;
-	Shader shader;
 	Camera* camera;
+	Shader* shader;
+	Shader* lightShader;
 
 	const unsigned SCR_WIDTH = 1000;
 	const unsigned SCR_HEIGHT = 800;
@@ -29,10 +30,14 @@ public:
 	bool firstMouse;
 
 	// Constructors/Destructors
-	OpenGL(const char* vertexSource, const char* fragSource);
+	OpenGL(const char* vertexSource, const char* fragSource, const char* lightVertSource, const char* lightFragSource);
+
+	// Getters/setters
 	Camera* getCamera();
 	GLFWwindow* getWindow();
-	Shader& getShader();
+	Shader* getShader();
+	Shader* getLightShader();
+	
 	
 };
 

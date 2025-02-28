@@ -157,8 +157,10 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="README.md" />
-    <None Include="Shaders\frag.glsl" />
-    <None Include="Shaders\vert.glsl" />
+    <None Include="Shaders\Frag.glsl" />
+    <None Include="Shaders\LightFrag.glsl" />
+    <None Include="Shaders\LightVert.glsl" />
+    <None Include="Shaders\Vert.glsl" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib" />

@@ -1,6 +1,6 @@
 #include "OpenGL.h"
 
-OpenGL::OpenGL(const char* vertexSource, const char* fragSource) 
+OpenGL::OpenGL(const char* vertexSource, const char* fragSource, const char* lightVertSource, const char* lightFragSource)
     : camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
 
     glfwInit();
@@ -36,6 +36,7 @@ OpenGL::OpenGL(const char* vertexSource, const char* fragSource)
     glEnable(GL_DEPTH_TEST);
 
     shader = Shader(vertexSource, fragSource);
+    lightShader = Shader(lightVertSource, lightFragSource);
     shader.use();
 }
 
@@ -47,9 +48,13 @@ GLFWwindow* OpenGL::getWindow() {
     return window;
 }
 
-Shader& OpenGL::getShader() {
+Shader* OpenGL::getShader() {
     return shader;
 }
+
+Shader* OpenGL::getLightShader() {
+    return lightShader;
+}   
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);

@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera(float scrWidth, float scrHeight)
-    : camPosition(glm::vec3(0.0f, 0.0f, 0.0f)),
+    : camPosition(glm::vec3(0.0f, 0.0f, 3.0f)),
       camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
       camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
       worldUp(camUp),
@@ -41,8 +41,7 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
     pitch += yoffset;
 
     // make sure that when pitch is out of bounds, screen doesn't get flipped
-    if (constrainPitch)
-    {
+    if (constrainPitch) {
         if (pitch > 89.0f)
             pitch = 89.0f;
         if (pitch < -89.0f)

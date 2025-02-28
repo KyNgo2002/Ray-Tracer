@@ -13,18 +13,17 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 	std::string fragString;
 
 	try {
-		std::cout << vertexSource << " " << fragSource << std::endl;
 		vShaderFile.open(vertexSource);
 		fShaderFile.open(fragSource);
 
 		if (!vShaderFile.is_open())
 			std::cerr << "ERROR: Could not open vertex shader file" << std::endl;
 		else
-			std::cout << "SUCCESS: Loaded vertex shader" << std::endl;
+			std::cout << "SUCCESS: Loaded vertex shader -> " << vertexSource << std::endl;
 		if (!fShaderFile.is_open())
 			std::cerr << "ERROR: could not open fragment shader file" << std::endl;
 		else
-			std::cout << "SUCCESS: Loaded fragment Shader" << std::endl;
+			std::cout << "SUCCESS: Loaded fragment Shader -> " << fragSource << std::endl;
 
 
 		// Initialize string streams to read from shader files
@@ -101,3 +100,40 @@ void Shader::clean() {
 void Shader::use() {
 	glUseProgram(shaderProgramID);
 }
+
+void Shader::setFloat(const char* name, float f) {
+	int floatUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniform1f(floatUniformLocation, f);
+}
+
+void Shader::setVec2(const char* name, float f0, float f1) {
+	int vectorUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniform2f(vectorUniformLocation, f0, f1);
+}
+
+void Shader::setVec3(const char* name, float f0, float f1, float f2) {
+	int vectorUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniform3f(vectorUniformLocation, f0, f1, f2);
+}
+
+void Shader::setVec4(const char* name, float f0, float f1, float f2, float f3) {
+	int vectorUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniform4f(vectorUniformLocation, f0, f1, f2, f3);
+}
+
+void Shader::setMat2(const char* name, glm::mat2& matrix) {
+	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniformMatrix2fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::setMat3(const char* name, glm::mat2& matrix) {
+	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniformMatrix3fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::setMat4(const char* name, glm::mat2& matrix) {
+	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	glUniformMatrix4fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+

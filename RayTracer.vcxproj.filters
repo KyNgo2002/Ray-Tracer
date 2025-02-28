@@ -69,10 +69,16 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="README.md" />
-    <None Include="Shaders\frag.glsl">
+    <None Include="Shaders\Frag.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\vert.glsl">
+    <None Include="Shaders\Vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightVert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightFrag.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
