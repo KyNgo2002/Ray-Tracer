@@ -35,9 +35,8 @@ OpenGL::OpenGL(const char* vertexSource, const char* fragSource, const char* lig
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glEnable(GL_DEPTH_TEST);
 
-    shader = Shader(vertexSource, fragSource);
-    lightShader = Shader(lightVertSource, lightFragSource);
-    shader.use();
+    shader = new Shader(vertexSource, fragSource);
+    lightShader = new Shader(lightVertSource, lightFragSource);
 }
 
 Camera* OpenGL::getCamera() {
@@ -54,7 +53,15 @@ Shader* OpenGL::getShader() {
 
 Shader* OpenGL::getLightShader() {
     return lightShader;
-}   
+}
+
+unsigned OpenGL::getScreenWidth() {
+    return SCR_WIDTH;
+}
+
+unsigned OpenGL::getScreenHeight() {
+    return SCR_WIDTH;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);

@@ -126,12 +126,12 @@ void Shader::setMat2(const char* name, glm::mat2& matrix) {
 	glUniformMatrix2fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::setMat3(const char* name, glm::mat2& matrix) {
+void Shader::setMat3(const char* name, glm::mat3& matrix) {
 	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
 	glUniformMatrix3fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::setMat4(const char* name, glm::mat2& matrix) {
+void Shader::setMat4(const char* name, glm::mat4& matrix) {
 	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
 	glUniformMatrix4fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }

@@ -31,8 +31,8 @@ public:
 	// Uniform Functionality (Matrices)
 	// --------------------------------
 	void setMat2(const char* name, glm::mat2& matrix);
-	void setMat3(const char* name, glm::mat2& matrix);
-	void setMat4(const char* name, glm::mat2& matrix);
+	void setMat3(const char* name, glm::mat3& matrix);
+	void setMat4(const char* name, glm::mat4& matrix);
 
 	
 

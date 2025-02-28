@@ -31,10 +31,18 @@ public:
 	float yaw;
 	float pitch;
 
+	// Constructor
 	Camera(float scrWidth, float scrHeight);
+
+
 	void calculateLookAt();
+	
+	// Callbacks
 	void processKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 	void updateCameraVectors();
+
+	// Getters
+	
 };
 

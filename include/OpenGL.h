@@ -37,6 +37,9 @@ public:
 	GLFWwindow* getWindow();
 	Shader* getShader();
 	Shader* getLightShader();
+
+	unsigned getScreenWidth();
+	unsigned getScreenHeight();
 	
 	
 };
