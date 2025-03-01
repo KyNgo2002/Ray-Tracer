@@ -58,10 +58,6 @@ int main() {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
 
-    //unsigned int indices[] = {  
-    //    0, 1, 2,   // first triangle
-    //};
-
     // Vertex Attributes
     unsigned int cubeVAO;
     glGenVertexArrays(1, &cubeVAO);
@@ -108,7 +104,7 @@ int main() {
 
     cubeShader->setVec3("light.position", 1.2f, 1.0f, 2.0f);
     cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-    cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
     cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
     auto prevTime = GetTickCount64();
@@ -117,6 +113,12 @@ int main() {
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
 
+    lightShader->use();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f));
+    lightShader->setMat4("model", model);
+    lightShader->setMat4("projection", projection);
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
 
@@ -149,13 +151,8 @@ int main() {
 
         // Light Cube shader setup
         lightShader->use();
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f)); 
-        lightShader->setMat4("model", model);
         lightShader->setMat4("view", camera->lookAt);
-        lightShader->setMat4("projection", projection);
-
+        
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
