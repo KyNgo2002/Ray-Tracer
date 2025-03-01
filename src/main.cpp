@@ -10,6 +10,8 @@
 
 int main() {
     OpenGL openGL("Shaders/Vert.glsl", "Shaders/Frag.glsl", "Shaders/LightVert.glsl", "Shaders/LightFrag.glsl");
+    Shader* cubeShader = openGL.getShader();
+    Shader* lightShader = openGL.getLightShader();
     Camera* camera = openGL.getCamera();
 
     float vertices[] = {
@@ -98,8 +100,16 @@ int main() {
     projection = glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-    openGL.getShader()->use();
-    openGL.getShader()->setVec3("LightPosition", 1.2f, 1.0f, 2.0f);
+    cubeShader->use();
+    cubeShader->setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+    cubeShader->setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+    cubeShader->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    cubeShader->setFloat("material.shininess", 32.0f);
+
+    cubeShader->setVec3("light.position", 1.2f, 1.0f, 2.0f);
+    cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+    cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
     auto prevTime = GetTickCount64();
     auto currTime = GetTickCount64();
@@ -123,29 +133,28 @@ int main() {
         processInput(openGL.getWindow(), camera, deltaTime);
 
         // Regular Cube Shader setup
-        openGL.getShader()->use();
-        openGL.getShader()->setVec3("ViewPos", camera->camPosition);
-        openGL.getShader()->setVec3("ObjectColor", 1.0f, 0.5f, 0.31f);
-        openGL.getShader()->setVec3("LightColor", 1.0f, 1.0f, 1.0f);
+        cubeShader->use();
+        cubeShader->setVec3("ViewPos", camera->camPosition);
+        cubeShader->setVec3("ObjectColor", 1.0f, 0.5f, 0.31f);
 
         // Model/view/projection transformations
         glm::mat4 model = glm::mat4(1.0f);
-        openGL.getShader()->setMat4("model", model);
-        openGL.getShader()->setMat4("view", camera->lookAt);
-        openGL.getShader()->setMat4("projection", projection);
+        cubeShader->setMat4("model", model);
+        cubeShader->setMat4("view", camera->lookAt);
+        cubeShader->setMat4("projection", projection);
         
         // Regular Cube Render
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Light Cube shader setup
-        openGL.getLightShader()->use();
+        lightShader->use();
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(0.2f)); 
-        openGL.getLightShader()->setMat4("model", model);
-        openGL.getLightShader()->setMat4("view", camera->lookAt);
-        openGL.getLightShader()->setMat4("projection", projection);
+        lightShader->setMat4("model", model);
+        lightShader->setMat4("view", camera->lookAt);
+        lightShader->setMat4("projection", projection);
 
         glBindVertexArray(lightCubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
