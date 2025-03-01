@@ -18,7 +18,6 @@ OpenGL::OpenGL(const char* vertexSource, const char* fragSource, const char* lig
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
-        
     }
 
     lastX = SCR_WIDTH / 2.0f;
@@ -60,7 +59,7 @@ unsigned OpenGL::getScreenWidth() {
 }
 
 unsigned OpenGL::getScreenHeight() {
-    return SCR_WIDTH;
+    return SCR_HEIGHT;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
