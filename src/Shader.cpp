@@ -101,38 +101,60 @@ void Shader::use() {
 	glUseProgram(shaderProgramID);
 }
 
+int Shader::getUniformLocation(const char* name) {
+	int uniformLocation = glGetUniformLocation(shaderProgramID, name);
+	if (uniformLocation == -1) 
+		std::cerr << "ERROR: Failed to retrieve uniform location for -> " << name << std::endl;
+	return uniformLocation;
+}
+
 void Shader::setFloat(const char* name, float f) {
-	int floatUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int floatUniformLocation = getUniformLocation(name);
 	glUniform1f(floatUniformLocation, f);
 }
 
+void Shader::setVec2(const char* name, glm::vec2& vector) {
+	int vectorUniformLocation = getUniformLocation(name);
+	glUniform2f(vectorUniformLocation, vector[0], vector[1]);
+}
+
 void Shader::setVec2(const char* name, float f0, float f1) {
-	int vectorUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int vectorUniformLocation = getUniformLocation(name);
 	glUniform2f(vectorUniformLocation, f0, f1);
 }
 
+void Shader::setVec3(const char* name, glm::vec3& vector) {
+	int vectorUniformLocation = getUniformLocation(name);
+	glUniform3f(vectorUniformLocation, vector[0], vector[1], vector[2]);
+}
+
 void Shader::setVec3(const char* name, float f0, float f1, float f2) {
-	int vectorUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int vectorUniformLocation = getUniformLocation(name);
 	glUniform3f(vectorUniformLocation, f0, f1, f2);
 }
 
+void Shader::setVec4(const char* name, glm::vec4& vector) {
+	int vectorUniformLocation = getUniformLocation(name);
+	glUniform4f(vectorUniformLocation, vector[0], vector[1], vector[2], vector[3]);
+}
+
 void Shader::setVec4(const char* name, float f0, float f1, float f2, float f3) {
-	int vectorUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int vectorUniformLocation = getUniformLocation(name);
 	glUniform4f(vectorUniformLocation, f0, f1, f2, f3);
 }
 
 void Shader::setMat2(const char* name, glm::mat2& matrix) {
-	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int matrixUniformLocation = getUniformLocation(name);
 	glUniformMatrix2fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::setMat3(const char* name, glm::mat3& matrix) {
-	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int matrixUniformLocation = getUniformLocation(name);
 	glUniformMatrix3fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::setMat4(const char* name, glm::mat4& matrix) {
-	int matrixUniformLocation = glGetUniformLocation(shaderProgramID, name);
+	int matrixUniformLocation = getUniformLocation(name);
 	glUniformMatrix4fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 

@@ -124,8 +124,9 @@ int main() {
 
         // Regular Cube Shader setup
         openGL.getShader()->use();
-        openGL.getShader()->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        openGL.getShader()->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+        openGL.getShader()->setVec3("ViewPos", camera->camPosition);
+        openGL.getShader()->setVec3("ObjectColor", 1.0f, 0.5f, 0.31f);
+        openGL.getShader()->setVec3("LightColor", 1.0f, 1.0f, 1.0f);
 
         // Model/view/projection transformations
         glm::mat4 model = glm::mat4(1.0f);

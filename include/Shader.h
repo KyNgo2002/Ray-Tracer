@@ -18,14 +18,22 @@ public:
 	void clean();
 	void use();
 
+
+	// Uniform Location 
+	// ----------------
+	int getUniformLocation(const char* name);
+
 	// Uniform Functionality (Constants)
 	// ---------------------------------
 	void setFloat(const char* name, float f);
 
 	// Uniform Functionality (Vectors)
 	// -------------------------------
+	void setVec2(const char* name, glm::vec2& vector);
 	void setVec2(const char* name, float f0, float f1);
+	void setVec3(const char* name, glm::vec3& vector);
 	void setVec3(const char* name, float f0, float f1, float f2);
+	void setVec4(const char* name, glm::vec4& vector);
 	void setVec4(const char* name, float f0, float f1, float f2, float f3);
 
 	// Uniform Functionality (Matrices)
