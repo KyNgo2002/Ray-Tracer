@@ -88,16 +88,14 @@ int main() {
     glGenVertexArrays(1, &lightCubeVAO);
     glBindVertexArray(lightCubeVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     // MVP matrices
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
+    glm::mat4 projection = 
+        glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
@@ -109,26 +107,30 @@ int main() {
     cubeShader->setInt("material.specular", 1);
     cubeShader->setFloat("material.shininess", 64.0f);
 
-
     cubeShader->setMat4("model", model);
+    cubeShader->setMat4("view", camera->lookAt);
     cubeShader->setMat4("projection", projection);
     cubeShader->setVec3("light.position", lightPos);
     cubeShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
     cubeShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
     cubeShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    //Attenuation
+    cubeShader->setFloat("light.constant", 1.0f);
+    cubeShader->setFloat("light.linear", 0.09f);
+    cubeShader->setFloat("light.quadratic", 0.032f);
+
+    lightShader->use();
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f));
+    lightShader->setMat4("model", model);
+    lightShader->setMat4("view", view);
+    lightShader->setMat4("projection", projection);
 
     auto prevTime = GetTickCount64();
     auto currTime = GetTickCount64();
 
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
-
-    lightShader->use();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, lightPos);
-    model = glm::scale(model, glm::vec3(0.2f));
-    lightShader->setMat4("model", model);
-    lightShader->setMat4("projection", projection);
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
 
