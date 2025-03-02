@@ -159,10 +159,14 @@
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="README.md" />
-    <None Include="Shaders\Frag.glsl" />
-    <None Include="Shaders\LightFrag.glsl" />
-    <None Include="Shaders\LightVert.glsl" />
-    <None Include="Shaders\Vert.glsl" />
+    <None Include="Shaders\Frag.frag">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\LightFrag.frag" />
+    <None Include="Shaders\LightVert.vert" />
+    <None Include="Shaders\Vert.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib" />
