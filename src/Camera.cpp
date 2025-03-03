@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "../include/Camera.h"
 
 Camera::Camera(float scrWidth, float scrHeight)
     : camPosition(glm::vec3(0.0f, 0.0f, 3.0f)),

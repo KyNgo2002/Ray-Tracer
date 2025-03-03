@@ -92,6 +92,8 @@
     <Library Include="lib\glfw3.lib">
       <Filter>Lib</Filter>
     </Library>
+    <Library Include="lib\assimp-vc143-mt.lib" />
+    <Library Include="lib\assimp-vc143-mtd.lib" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\container.png">

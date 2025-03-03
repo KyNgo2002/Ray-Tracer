@@ -6,12 +6,10 @@
 #include "Camera.h"
 #include "Shader.h"
 
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, Camera* camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
 
 // Class that encapsulates the OpenGL state machine
 class OpenGL {
