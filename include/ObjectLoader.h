@@ -5,6 +5,6 @@
 #include <assimp/postprocess.h>
 
 class ObjectLoader {
-
+    
 };
 
