@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
     <ClCompile Include="src\Camera.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="include\OpenGL.h" />
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\Mesh.h" />
+    <ClInclude Include="include\Model.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
