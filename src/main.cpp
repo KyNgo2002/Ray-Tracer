@@ -7,6 +7,7 @@
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
 #include "../include/stb_image.h"
+#include "../include/Model.h"
 
 unsigned int loadTexture(char const* path);
 
@@ -164,6 +165,11 @@ int main() {
     lightShader->setMat4("view", view);
     lightShader->setMat4("projection", projection);
 
+    Shader modelShader("../Shaders/ModelLoading.vert", "../Shaders/ModelLoading.frag");
+
+    char path[] = "C:\\Users\\kyngo\\Downloads\\backpack";
+    Model backpack(path);
+
     auto prevTime = GetTickCount64();
     auto currTime = GetTickCount64();
 
@@ -184,8 +190,9 @@ int main() {
         // Process user input
         processInput(openGL.getWindow(), camera, deltaTime);
 
+        //backpack.Draw(&modelShader);
         // Regular Cube Shader setup
-        cubeShader->use();
+        /*cubeShader->use();
         cubeShader->setVec3("ViewPos", camera->camPosition);
         cubeShader->setMat4("view", camera->lookAt);
         
@@ -193,24 +200,24 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, specularMap);
+        glBindTexture(GL_TEXTURE_2D, specularMap);*/
 
         // Regular Cube Render
-        glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+       /* glBindVertexArray(cubeVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
         // Light Cube shader setup
-        lightShader->use();
-        lightShader->setMat4("view", camera->lookAt);
+        /*lightShader->use();
+        lightShader->setMat4("view", camera->lookAt);*/
         
-        glBindVertexArray(lightCubeVAO);
+        /*glBindVertexArray(lightCubeVAO);
         for (int i = 0; i < 4; ++i) {
             model = glm::mat4(1.0f);
             model = glm::translate(model, pointLightPositions[i]);
             model = glm::scale(model, glm::vec3(0.2f));
             lightShader->setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        }*/
 
         calculateFPS(runningFrameCount, totalFrames);
 

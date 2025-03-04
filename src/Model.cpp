@@ -1,6 +1,6 @@
 #include "Model.h"
 
-unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma);
+unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma = false);
 
 Model::Model(char* path) {
     loadModel(path);
@@ -88,15 +88,25 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
     std::vector<Texture> textures;
-    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
-    {
+    for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
-        Texture texture;
-        texture.id = TextureFromFile(str.C_Str(), directory);
-        texture.type = typeName;
-        texture.path = str.C_Str();
-        textures.push_back(texture);
+        bool skip = false;
+        for (unsigned int j = 0; j < texturesLoaded.size(); j++) {
+            if (std::strcmp(texturesLoaded[j].path.data(), str.C_Str()) == 0) {
+                textures.push_back(texturesLoaded[j]);
+                skip = true;
+                break;
+            }
+        }
+        if (!skip) {   // if texture hasn't been loaded already, load it
+            Texture texture;
+            texture.id = TextureFromFile(str.C_Str(), directory);
+            texture.type = typeName;
+            texture.path = str.C_Str();
+            textures.push_back(texture);
+            texturesLoaded.push_back(texture); // add to loaded textures
+        }
     }
     return textures;
 }

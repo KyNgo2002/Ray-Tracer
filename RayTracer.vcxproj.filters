@@ -99,6 +99,14 @@
     <None Include="Shaders\Frag.frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\ModelLoading.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ModelLoading.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="lib\assimp-vc143-mt.dll" />
+    <None Include="lib\assimp-vc143-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib">
