@@ -16,10 +16,11 @@ void Model::loadModel(std::string path) {
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        std::cout << "ERROR::ASSIMP::" << std::endl;
+        std::cout << "ERROR::ASSIMP" << std::endl;
         return;
     }
-    directory = path.substr(0, path.find_last_of('/'));
+
+    directory = path.substr(0, path.find_last_of('\\'));
 
     processNode(scene->mRootNode, scene);
 }
@@ -72,17 +73,37 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         for (unsigned int j = 0; j < face.mNumIndices; j++)
             indices.push_back(face.mIndices[j]);
     }
-    // process material
-    if (mesh->mMaterialIndex >= 0) {
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        std::vector<Texture> diffuseMaps = loadMaterialTextures(material,
-            aiTextureType_DIFFUSE, "texture_diffuse");
-        textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-        std::vector<Texture> specularMaps = loadMaterialTextures(material,
-            aiTextureType_SPECULAR, "texture_specular");
-        textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace face = mesh->mFaces[i];
+        // retrieve all indices of the face and store them in the indices vector
+        for (unsigned int j = 0; j < face.mNumIndices; j++)
+            indices.push_back(face.mIndices[j]);
     }
+    // process materials
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    // we assume a convention for sampler names in the shaders. Each diffuse texture should be named
+    // as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
+    // Same applies to other texture as the following list summarizes:
+    // diffuse: texture_diffuseN
+    // specular: texture_specularN
+    // normal: texture_normalN
 
+    // 1. diffuse maps
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
+    // 2. specular maps
+    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+    // 3. normal maps
+    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
+    // 4. height maps
+    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
+    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+
+    // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);
 }
 
@@ -113,7 +134,8 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
 
 unsigned int TextureFromFile(const char* path, const std::string& directory, bool gamma) {
     std::string filename = std::string(path);
-    filename = directory + '/' + filename;
+    filename = directory + '\\' + filename;
+
 
     unsigned int textureID;
     glGenTextures(1, &textureID);

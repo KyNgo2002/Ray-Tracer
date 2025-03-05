@@ -107,67 +107,67 @@ int main() {
 
     glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
-    unsigned int diffuseMap = loadTexture("./Textures/container.png");
-    unsigned int specularMap = loadTexture("./Textures/container1.png");
+    /*unsigned int diffuseMap = loadTexture("./Textures/container.png");
+    unsigned int specularMap = loadTexture("./Textures/container1.png");*/
 
-    cubeShader->use();
+    /*cubeShader->use();
     cubeShader->setInt("material.diffuse", 0);
     cubeShader->setInt("material.specular", 1);
     cubeShader->setFloat("material.shininess", 64.0f);
 
     cubeShader->setMat4("model", model);
     cubeShader->setMat4("view", camera->lookAt);
-    cubeShader->setMat4("projection", projection);
+    cubeShader->setMat4("projection", projection);*/
     
-    // point light 1
-    cubeShader->setVec3("pointLights[0].position", pointLightPositions[0]);
-    cubeShader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[0].constant", 1.0f);
-    cubeShader->setFloat("pointLights[0].linear", 0.09f);
-    cubeShader->setFloat("pointLights[0].quadratic", 0.032f);
-    // point light 2
-    cubeShader->setVec3("pointLights[1].position", pointLightPositions[1]);
-    cubeShader->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[1].constant", 1.0f);
-    cubeShader->setFloat("pointLights[1].linear", 0.09f);
-    cubeShader->setFloat("pointLights[1].quadratic", 0.032f);
-    // point light 3
-    cubeShader->setVec3("pointLights[2].position", pointLightPositions[2]);
-    cubeShader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[2].constant", 1.0f);
-    cubeShader->setFloat("pointLights[2].linear", 0.09f);
-    cubeShader->setFloat("pointLights[2].quadratic", 0.032f);
-    // point light 4
-    cubeShader->setVec3("pointLights[3].position", pointLightPositions[3]);
-    cubeShader->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[3].constant", 1.0f);
-    cubeShader->setFloat("pointLights[3].linear", 0.09f);
-    cubeShader->setFloat("pointLights[3].quadratic", 0.032f);
+    //// point light 1
+    //cubeShader->setVec3("pointLights[0].position", pointLightPositions[0]);
+    //cubeShader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[0].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[0].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[0].quadratic", 0.032f);
+    //// point light 2
+    //cubeShader->setVec3("pointLights[1].position", pointLightPositions[1]);
+    //cubeShader->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[1].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[1].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[1].quadratic", 0.032f);
+    //// point light 3
+    //cubeShader->setVec3("pointLights[2].position", pointLightPositions[2]);
+    //cubeShader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[2].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[2].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[2].quadratic", 0.032f);
+    //// point light 4
+    //cubeShader->setVec3("pointLights[3].position", pointLightPositions[3]);
+    //cubeShader->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[3].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[3].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[3].quadratic", 0.032f);
 
 
-    cubeShader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    cubeShader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-    cubeShader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+    //cubeShader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    //cubeShader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    //cubeShader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
-    lightShader->use();
+    /*lightShader->use();
     model = glm::translate(model, lightPos);
     model = glm::scale(model, glm::vec3(0.2f));
     lightShader->setMat4("model", model);
     lightShader->setMat4("view", view);
-    lightShader->setMat4("projection", projection);
+    lightShader->setMat4("projection", projection);*/
 
-    Shader modelShader("../Shaders/ModelLoading.vert", "../Shaders/ModelLoading.frag");
+    Shader modelShader("Shaders/ModelLoading.vert", "Shaders/ModelLoading.frag");
 
-    char path[] = "C:\\Users\\kyngo\\Downloads\\backpack";
+    char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
     Model backpack(path);
 
     auto prevTime = GetTickCount64();
@@ -190,7 +190,7 @@ int main() {
         // Process user input
         processInput(openGL.getWindow(), camera, deltaTime);
 
-        //backpack.Draw(&modelShader);
+        backpack.Draw(&modelShader);
         // Regular Cube Shader setup
         /*cubeShader->use();
         cubeShader->setVec3("ViewPos", camera->camPosition);
