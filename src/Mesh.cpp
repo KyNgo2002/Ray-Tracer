@@ -28,9 +28,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std:
 	this->indices = indices;
 	this->textures = textures;
 	
-	VBO = -1;
-	VAO = -1;
-	EBO = -1;
 }
 
 void Mesh::Draw(Shader* shader) {
