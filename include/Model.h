@@ -16,10 +16,12 @@ class Model {
 public:
     Model(char* path);
     void Draw(Shader* shader);
+    std::string directory;
+    bool gammaCorrection;
+
 private:
     // model data
     std::vector<Mesh> meshes;
-    std::string directory;
     std::vector<Texture> texturesLoaded;
 
     void loadModel(std::string path);
