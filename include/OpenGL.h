@@ -5,6 +5,7 @@
 #include "windows.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window, Camera* camera, float deltaTime);

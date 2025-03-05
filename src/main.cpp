@@ -1,9 +1,11 @@
 #include <iostream>
 #include "windows.h"
 #include "../include/Shader.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
 #include "../include/stb_image.h"
@@ -165,8 +167,11 @@ int main() {
     lightShader->setMat4("view", view);
     lightShader->setMat4("projection", projection);*/
 
-    Shader modelShader("Shaders/ModelLoading.vert", "Shaders/ModelLoading.frag");
+    Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
 
+    modelShader.setMat4("model", model);
+    modelShader.setMat4("view", camera->lookAt);
+    modelShader.setMat4("projection", projection); 
     char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
     Model backpack(path);
 
@@ -189,6 +194,10 @@ int main() {
 
         // Process user input
         processInput(openGL.getWindow(), camera, deltaTime);
+
+        modelShader.setMat4("model", model);
+        modelShader.setMat4("view", camera->lookAt);
+        modelShader.setMat4("projection", projection);
 
         backpack.Draw(&modelShader);
         // Regular Cube Shader setup

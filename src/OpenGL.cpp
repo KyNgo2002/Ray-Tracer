@@ -20,6 +20,8 @@ OpenGL::OpenGL(const char* vertexSource, const char* fragSource, const char* lig
         std::cout << "Failed to initialize GLAD" << std::endl;
     }
 
+    stbi_set_flip_vertically_on_load(true);
+
     lastX = SCR_WIDTH / 2.0f;
     lastY = SCR_HEIGHT / 2.0f;
     firstMouse = true;
