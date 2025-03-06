@@ -11,6 +11,19 @@ void Model::Draw(Shader* shader) {
         meshes[i].Draw(shader);
 }
 
+size_t Model::getNumMeshes() {
+    return meshes.size();
+}
+
+size_t Model::getNumTextures() {
+    return texturesLoaded.size();
+}
+
+void Model::printMeshVertices() {
+    for (unsigned i = 0; i < meshes.size(); ++i) 
+        std::cout << meshes[i].getNumVertices() << std::endl;
+}
+
 void Model::loadModel(std::string path) {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);

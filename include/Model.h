@@ -14,11 +14,16 @@
 
 class Model {
 public:
+    // Constructor
     Model(char* path);
     void Draw(Shader* shader);
     std::string directory;
     bool gammaCorrection;
 
+    size_t getNumMeshes();
+    size_t getNumTextures();
+
+    void printMeshVertices();
 private:
     // model data
     std::vector<Mesh> meshes;
@@ -29,5 +34,7 @@ private:
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
         std::string typeName);
+
+    
 };
 
