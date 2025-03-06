@@ -107,7 +107,6 @@ int main() {
     glm::mat4 projection = 
         glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
 
-    glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
     /*unsigned int diffuseMap = loadTexture("./Textures/container.png");
     unsigned int specularMap = loadTexture("./Textures/container1.png");*/
@@ -121,52 +120,43 @@ int main() {
     cubeShader->setMat4("view", camera->lookAt);
     cubeShader->setMat4("projection", projection);*/
     
-    // point light 1
-    cubeShader->setVec3("pointLights[0].position", pointLightPositions[0]);
-    cubeShader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[0].constant", 1.0f);
-    cubeShader->setFloat("pointLights[0].linear", 0.09f);
-    cubeShader->setFloat("pointLights[0].quadratic", 0.032f);
-    // point light 2
-    cubeShader->setVec3("pointLights[1].position", pointLightPositions[1]);
-    cubeShader->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[1].constant", 1.0f);
-    cubeShader->setFloat("pointLights[1].linear", 0.09f);
-    cubeShader->setFloat("pointLights[1].quadratic", 0.032f);
-    // point light 3
-    cubeShader->setVec3("pointLights[2].position", pointLightPositions[2]);
-    cubeShader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[2].constant", 1.0f);
-    cubeShader->setFloat("pointLights[2].linear", 0.09f);
-    cubeShader->setFloat("pointLights[2].quadratic", 0.032f);
-    // point light 4
-    cubeShader->setVec3("pointLights[3].position", pointLightPositions[3]);
-    cubeShader->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-    cubeShader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-    cubeShader->setFloat("pointLights[3].constant", 1.0f);
-    cubeShader->setFloat("pointLights[3].linear", 0.09f);
-    cubeShader->setFloat("pointLights[3].quadratic", 0.032f);
+    //// point light 1
+    //cubeShader->setVec3("pointLights[0].position", pointLightPositions[0]);
+    //cubeShader->setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[0].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[0].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[0].quadratic", 0.032f);
+    //// point light 2
+    //cubeShader->setVec3("pointLights[1].position", pointLightPositions[1]);
+    //cubeShader->setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[1].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[1].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[1].quadratic", 0.032f);
+    //// point light 3
+    //cubeShader->setVec3("pointLights[2].position", pointLightPositions[2]);
+    //cubeShader->setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[2].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[2].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[2].quadratic", 0.032f);
+    //// point light 4
+    //cubeShader->setVec3("pointLights[3].position", pointLightPositions[3]);
+    //cubeShader->setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+    //cubeShader->setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    //cubeShader->setFloat("pointLights[3].constant", 1.0f);
+    //cubeShader->setFloat("pointLights[3].linear", 0.09f);
+    //cubeShader->setFloat("pointLights[3].quadratic", 0.032f);
 
-    cubeShader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    cubeShader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    cubeShader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-    cubeShader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-
-    // Light shader
-    lightShader->use();
-    model = glm::translate(model, lightPos);
-    model = glm::scale(model, glm::vec3(0.2f));
-    lightShader->setMat4("model", model);
-    lightShader->setMat4("view", view);
-    lightShader->setMat4("projection", projection);
-
+    //cubeShader->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    //cubeShader->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    //cubeShader->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    //cubeShader->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 
     // Model 
     Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
@@ -177,7 +167,6 @@ int main() {
 
     // Model loading
     Model backpack(path);
-    backpack.printMeshVertices();
 
     auto prevTime = GetTickCount64();
     auto currTime = GetTickCount64();
@@ -193,12 +182,13 @@ int main() {
         prevTime = currTime;
 
         // Clean Frame
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Process user input
         processInput(openGL.getWindow(), camera, deltaTime);
 
+        modelShader.use();
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
@@ -225,17 +215,17 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
         // Light Cube shader setup
-        lightShader->use();
-        lightShader->setMat4("view", camera->lookAt);
+        /*lightShader->use();
+        lightShader->setMat4("view", camera->lookAt);*/
         
-        glBindVertexArray(lightCubeVAO);
+        /*glBindVertexArray(lightCubeVAO);
         for (int i = 0; i < 4; ++i) {
             model = glm::mat4(1.0f);
             model = glm::translate(model, pointLightPositions[i]);
             model = glm::scale(model, glm::vec3(0.2f));
             lightShader->setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        }*/
 
         calculateFPS(runningFrameCount, totalFrames);
 

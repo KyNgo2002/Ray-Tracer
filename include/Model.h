@@ -17,6 +17,7 @@ public:
     // Constructor
     Model(char* path);
     void Draw(Shader* shader);
+
     std::string directory;
     bool gammaCorrection;
 
