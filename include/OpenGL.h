@@ -40,6 +40,5 @@ public:
 	unsigned getScreenWidth();
 	unsigned getScreenHeight();
 	
-	
 };
 
