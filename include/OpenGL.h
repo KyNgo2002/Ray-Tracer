@@ -20,8 +20,8 @@ private:
 	Shader* shader;
 	Shader* lightShader;
 
-	const unsigned SCR_WIDTH = 1000;
-	const unsigned SCR_HEIGHT = 800;
+	const float SCR_WIDTH = 1000;
+	const float SCR_HEIGHT = 800;
 
 public:
 	float lastX;
@@ -37,8 +37,8 @@ public:
 	Shader* getShader();
 	Shader* getLightShader();
 
-	unsigned getScreenWidth();
-	unsigned getScreenHeight();
+	float getScreenWidth();
+	float getScreenHeight();
 	
 };
 

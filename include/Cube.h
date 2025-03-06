@@ -57,11 +57,17 @@ private:
     };
 
     unsigned int VAO, VBO;
+    Camera* camera;
+    float scrWidth, scrHeight;
     std::vector<glm::mat4> cubeModelMatrices;
+    glm::mat4 projection;
 public:
-    Cube();
-    void Draw(Shader* shader);
+    Cube(Camera* camera, float scrWidth, float scrHeight);
+    ~Cube();
+    void draw(Shader* shader);
     void addCube();
     void translateCube(unsigned index, glm::vec3& translationUnit);
+    void scaleCube(unsigned index, glm::vec3& scaleUnit);
+
 };
 

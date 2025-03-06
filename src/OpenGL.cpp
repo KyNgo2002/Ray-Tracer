@@ -56,11 +56,11 @@ Shader* OpenGL::getLightShader() {
     return lightShader;
 }
 
-unsigned OpenGL::getScreenWidth() {
+float OpenGL::getScreenWidth() {
     return SCR_WIDTH;
 }
 
-unsigned OpenGL::getScreenHeight() {
+float OpenGL::getScreenHeight() {
     return SCR_HEIGHT;
 }
 
