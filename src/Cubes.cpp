@@ -1,6 +1,6 @@
-#include "Cube.h"
+#include "Cubes.h"
 
-Cube::Cube(Camera* camera, float scrWidth, float scrHeight) :
+Cubes::Cubes(Camera* camera, float scrWidth, float scrHeight) :
 	  camera{camera}, 
       scrWidth{scrWidth}, 
       scrHeight{scrHeight}, 
@@ -23,12 +23,12 @@ Cube::Cube(Camera* camera, float scrWidth, float scrHeight) :
 	glBindVertexArray(0);
 }
 
-Cube::~Cube() {
+Cubes::~Cubes() {
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &VAO);
 }
 
-void Cube::draw(Shader* shader) {
+void Cubes::draw(Shader* shader) {
 	shader->use();
 	shader->setMat4("view", camera->lookAt);
 	shader->setMat4("projection", projection);
@@ -40,11 +40,11 @@ void Cube::draw(Shader* shader) {
 	glBindVertexArray(0);
 }
 
-void Cube::addCube() {
+void Cubes::addCube() {
 	cubeModelMatrices.push_back(glm::mat4(1.0f));
 }
 
-void Cube::translateCube(unsigned index, const glm::vec3& translationUnit) {
+void Cubes::translateCube(unsigned index, const glm::vec3& translationUnit) {
 	if (index >= cubeModelMatrices.size()) {
 		std::cerr << "Error::function::translateCube index out of bounds!" << std::endl;
 		return;
@@ -52,7 +52,7 @@ void Cube::translateCube(unsigned index, const glm::vec3& translationUnit) {
 	cubeModelMatrices[index] = glm::translate(cubeModelMatrices[index], translationUnit);
 }
 
-void Cube::scaleCube(unsigned index, const glm::vec3& scaleUnit) {
+void Cubes::scaleCube(unsigned index, const glm::vec3& scaleUnit) {
 	if (index >= cubeModelMatrices.size()) {
 		std::cerr << "Error::function::scaleCube index out of bounds!" << std::endl;
 		return;

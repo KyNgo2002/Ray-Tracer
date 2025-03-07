@@ -10,7 +10,7 @@
 #include "Shader.h"
 #include "Camera.h"
 
-class Cube {
+class Cubes {
 private:
     const float cubeData[288] = {
         // positions          // normals           // texture coords
@@ -64,8 +64,8 @@ private:
     std::vector<glm::mat4> cubeModelMatrices;
     
 public:
-    Cube(Camera* camera, float scrWidth, float scrHeight);
-    ~Cube();
+    Cubes(Camera* camera, float scrWidth, float scrHeight);
+    ~Cubes();
     void draw(Shader* shader);
     void addCube();
     void translateCube(unsigned index, const glm::vec3& translationUnit);

@@ -9,7 +9,8 @@
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
 #include "../include/Model.h"
-#include "Cube.h"
+#include "Cubes.h"
+#include "Planes.h"
 
 int main() {
     OpenGL openGL("Shaders/Vert.vert", "Shaders/Frag.frag", "Shaders/LightVert.vert", "Shaders/LightFrag.frag");
@@ -19,11 +20,14 @@ int main() {
    
     Camera* camera = openGL.getCamera();
 
-    Cube cube(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
+    Cubes cube(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
     cube.addCube();
     cube.addCube();
     cube.translateCube(1, glm::vec3(1.0f, 1.0f, 1.0f));
     cube.scaleCube(0, glm::vec3(0.5f, 0.1f, 2.2f));
+
+    Planes plane(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
+    plane.addPlane();
 
     // MVP matrices
     glm::mat4 model = glm::mat4(1.0f);
@@ -69,8 +73,10 @@ int main() {
         modelShader.setMat4("view", camera->lookAt);
         modelShader.setMat4("projection", projection);
 
-        backpack.Draw(&modelShader);
+        //backpack.Draw(&modelShader);
         cube.draw(lightShader);
+
+        plane.draw(lightShader);
 
         calculateFPS(runningFrameCount, totalFrames);
 
