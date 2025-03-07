@@ -1,10 +1,10 @@
 #include "Cube.h"
-#include "Camera.h"
 
-Cube::Cube(Camera* camera, float scrWidth, float scrHeight) : 
-	camera{ camera },
-	scrWidth{scrWidth}, scrHeight{scrHeight}, 
-	projection{glm::perspective(glm::radians(45.0f), scrWidth / scrHeight, 0.1f, 100.0f) }  {
+Cube::Cube(Camera* camera, float scrWidth, float scrHeight) :
+	  camera{camera}, 
+      scrWidth{scrWidth}, 
+      scrHeight{scrHeight}, 
+      projection{glm::perspective(glm::radians(45.0f), scrWidth / scrHeight, 0.1f, 100.0f)}  {
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -20,29 +20,31 @@ Cube::Cube(Camera* camera, float scrWidth, float scrHeight) :
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
-	glDeleteBuffers(1, &VBO);
 	glBindVertexArray(0);
 }
 
 Cube::~Cube() {
+	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &VAO);
 }
 
 void Cube::draw(Shader* shader) {
 	shader->use();
+	shader->setMat4("view", camera->lookAt);
 	shader->setMat4("projection", projection);
+	glBindVertexArray(VAO);
 	for (size_t i = 0; i < cubeModelMatrices.size(); ++i) {
 		shader->setMat4("model", cubeModelMatrices[i]);
-		
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+	glBindVertexArray(0);
 }
 
 void Cube::addCube() {
 	cubeModelMatrices.push_back(glm::mat4(1.0f));
 }
 
-void Cube::translateCube(unsigned index, glm::vec3& translationUnit) {
+void Cube::translateCube(unsigned index, const glm::vec3& translationUnit) {
 	if (index >= cubeModelMatrices.size()) {
 		std::cerr << "Error::function::translateCube index out of bounds!" << std::endl;
 		return;
@@ -50,7 +52,7 @@ void Cube::translateCube(unsigned index, glm::vec3& translationUnit) {
 	cubeModelMatrices[index] = glm::translate(cubeModelMatrices[index], translationUnit);
 }
 
-void Cube::scaleCube(unsigned index, glm::vec3& scaleUnit) {
+void Cube::scaleCube(unsigned index, const glm::vec3& scaleUnit) {
 	if (index >= cubeModelMatrices.size()) {
 		std::cerr << "Error::function::scaleCube index out of bounds!" << std::endl;
 		return;

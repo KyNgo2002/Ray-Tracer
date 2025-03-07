@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "Camera.h"
 
 class Cube {
 private:
@@ -59,15 +60,16 @@ private:
     unsigned int VAO, VBO;
     Camera* camera;
     float scrWidth, scrHeight;
-    std::vector<glm::mat4> cubeModelMatrices;
     glm::mat4 projection;
+    std::vector<glm::mat4> cubeModelMatrices;
+    
 public:
     Cube(Camera* camera, float scrWidth, float scrHeight);
     ~Cube();
     void draw(Shader* shader);
     void addCube();
-    void translateCube(unsigned index, glm::vec3& translationUnit);
-    void scaleCube(unsigned index, glm::vec3& scaleUnit);
+    void translateCube(unsigned index, const glm::vec3& translationUnit);
+    void scaleCube(unsigned index, const glm::vec3& scaleUnit);
 
 };
 
