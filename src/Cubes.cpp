@@ -60,6 +60,14 @@ void Cubes::scaleCube(unsigned index, const glm::vec3& scaleUnit) {
 	cubeModelMatrices[index] = glm::scale(cubeModelMatrices[index], scaleUnit);
 }
 
+void Cubes::rotateCube(unsigned index, float angle, const glm::vec3& axis) {
+	if (index >= cubeModelMatrices.size()) {
+		std::cerr << "Error::function::scaleCube index out of bounds!" << std::endl;
+		return;
+	}
+	cubeModelMatrices[index] = glm::rotate(cubeModelMatrices[index], glm::radians(angle), axis);
+}
+
 
 
 

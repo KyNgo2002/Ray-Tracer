@@ -28,6 +28,7 @@ public:
 	float lastY;
 	bool firstMouse;
 
+public:
 	// Constructors/Destructors
 	OpenGL(const char* vertexSource, const char* fragSource, const char* lightVertSource, const char* lightFragSource);
 

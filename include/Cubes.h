@@ -64,12 +64,18 @@ private:
     std::vector<glm::mat4> cubeModelMatrices;
     
 public:
+    // Constructor/Destructor
+    // ----------------------------------------------------
     Cubes(Camera* camera, float scrWidth, float scrHeight);
     ~Cubes();
+
+    // Helpers
+    //------------------------
     void draw(Shader* shader);
     void addCube();
     void translateCube(unsigned index, const glm::vec3& translationUnit);
     void scaleCube(unsigned index, const glm::vec3& scaleUnit);
+    void rotateCube(unsigned index, float angle, const glm::vec3& axis);
 
 };
 

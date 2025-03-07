@@ -21,6 +21,7 @@ public:
     std::string directory;
     bool gammaCorrection;
 
+public:
     size_t getNumMeshes();
     size_t getNumTextures();
 
@@ -30,12 +31,12 @@ private:
     std::vector<Mesh> meshes;
     std::vector<Texture> texturesLoaded;
 
+private:
     void loadModel(std::string path);
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
     std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type,
         std::string typeName);
-
     
 };
 

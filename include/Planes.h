@@ -26,6 +26,7 @@ private:
     float scrWidth, scrHeight;
     glm::mat4 projection;
     std::vector<glm::mat4> planeModelMatrices;
+
 public:
     Planes(Camera* camera, float scrWidth, float scrHeight);
     ~Planes();
@@ -33,5 +34,6 @@ public:
     void addPlane();
     void translatePlane(unsigned index, const glm::vec3& translationUnit);
     void scalePlane(unsigned index, const glm::vec3& scaleUnit);
+    void rotatePlane(unsigned index, float angle, const glm::vec3& axis);
 };
 

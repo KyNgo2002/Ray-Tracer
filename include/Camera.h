@@ -19,14 +19,17 @@ class Camera {
 private:
 	
 public:
+	// Camera
 	glm::vec3 camPosition;
 	glm::vec3 camFront;
 	glm::vec3 camUp;
 	glm::vec3 camRight;
 	glm::vec3 worldUp;
 
+	// View Matrix
 	glm::mat4 lookAt;
 
+public:
 	const float cameraSpeed = 0.01f;
 	const float MOUSE_SENSITIVITY = 0.05f;
 	float yaw;
@@ -34,8 +37,6 @@ public:
 
 	// Constructor
 	Camera(float scrWidth, float scrHeight);
-
-
 	void calculateLookAt();
 	
 	// Callbacks
@@ -43,7 +44,5 @@ public:
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 	void updateCameraVectors();
 
-	// Getters
-	
 };
 

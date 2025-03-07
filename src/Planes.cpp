@@ -59,3 +59,12 @@ void Planes::scalePlane(unsigned index, const glm::vec3& scaleUnit) {
 	}
 	planeModelMatrices[index] = glm::scale(planeModelMatrices[index], scaleUnit);
 }
+
+void Planes::rotatePlane(unsigned index, float angle, const glm::vec3& axis) {
+	if (index >= planeModelMatrices.size()) {
+		std::cerr << "Error::function::scaleCube index out of bounds!" << std::endl;
+		return;
+	}
+	planeModelMatrices[index] = glm::rotate(planeModelMatrices[index], glm::radians(angle), axis);
+}
+

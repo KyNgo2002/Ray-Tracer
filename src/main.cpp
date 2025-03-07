@@ -20,14 +20,16 @@ int main() {
    
     Camera* camera = openGL.getCamera();
 
-    Cubes cube(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
-    cube.addCube();
-    cube.addCube();
-    cube.translateCube(1, glm::vec3(1.0f, 1.0f, 1.0f));
-    cube.scaleCube(0, glm::vec3(0.5f, 0.1f, 2.2f));
+    Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
+    cubes.addCube();
+    cubes.addCube();
+    cubes.translateCube(1, glm::vec3(1.0f, 1.0f, 1.0f));
+    cubes.scaleCube(0, glm::vec3(0.5f, 0.1f, 2.2f));
 
-    Planes plane(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
-    plane.addPlane();
+    Planes planes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
+    planes.addPlane();
+    planes.scalePlane(0, glm::vec3(200.0f, 200.0f, 200.0f));
+    planes.rotatePlane(0, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
 
     // MVP matrices
     glm::mat4 model = glm::mat4(1.0f);
@@ -36,7 +38,7 @@ int main() {
     modelShader.setMat4("model", model);
     glm::mat4 projection = 
         glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
-
+    
     modelShader.setMat4("view", camera->lookAt);
     modelShader.setMat4("projection", projection); 
 
@@ -74,9 +76,9 @@ int main() {
         modelShader.setMat4("projection", projection);
 
         //backpack.Draw(&modelShader);
-        cube.draw(lightShader);
 
-        plane.draw(lightShader);
+        cubes.draw(lightShader);
+        planes.draw(lightShader);
 
         calculateFPS(runningFrameCount, totalFrames);
 

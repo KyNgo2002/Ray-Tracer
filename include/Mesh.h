@@ -35,9 +35,10 @@ public:
     std::vector<unsigned int> indices;
     std::vector<Texture>      textures;
 
+public:
+    // Helpers
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
     void Draw(Shader* shader);
-
     size_t getNumVertices();
 };
 

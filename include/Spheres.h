@@ -17,6 +17,7 @@ private:
     float scrWidth, scrHeight;
     glm::mat4 projection;
     std::vector<glm::mat4> cubeModelMatrices;
+
 public:
     Spheres(Camera* camera, float scrWidth, float scrHeight);
     ~Spheres();
