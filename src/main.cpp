@@ -22,6 +22,7 @@ int main() {
    
     Camera* camera = openGL.getCamera();
 
+    
     /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
     cubes.addCube();
     cubes.addCube();
@@ -71,6 +72,12 @@ int main() {
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
+
+    // Uniforms
+    glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
+    rayShader.setFloat("Radius", 0.5f);
+    rayShader.setVec2("Resolution", resolution);
+
 
 
     // Frame buffer
