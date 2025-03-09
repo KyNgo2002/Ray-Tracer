@@ -119,6 +119,12 @@
     </None>
     <None Include="lib\assimp-vc143-mt.dll" />
     <None Include="lib\assimp-vc143-mtd.dll" />
+    <None Include="Shaders\Ray.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Ray.Frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib">

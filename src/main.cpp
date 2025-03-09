@@ -17,24 +17,24 @@ bool raytracingOn = true;
 int main() {
     OpenGL openGL;
     
-    Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
-    Shader lightShader("Shaders\\LightVert.vert", "Shaders\\LightFrag.frag");
+    Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
+    //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
    
     Camera* camera = openGL.getCamera();
 
-    Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
+    /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
     cubes.addCube();
     cubes.addCube();
     cubes.translateCube(1, glm::vec3(1.0f, 1.0f, 1.0f));
-    cubes.scaleCube(0, glm::vec3(0.5f, 0.1f, 2.2f));
+    cubes.scaleCube(0, glm::vec3(0.5f, 0.1f, 2.2f));*/
 
-    Planes planes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
+    /*Planes planes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
     planes.addPlane();
     planes.scalePlane(0, glm::vec3(200.0f, 200.0f, 200.0f));
-    planes.rotatePlane(0, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+    planes.rotatePlane(0, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));*/
 
     // MVP matrices
-    glm::mat4 model = glm::mat4(1.0f);
+    /*glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
     model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
     modelShader.setMat4("model", model);
@@ -42,13 +42,37 @@ int main() {
         glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
     
     modelShader.setMat4("view", camera->lookAt);
-    modelShader.setMat4("projection", projection); 
+    modelShader.setMat4("projection", projection);*/ 
 
-    char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
+    //char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
 
     // Model loading
-    Model backpack(path);
-    
+    //Model backpack(path);
+    float vertices[] = {
+         -1.0f, -1.0f, 0.0f,
+         -1.0f, 1.0f, 0.0f,
+         1.0f, 1.0f, 0.0f,
+
+         1.0f, 1.0f, 0.0f,
+         1.0f, -1.0f, 0.0f,
+         -1.0f, -1.0f, 0.0f
+    };
+
+    rayShader.use();
+    unsigned rectVAO, rectVBO;
+    glGenVertexArrays(1, &rectVAO);
+    glGenBuffers(1, &rectVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(rectVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+
     // Frame buffer
     GLuint FBO, tex;
     glGenFramebuffers(1, &FBO);
@@ -88,15 +112,20 @@ int main() {
         // Process user input
         processInput(openGL.getWindow(), camera, deltaTime);
 
-        modelShader.use();
+        glBindVertexArray(rectVAO);
+        
+        rayShader.use();
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        /*modelShader.use();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
         modelShader.setMat4("model", model);
         modelShader.setMat4("view", camera->lookAt);
-        modelShader.setMat4("projection", projection);
+        modelShader.setMat4("projection", projection);*/
 
-        backpack.Draw(&modelShader);
+        //backpack.Draw(&modelShader);
 
         //cubes.draw(lightShader);
         //planes.draw(lightShader);
