@@ -17,8 +17,6 @@ class OpenGL {
 private:
 	GLFWwindow* window;
 	Camera* camera;
-	Shader* shader;
-	Shader* lightShader;
 
 	const float SCR_WIDTH = 1000;
 	const float SCR_HEIGHT = 800;
@@ -30,13 +28,11 @@ public:
 
 public:
 	// Constructors/Destructors
-	OpenGL(const char* vertexSource, const char* fragSource, const char* lightVertSource, const char* lightFragSource);
+	OpenGL();
 
 	// Getters/setters
 	Camera* getCamera();
 	GLFWwindow* getWindow();
-	Shader* getShader();
-	Shader* getLightShader();
 
 	float getScreenWidth();
 	float getScreenHeight();

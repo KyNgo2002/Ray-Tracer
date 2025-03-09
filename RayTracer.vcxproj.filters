@@ -134,5 +134,8 @@
     <Image Include="Textures\container1.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Textures\checker.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

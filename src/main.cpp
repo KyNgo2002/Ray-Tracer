@@ -12,11 +12,13 @@
 #include "Cubes.h"
 #include "Planes.h"
 
+bool raytracingOn = true;
+
 int main() {
-    OpenGL openGL("Shaders/Vert.vert", "Shaders/Frag.frag", "Shaders/LightVert.vert", "Shaders/LightFrag.frag");
+    OpenGL openGL;
     
     Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
-    Shader* lightShader = openGL.getLightShader();
+    Shader lightShader("Shaders\\LightVert.vert", "Shaders\\LightFrag.frag");
    
     Camera* camera = openGL.getCamera();
 
@@ -46,6 +48,25 @@ int main() {
 
     // Model loading
     Model backpack(path);
+    
+    // Frame buffer
+    GLuint FBO, tex;
+    glGenFramebuffers(1, &FBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 800, 600, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+    
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     auto prevTime = GetTickCount64();
     auto currTime = GetTickCount64();
@@ -75,10 +96,10 @@ int main() {
         modelShader.setMat4("view", camera->lookAt);
         modelShader.setMat4("projection", projection);
 
-        //backpack.Draw(&modelShader);
+        backpack.Draw(&modelShader);
 
-        cubes.draw(lightShader);
-        planes.draw(lightShader);
+        //cubes.draw(lightShader);
+        //planes.draw(lightShader);
 
         calculateFPS(runningFrameCount, totalFrames);
 
