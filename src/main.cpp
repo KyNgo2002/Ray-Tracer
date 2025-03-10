@@ -18,11 +18,11 @@ int main() {
     OpenGL openGL;
     
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
-    //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
-   
+
     Camera* camera = openGL.getCamera();
 
-    
+    //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
+   
     /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
     cubes.addCube();
     cubes.addCube();
@@ -75,10 +75,8 @@ int main() {
 
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setFloat("Radius", 0.5f);
+    rayShader.setFloat("Radius", 0.25f);
     rayShader.setVec2("Resolution", resolution);
-
-
 
     // Frame buffer
     GLuint FBO, tex;
