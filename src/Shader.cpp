@@ -118,6 +118,11 @@ void Shader::setFloat(const char* name, float f) {
 	glUniform1f(floatUniformLocation, f);
 }
 
+void Shader::setFloatv(const char* name, std::vector<float>& floats) {
+	int floatVUniformLocation = getUniformLocation(name);
+	glUniform1fv(floatVUniformLocation, floats.size(), floats.data());
+}
+
 void Shader::setVec2(const char* name, glm::vec2& vector) {
 	int vectorUniformLocation = getUniformLocation(name);
 	glUniform2f(vectorUniformLocation, vector[0], vector[1]);
@@ -165,12 +170,12 @@ void Shader::setMat4(const char* name, glm::mat4& matrix) {
 
 void Shader::setVec2v(const char* name, std::vector<glm::vec2>& vectors) {
 	int arrayUniformLocation = getUniformLocation(name);
-	glUniform4fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
+	glUniform2fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
 }
 
 void Shader::setVec3v(const char* name, std::vector<glm::vec3>& vectors) {
 	int arrayUniformLocation = getUniformLocation(name);
-	glUniform4fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
+	glUniform3fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
 }
 
 void Shader::setVec4v(const char* name, std::vector<glm::vec4>& vectors) {

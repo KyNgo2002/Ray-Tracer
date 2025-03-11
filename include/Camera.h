@@ -31,8 +31,8 @@ public:
 	glm::mat4 inversePerspective;
 
 public:
-	const float cameraSpeed = 0.01f;
-	const float MOUSE_SENSITIVITY = 0.05f;
+	const float cameraSpeed = 0.009f;
+	const float MOUSE_SENSITIVITY = 0.04f;
 	float yaw;
 	float pitch;
 

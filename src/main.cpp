@@ -75,17 +75,24 @@ int main() {
 
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setFloat("Radius", 0.5f);
+    //rayShader.setFloat("Radius", 0.5f);
     rayShader.setVec2("Resolution", resolution);
 
     
-
     std::vector<glm::vec3> spherePositions;
-    spherePositions.push_back(glm::vec3(0.0f));
-    //rayShader.setVec3v("SpherePositions", spherePositions);
+    std::vector<glm::vec3> sphereColors;
+    std::vector<float> sphereRadii;
 
+    spherePositions.push_back(glm::vec3(0.0f, 0.0f, -5.0f));
+    spherePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+    sphereColors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+    sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
+    sphereRadii.push_back(2.5f);
+    sphereRadii.push_back(1.0f);
 
-
+    rayShader.setVec3v("SpherePositions", spherePositions);
+    rayShader.setVec3v("SphereColors", sphereColors);
+    rayShader.setFloatv("SphereRadii", sphereRadii);
 
     // Frame buffer
     GLuint FBO, tex;

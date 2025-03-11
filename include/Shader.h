@@ -28,6 +28,8 @@ public:
 	void setFloat(const char* name, float f);
 
 	// Uniform Functionality (Vectors)
+	void setFloatv(const char* name, std::vector<float>& floats);
+
 	void setVec2(const char* name, glm::vec2& vector);
 	void setVec2(const char* name, float f0, float f1);
 	void setVec3(const char* name, glm::vec3& vector);
