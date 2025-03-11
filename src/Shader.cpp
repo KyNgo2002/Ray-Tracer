@@ -163,4 +163,19 @@ void Shader::setMat4(const char* name, glm::mat4& matrix) {
 	glUniformMatrix4fv(matrixUniformLocation, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
+void Shader::setVec2v(const char* name, std::vector<glm::vec2>& vectors) {
+	int arrayUniformLocation = getUniformLocation(name);
+	glUniform4fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
+}
+
+void Shader::setVec3v(const char* name, std::vector<glm::vec3>& vectors) {
+	int arrayUniformLocation = getUniformLocation(name);
+	glUniform4fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
+}
+
+void Shader::setVec4v(const char* name, std::vector<glm::vec4>& vectors) {
+	int arrayUniformLocation = getUniformLocation(name);
+	glUniform4fv(arrayUniformLocation, vectors.size(), &vectors[0][0]);
+}
+
 

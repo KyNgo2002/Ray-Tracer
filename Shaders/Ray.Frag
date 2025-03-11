@@ -5,6 +5,8 @@ out vec4 FragColor;
 uniform float Radius;
 uniform vec2 Resolution;
 
+uniform vec3 SpherePositions[1];
+
 void main() {
 	vec3 rayOrigin = vec3(0.0f, 0.0f, 1.0f);
 	vec3 rayDirection = normalize(vec3(gl_FragCoord.x / Resolution.x * 2.0f - 1.0f, 

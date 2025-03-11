@@ -78,6 +78,12 @@ int main() {
     rayShader.setFloat("Radius", 0.5f);
     rayShader.setVec2("Resolution", resolution);
 
+    glm::vec3 spherePositons[1] = {
+        glm::vec3(0.0f)
+    };
+
+
+
     // Frame buffer
     GLuint FBO, tex;
     glGenFramebuffers(1, &FBO);

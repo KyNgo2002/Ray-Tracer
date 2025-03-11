@@ -1,9 +1,11 @@
 #pragma once
 #include <glad/glad.h>
 #include <fstream>
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 class Shader {
 public:
@@ -37,4 +39,9 @@ public:
 	void setMat2(const char* name, glm::mat2& matrix);
 	void setMat3(const char* name, glm::mat3& matrix);
 	void setMat4(const char* name, glm::mat4& matrix);
+
+	// Uniform Functionality (Vectors)
+	void setVec2v(const char* name, std::vector<glm::vec2>& vectors);
+	void setVec3v(const char* name, std::vector<glm::vec3>& vectors);
+	void setVec4v(const char* name, std::vector<glm::vec4>& vectors);
 };
