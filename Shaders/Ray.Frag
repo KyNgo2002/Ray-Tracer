@@ -5,13 +5,21 @@ out vec4 FragColor;
 uniform float Radius;
 uniform vec2 Resolution;
 
-uniform vec3 SpherePositions[1];
+uniform vec3 CamPosition;
+uniform vec3 CamDirection;
+uniform vec3 CamRight;
+uniform vec3 CamUp;
+
+
+//uniform vec3 SpherePositions[1];
 
 void main() {
-	vec3 rayOrigin = vec3(0.0f, 0.0f, 1.0f);
-	vec3 rayDirection = normalize(vec3(gl_FragCoord.x / Resolution.x * 2.0f - 1.0f, 
-		gl_FragCoord.y / Resolution.y * 2.0f - 1.0f, -1.0f));
-	
+	vec2 uv = gl_FragCoord.xy / Resolution * 2.0f - 1.0f;
+
+	vec3 rayOrigin = CamPosition;
+	//vec3 rayDirection = normalize(vec3(uv.x, uv.y, -1.0f));
+	vec3 rayDirection = normalize(CamDirection + uv.x * CamRight + uv.y * CamUp);
+
 	vec3 lightDirection = normalize(vec3(-1.0f));
 
 	float a = dot(rayDirection, rayDirection);
@@ -34,6 +42,6 @@ void main() {
 	vec3 diffuse = d * vec3(1.0f, 0.0f, 1.0f);
 	vec3 specular = pow(max(dot(reflectDirection, rayOrigin), 0.0f), 32) * vec3(1.0f, 1.0f, 1.0f);
 	
-	FragColor = discriminant >= 0.0f ? FragColor = vec4(diffuse + specular, 1.0f) : 
+	FragColor = discriminant >= 0.0f ? FragColor = vec4(diffuse, 1.0f) : 
 		FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }

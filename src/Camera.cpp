@@ -1,12 +1,15 @@
 #include "../include/Camera.h"
 
 Camera::Camera(float scrWidth, float scrHeight)
-    : camPosition(glm::vec3(0.0f, 0.0f, 3.0f)),
+    : camPosition(glm::vec3(0.0f, 0.0f, 1.0f)),
       camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
       camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
       worldUp(camUp),
       camRight(glm::vec3(0.0f, 0.0f, 0.0f)),
-	  lookAt(glm::lookAt(camPosition, camPosition + camFront, camUp)) {
+	  lookAt(glm::lookAt(camPosition, camPosition + camFront, camUp)),
+      inverseLookAt(glm::inverse(lookAt)),
+      perspective(glm::perspective(glm::radians(45.0f), scrWidth / scrHeight, 0.1f, 100.0f)),
+      inversePerspective(glm::inverse(perspective)) {
 
     yaw = -90.0f;
     pitch = 0.0f;
@@ -15,6 +18,7 @@ Camera::Camera(float scrWidth, float scrHeight)
 
 void Camera::calculateLookAt() {
 	lookAt = glm::lookAt(camPosition, camPosition + camFront, camUp);
+    inverseLookAt = glm::inverse(lookAt);
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime) {

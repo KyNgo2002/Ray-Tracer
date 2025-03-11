@@ -16,8 +16,6 @@ enum CameraMovement {
 };
 
 class Camera {
-private:
-	
 public:
 	// Camera
 	glm::vec3 camPosition;
@@ -26,8 +24,11 @@ public:
 	glm::vec3 camRight;
 	glm::vec3 worldUp;
 
-	// View Matrix
+	// Matrices
 	glm::mat4 lookAt;
+	glm::mat4 inverseLookAt;
+	glm::mat4 perspective;
+	glm::mat4 inversePerspective;
 
 public:
 	const float cameraSpeed = 0.01f;

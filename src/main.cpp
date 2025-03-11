@@ -78,9 +78,12 @@ int main() {
     rayShader.setFloat("Radius", 0.5f);
     rayShader.setVec2("Resolution", resolution);
 
-    glm::vec3 spherePositons[1] = {
-        glm::vec3(0.0f)
-    };
+    
+
+    std::vector<glm::vec3> spherePositions;
+    spherePositions.push_back(glm::vec3(0.0f));
+    //rayShader.setVec3v("SpherePositions", spherePositions);
+
 
 
 
@@ -126,6 +129,11 @@ int main() {
         glBindVertexArray(rectVAO);
         
         rayShader.use();
+        rayShader.setVec3("CamPosition", camera->camPosition);
+        rayShader.setVec3("CamDirection", camera->camFront);
+        rayShader.setVec3("CamRight", camera->camRight);
+        rayShader.setVec3("CamUp", camera->camUp);
+
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         /*modelShader.use();
