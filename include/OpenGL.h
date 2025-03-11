@@ -18,8 +18,8 @@ private:
 	GLFWwindow* window;
 	Camera* camera;
 
-	const float SCR_WIDTH = 1000;
-	const float SCR_HEIGHT = 800;
+	const float SCR_WIDTH;
+	const float SCR_HEIGHT;
 
 public:
 	float lastX;
@@ -28,7 +28,7 @@ public:
 
 public:
 	// Constructors/Destructors
-	OpenGL();
+	OpenGL(float SCR_WIDTH, float SCR_HEIGHT);
 
 	// Getters/setters
 	Camera* getCamera();

@@ -6,13 +6,11 @@ uniform float Radius;
 uniform vec2 Resolution;
 
 void main() {
-	vec3 rayOrigin = vec3(0.0f, 0.0f, 2.0f);
-	vec3 rayDirection = (vec3(gl_FragCoord.x / Resolution.x * 2.0f - 1.0f, gl_FragCoord.y / Resolution.y * 2.0f - 1.0f, -1.0f));
+	vec3 rayOrigin = vec3(0.0f, 0.0f, 1.0f);
+	vec3 rayDirection = normalize(vec3(gl_FragCoord.x / Resolution.x * 2.0f - 1.0f, 
+		gl_FragCoord.y / Resolution.y * 2.0f - 1.0f, -1.0f));
 	
-	if (rayDirection.y <= 0) 
-		FragColor = vec4(1.0f);
-	else
-		FragColor = vec4(0.0f);
+	vec3 lightDirection = normalize(vec3(-1.0f));
 
 	float a = dot(rayDirection, rayDirection);
 	float b = 2.0f * dot(rayOrigin, rayDirection);
@@ -20,10 +18,20 @@ void main() {
 
 	float discriminant = b * b - 4.0f * a * c;
 
-	if (discriminant >= 0) 
-		FragColor = vec4(1.0f, 0.0f, 1.0f, 1.0f);
-	else if (discriminant < 0) 
-		FragColor = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	float farthestT = (-b + sqrt(discriminant)) / (2.0f * a);
+	float closestT = (-b - sqrt(discriminant)) / (2.0f * a);
 
-	// FragColor = vec4(1.0f);
+	vec3 hitpoint = (rayOrigin + rayDirection * closestT);
+
+	vec3 normal = normalize(hitpoint); 
+
+	float d = max(dot(normal, -lightDirection), 0.0f);
+
+	vec3 reflectDirection = reflect(lightDirection, normal);
+
+	vec3 diffuse = d * vec3(1.0f, 0.0f, 1.0f);
+	vec3 specular = pow(max(dot(reflectDirection, rayOrigin), 0.0f), 32) * vec3(1.0f, 1.0f, 1.0f);
+	
+	FragColor = discriminant >= 0.0f ? FragColor = vec4(diffuse + specular, 1.0f) : 
+		FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 }

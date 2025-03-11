@@ -1,6 +1,9 @@
 #include "OpenGL.h"
 
-OpenGL::OpenGL() : camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
+OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
+    SCR_WIDTH{ SCR_WIDTH },
+    SCR_HEIGHT{ SCR_HEIGHT },
+    camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

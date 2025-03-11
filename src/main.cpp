@@ -15,7 +15,7 @@
 bool raytracingOn = true;
 
 int main() {
-    OpenGL openGL;
+    OpenGL openGL(900.0f, 900.0f);
     
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
 
@@ -75,7 +75,7 @@ int main() {
 
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setFloat("Radius", 0.25f);
+    rayShader.setFloat("Radius", 0.5f);
     rayShader.setVec2("Resolution", resolution);
 
     // Frame buffer
