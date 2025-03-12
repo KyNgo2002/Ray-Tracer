@@ -125,6 +125,9 @@
     <None Include="Shaders\Ray.Frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\Temp.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib">
