@@ -27,19 +27,43 @@ uniform vec3 SpherePositions[2];
 uniform vec3 SphereColors[2];
 uniform float SphereRadii[2];
 
-HitPayload TraceRay(inout Ray ray) {
+HitPayload TraceRay(Ray ray) {
 	HitPayload payload;
 	payload.hitDistance = -1;
 
+	return payload;
+}
+
+void main() {
+	vec2 uv = gl_FragCoord.xy / Resolution * 2.0f - 1.0f;
 	int closestInd = -1;
 	float hitDistance = 3.402823466e+38;
+	vec3 rayDirection = normalize(CamDirection + uv.x * CamRight + uv.y * CamUp);
+	vec3 color = vec3(0.0f);
+
+	// Ray Creation
+	Ray ray;
+	ray.origin = CamPosition;
+	ray.direction = rayDirection;
+	
+	for (int i = 0; i < Bounces; ++i) {
+		HitPayload payload = TraceRay(ray);
+
+		if (payload.hitDistance == -1) {
+			color += vec4(0.6f, 0.7f, 0.9f, 1.0f) * 0.2;
+			break;
+		}
+		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
+		ray.direction = reflect(ray.direction, payload.worldNorm);
+		
+	}
 
 	for (int i = 0; i < 2; ++i) {
 		vec3 origin = CamPosition - SpherePositions[i];
 
-		float a = dot(ray.direction, ray.direction);
-		float b = 2.0f * dot(ray.origin, ray.direction);
-		float c = dot(ray.origin, ray.origin) - SphereRadii[i] * SphereRadii[i];
+		float a = dot(rayDirection, rayDirection);
+		float b = 2.0f * dot(origin, rayDirection);
+		float c = dot(origin, origin) - SphereRadii[i] * SphereRadii[i];
 
 		float discriminant = b * b - 4.0f * a * c;
 
@@ -53,45 +77,9 @@ HitPayload TraceRay(inout Ray ray) {
 		}
 	}
 
-	if (closestInd < 0) {
+	if (closestInd == -1) {
 		FragColor = vec4(0.6f, 0.7f, 0.9f, 1.0f);
-		payload.hitDistance = -1.0f;
-		return payload;
-	}
-	else {
-		payload.objInd = closestInd;
-		payload.hitDistance = hitDistance;
-	}
-
-	return payload;
-}
-
-void main() {
-	vec2 uv = gl_FragCoord.xy / Resolution * 2.0f - 1.0f;
-	int closestInd = -1;
-	float hitDistance = 3.402823466e+38;
-	vec3 rayDirection = normalize(CamDirection + uv.x * CamRight + uv.y * CamUp);
-	vec3 color = vec3(0.0f);
-	float multiplier = 1.0f;
-	// Ray Creation
-	Ray ray;
-	ray.origin = CamPosition;
-	ray.direction = rayDirection;
-	
-	for (int i = 0; i < Bounces; ++i) {
-		HitPayload payload = TraceRay(ray);
-
-		if (payload.hitDistance == -1) {
-			color += vec4(0.6f, 0.7f, 0.9f, 1.0f) * 0.2;
-			break;
-		}
-		// Add Color contribution
-		color += SphereColors[payload.objInd] * multiplier;
-		// Set new ray parameters
-		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		ray.direction = reflect(ray.direction, payload.worldNorm);
-		// Reduce multiplier
-		multiplier *= 0.7;
+		return;
 	}
 
 	vec3 rayOrigin = CamPosition - SpherePositions[closestInd];

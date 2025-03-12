@@ -75,9 +75,8 @@ int main() {
 
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    //rayShader.setFloat("Radius", 0.5f);
     rayShader.setVec2("Resolution", resolution);
-
+    rayShader.setInt("Bounces", 1);
     
     std::vector<glm::vec3> spherePositions;
     std::vector<glm::vec3> sphereColors;
