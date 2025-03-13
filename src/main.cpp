@@ -11,6 +11,8 @@
 #include "../include/Model.h"
 #include "Cubes.h"
 #include "Planes.h"
+#include <time.h>
+#include <cstdlib>
 
 bool raytracingOn = true;
 
@@ -21,6 +23,7 @@ int main() {
 
     Camera* camera = openGL.getCamera();
 
+    srand(time(0));
     //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
    
     /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
@@ -78,21 +81,32 @@ int main() {
     rayShader.setInt("NumSpheres", 2);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 2);
-    
+    rayShader.setInt("Time", rand() % 100);
+
     std::vector<glm::vec3> spherePositions;
     std::vector<glm::vec3> sphereColors;
     std::vector<float> sphereRadii;
+    std::vector<float> roughness;
+    std::vector<float> metallic;
 
     spherePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-    spherePositions.push_back(glm::vec3(0.0f, -9.2f, 0.0f));
+    spherePositions.push_back(glm::vec3(0.0f, -101.f, 0.0f));
     sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
     sphereColors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
-    sphereRadii.push_back(0.5f);
-    sphereRadii.push_back(8.6f);
+
+    sphereRadii.push_back(1.0f);
+    sphereRadii.push_back(100.0f);
+    roughness.push_back(0.5f);
+    roughness.push_back(0.5f);
+    metallic.push_back(0.5f);
+    metallic.push_back(0.5);
 
     rayShader.setVec3v("SpherePositions", spherePositions);
     rayShader.setVec3v("SphereColors", sphereColors);
     rayShader.setFloatv("SphereRadii", sphereRadii);
+    //rayShader.setFloatv("Roughness", roughness);
+    //rayShader.setFloatv("Metallic", metallic);
+
 
     // Frame buffer
     GLuint FBO, tex;
@@ -140,6 +154,8 @@ int main() {
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
+        rayShader.setInt("time", rand());
+
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
