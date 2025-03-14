@@ -38,28 +38,21 @@ uniform vec3 CamUp;
 out vec4 FragColor;
 
 uint32_t PCG_HASH(uint32_t seed) {
-	uint32_t state = seed * 747796405u + 2891336453u;
-	uint32_t word = ((state >> (( state >> 28u) + 4u)) ^ state) * 277803737u;
-	return (word >> 22u) ^ word;
+	uint32_t state = seed * (747796405u) + (2891336453u);
+	uint32_t word = ((state >> (( state >> (28u)) + (4u))) ^ state) * (277803737u);
+	return (word >> (22u)) ^ word;
 }
 
 float RandomFloat(inout uint32_t seed) {
 	seed = PCG_HASH(seed);
-	return (float)seed / (float)4,294,967,295;
-}
-
-
-float hash(vec2 p) {
-    vec3 p3 = fract(vec3(p.xyx) * 443.8975);
-    p3 += dot(p3, p3.yzx + 19.19);
-    return fract((p3.x + p3.y) * p3.z);
+	return (float)seed / (float)(4294967295u);
 }
 
 vec3 generateRandVec(inout uint32_t seed) {
 	return vec3(
-		RandomFloat(seed) * 2.0f - 1.0f,
-		RandomFloat(seed) * 2.0f - 1.0f,
-		RandomFloat(seed) * 2.0f - 1.0f
+		RandomFloat(seed) - 0.5f,
+		RandomFloat(seed) - 0.5f,
+		RandomFloat(seed) - 0.5f
 	);
 }
 
@@ -101,17 +94,14 @@ HitPayload TraceRay(inout Ray ray) {
 		payload.worldNorm = normalize(payload.worldPos);
 		payload.worldPos += SpherePositions[closestInd];
 	}
-
 	return payload;
 }
 
 void main() {
-	vec2 uv = gl_FragCoord.xy / Resolution * 2.0f - 1.0f;
-	vec2 uvHash = hash2d(uv);
-
+	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
 	vec3 color = vec3(0.0f);
 	float multiplier = 1.0f;
-	uint32_t seed = (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
+	uint32_t seed = Time + (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y;
 
 	// Ray Creation
 	Ray ray;
@@ -122,38 +112,24 @@ void main() {
 		seed += i;
 		HitPayload payload = TraceRay(ray);
 		
-		if (payload.hitDistance == -1) {
+		if (payload.hitDistance < 0.0f) {
 			color += vec3(0.6f, 0.7f, 0.9f) * multiplier;
 			break;
 		}
 		// Add Color contribution
 		vec3 lightDirection = normalize(vec3(-1.0f));
 		float lightIntensity = max(dot(payload.worldNorm, -lightDirection), 0.0f);
+
 		vec3 sphereColor = SphereColors[payload.objInd];
 		sphereColor *= lightIntensity;
-		color += sphereColor * multiplier;
+		//color += sphereColor * multiplier;
 
 		// Set new ray parameters
 		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		ray.direction = reflect(ray.direction, payload.worldNorm);
-		//ray.direction = reflect(ray.direction, payload.worldNorm + 0.01f * generateRandVec(seed));
-		//ray.direction = normalize(payload.worldNorm);
+		ray.direction = reflect(ray.direction, payload.worldNorm + 1.0f * generateRandVec(seed));
 		// Reduce multiplier
 		multiplier *= 0.5;
 	}
-
-	//vec3 rayOrigin = CamPosition - SpherePositions[closestInd];
-	//vec3 hitPoint = rayOrigin + rayDirection * hitDistance;
-	//vec3 lightDirection = normalize(vec3(-1.0f));
-
-	//vec3 normal = normalize(hitPoint); 
-
-	//float d = max(dot(normal, -lightDirection), 0.0f);
-
-	//vec3 reflectDirection = reflect(lightDirection, normal);
-
-	//vec3 diffuse = d * SphereColors[closestInd];
-	//vec3 specular = pow(max(dot(reflectDirection, rayOrigin), 0.0f), 1) * vec3(1.0f, 1.0f, 1.0f);
 	
 	FragColor = vec4(color , 1.0f);
 }
