@@ -54,13 +54,14 @@ int main() {
     // Model loading
     //Model backpack(path);
     float vertices[] = {
-         -1.0f, -1.0f, 0.0f,
-         -1.0f, 1.0f, 0.0f,
-         1.0f, 1.0f, 0.0f,
+        // Vertex Coords        Texture Coords
+         -1.0f, -1.0f, 0.0f,    0.0f, 0.0f,
+         -1.0f, 1.0f, 0.0f,     0.0f, 1.0f,
+         1.0f, 1.0f, 0.0f,      1.0f, 1.0f,
 
-         1.0f, 1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         -1.0f, -1.0f, 0.0f
+         1.0f, 1.0f, 0.0f,      1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f,     1.0f, 0.0f,
+         -1.0f, -1.0f, 0.0f,    0.0f, 0.0f
     };
 
     rayShader.use();
@@ -72,11 +73,20 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindVertexArray(rectVAO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+
+    screenShader.use();
+    glBindVertexArray(rectVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
+    rayShader.use();
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 2);
@@ -110,12 +120,12 @@ int main() {
 
 
     // Frame buffer objects
-    GLuint FBO, tex;
-    glGenFramebuffers(1, &FBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+    GLuint accumulationFBO, accumulationTex;
+    glGenFramebuffers(1, &accumulationFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
 
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &accumulationTex);
+    glBindTexture(GL_TEXTURE_2D, accumulationTex);
 
     // use GL_RGBA32F if higher floating point precision needed.
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
@@ -123,7 +133,7 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Attach texture to framebuffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumulationTex, 0);
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
@@ -143,14 +153,13 @@ int main() {
         float deltaTime = currTime - prevTime;
         prevTime = currTime;
 
-        // Bind ray tracing framebuffer
-        //glBindFramebuffer(GL_FRAMEBUFFER, FBO);
-        // Clean Frame
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Process user input
+        // User input
         processInput(openGL.getWindow(), camera, deltaTime);
+
+        // Bind ray tracing framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
+        // Clean Frame
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glBindVertexArray(rectVAO);
         rayShader.use();
@@ -163,10 +172,13 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
-        /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         screenShader.use();
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glDrawArrays(GL_TRIANGLES, 0, 6);*/
+        glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
         /*modelShader.use();
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
@@ -186,7 +198,7 @@ int main() {
         glfwSwapBuffers(openGL.getWindow());
         glfwPollEvents();
     }
-    glDeleteFramebuffers(1, &FBO);
+    glDeleteFramebuffers(1, &accumulationFBO);
     glfwTerminate();
 	return 0;
 }

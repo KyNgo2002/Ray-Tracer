@@ -37,6 +37,8 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 
 }
 
