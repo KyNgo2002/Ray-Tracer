@@ -29,6 +29,7 @@ uniform int Time;
 uniform vec3 SpherePositions[2];
 uniform vec3 SphereColors[2];
 uniform float SphereRadii[2];
+uniform float Roughness[2];
 
 uniform vec3 CamPosition;
 uniform vec3 CamDirection;
@@ -122,11 +123,11 @@ void main() {
 
 		vec3 sphereColor = SphereColors[payload.objInd];
 		sphereColor *= lightIntensity;
-		//color += sphereColor * multiplier;
+		color += sphereColor * multiplier;
 
 		// Set new ray parameters
 		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		ray.direction = reflect(ray.direction, payload.worldNorm + 1.0f * generateRandVec(seed));
+		ray.direction = reflect(ray.direction, payload.worldNorm + Roughness[payload.objInd] * generateRandVec(seed));
 		// Reduce multiplier
 		multiplier *= 0.5;
 	}

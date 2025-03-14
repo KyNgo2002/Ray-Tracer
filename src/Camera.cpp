@@ -1,7 +1,7 @@
 #include "../include/Camera.h"
 
 Camera::Camera(float scrWidth, float scrHeight)
-    : camPosition(glm::vec3(0.0f, 0.0f, 1.0f)),
+    : camPosition(glm::vec3(0.0f, 0.0f, 2.0f)),
       camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
       camUp(glm::vec3(0.0f, 1.0f, 0.0f)),
       worldUp(camUp),
