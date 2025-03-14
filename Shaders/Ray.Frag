@@ -135,8 +135,8 @@ void main() {
 
 		// Set new ray parameters
 		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		//ray.direction = reflect(ray.direction, payload.worldNorm);
-		ray.direction = reflect(ray.direction, payload.worldNorm + 0.01f * generateRandVec(seed));
+		ray.direction = reflect(ray.direction, payload.worldNorm);
+		//ray.direction = reflect(ray.direction, payload.worldNorm + 0.01f * generateRandVec(seed));
 		//ray.direction = normalize(payload.worldNorm);
 		// Reduce multiplier
 		multiplier *= 0.5;

@@ -81,7 +81,8 @@ int main() {
     rayShader.setInt("NumSpheres", 2);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 2);
-    rayShader.setInt("Time", rand() % 100);
+    int time = rand() % 100;
+    rayShader.setInt("Time", time);
 
     std::vector<glm::vec3> spherePositions;
     std::vector<glm::vec3> sphereColors;
@@ -154,7 +155,8 @@ int main() {
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
-        rayShader.setInt("time", rand());
+        time = rand() % 100;
+        rayShader.setInt("Time", rand() % 100);
 
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
