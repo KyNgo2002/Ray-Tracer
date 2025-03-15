@@ -30,12 +30,14 @@ public:
 	glm::mat4 perspective;
 	glm::mat4 inversePerspective;
 
-public:
 	const float cameraSpeed = 0.009f;
 	const float MOUSE_SENSITIVITY = 0.04f;
 	float yaw;
 	float pitch;
+	int frames;
+	bool moved;
 
+public:
 	// Constructor
 	Camera(float scrWidth, float scrHeight);
 	void calculateLookAt();
@@ -44,6 +46,9 @@ public:
 	void processKeyboard(CameraMovement direction, float deltaTime);
 	void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
 	void updateCameraVectors();
+
+	// Modifiers
+	void setMoved();
 
 };
 

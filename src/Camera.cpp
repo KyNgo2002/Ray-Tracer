@@ -13,6 +13,9 @@ Camera::Camera(float scrWidth, float scrHeight)
 
     yaw = -90.0f;
     pitch = 0.0f;
+    frames = 1;
+    moved = false;
+
     updateCameraVectors();
 }
 
@@ -66,4 +69,8 @@ void Camera::updateCameraVectors() {
     // also re-calculate the Right and Up vector
     camRight = glm::normalize(glm::cross(camFront, worldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
     camUp = glm::normalize(glm::cross(camRight, camFront));
+}
+
+void Camera::setMoved() {
+    moved = true;
 }

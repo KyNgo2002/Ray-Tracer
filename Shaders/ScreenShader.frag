@@ -5,8 +5,8 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform uint Frames;
-uniform sampler2D screenTexture;
+uniform sampler2D ScreenTexture;
 
 void main() {
-	FragColor = texture(screenTexture, TexCoord) / Frames;
+	FragColor = texture(ScreenTexture, TexCoord) / Frames;
 }

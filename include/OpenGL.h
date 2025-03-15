@@ -8,7 +8,7 @@
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-bool processInput(GLFWwindow* window, Camera* camera, float deltaTime);
+void processInput(GLFWwindow* window, Camera* camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 

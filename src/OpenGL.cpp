@@ -37,8 +37,7 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0);
 
 }
 
@@ -62,37 +61,35 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-bool processInput(GLFWwindow* window, Camera* camera, float deltaTime) {
-    bool moved = false;
+void processInput(GLFWwindow* window, Camera* camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        moved = true;
+        camera->setMoved();
         camera->processKeyboard(FORWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        moved = true;
+        camera->setMoved();
         camera->processKeyboard(BACKWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        moved = true;
+        camera->setMoved();
         camera->processKeyboard(LEFT, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        moved = true;
+        camera->setMoved();
         camera->processKeyboard(RIGHT, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        moved = true;
+        camera->setMoved();
         camera->processKeyboard(UP, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        moved = true;
+        camera->setMoved();
         camera->processKeyboard(DOWN, deltaTime);
     }
-    if (moved) 
+    if (camera->moved) 
         camera->calculateLookAt();
-    return moved;
 }
 
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
@@ -129,6 +126,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
 
     instance->lastX = xpos;
     instance->lastY = ypos;
-
+    
     instance->getCamera()->ProcessMouseMovement(xoffset, yoffset);
+    instance->getCamera()->moved = true;
 }
