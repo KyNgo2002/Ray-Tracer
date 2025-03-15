@@ -125,9 +125,6 @@
     <None Include="Shaders\Ray.Frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\Temp.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\ScreenShader.vert">
       <Filter>Shaders</Filter>
     </None>

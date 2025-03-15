@@ -67,28 +67,28 @@ bool processInput(GLFWwindow* window, Camera* camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        camera->processKeyboard(FORWARD, deltaTime);
         moved = true;
+        camera->processKeyboard(FORWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        camera->processKeyboard(BACKWARD, deltaTime);
         moved = true;
+        camera->processKeyboard(BACKWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        camera->processKeyboard(LEFT, deltaTime);
         moved = true;
+        camera->processKeyboard(LEFT, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        camera->processKeyboard(RIGHT, deltaTime);
         moved = true;
+        camera->processKeyboard(RIGHT, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        camera->processKeyboard(UP, deltaTime);
         moved = true;
+        camera->processKeyboard(UP, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        camera->processKeyboard(DOWN, deltaTime);
         moved = true;
+        camera->processKeyboard(DOWN, deltaTime);
     }
     if (moved) 
         camera->calculateLookAt();
@@ -107,7 +107,7 @@ void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
         std::cout << "FPS: " << frames << std::endl;
         std::cout << "Average FPS: " << totalFrames / runningFrameCount - 1 << std::endl;
         lastTime = currentTime;
-        frames = 0;
+        frames = 1;
     }
 }
 

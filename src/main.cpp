@@ -40,6 +40,9 @@ int main() {
     srand(time(0));
 
     std::chrono::high_resolution_clock clock;
+
+    unsigned int frames = 1;
+
     //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
    
     /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
@@ -92,6 +95,8 @@ int main() {
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     screenShader.use();
     glBindVertexArray(rectVAO);
@@ -102,6 +107,8 @@ int main() {
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
+
+    screenShader.setUInt("Frames", frames);
 
     rayShader.use();
     // Uniforms
@@ -160,9 +167,11 @@ int main() {
     auto prevTime = clock.now();
     auto currTime = clock.now();
 
-    int frames = 0;
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
+
+    glBindTexture(GL_TEXTURE_2D, accumulationTex);
+
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -171,8 +180,12 @@ int main() {
         prevTime = currTime;
 
         // User input
-        bool moved = processInput(openGL.getWindow(), camera, deltaTime.count());
-
+        bool moved = processInput(openGL.getWindow(), camera, static_cast<float>(deltaTime.count()));
+        if (moved) {
+            glClear(GL_COLOR_BUFFER_BIT);
+            frames = 1;
+            screenShader.setUInt("Frames", frames);
+        }
         // First pass accumulation buffer
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
         rayShader.use();
@@ -187,7 +200,7 @@ int main() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         screenShader.use();
-        glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        screenShader.setUInt("Frames", frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // FPS
@@ -196,6 +209,7 @@ int main() {
         // Check Events and swap buffers
         glfwSwapBuffers(openGL.getWindow());
         glfwPollEvents();
+        frames++;
     }
     glDeleteFramebuffers(1, &accumulationFBO);
     glfwTerminate();

@@ -21,6 +21,10 @@ struct HitPayload {
 	int objInd;
 };
 
+in vec2 TexCoord;
+
+out vec4 FragColor;
+
 uniform int NumSpheres;
 uniform vec2 Resolution;
 uniform int Bounces;
@@ -36,7 +40,7 @@ uniform vec3 CamDirection;
 uniform vec3 CamRight;
 uniform vec3 CamUp;
 
-out vec4 FragColor;
+uniform sampler2D AccumulationTexture;
 
 uint32_t PCG_HASH(uint32_t seed) {
 	uint32_t state = seed * (747796405u) + (2891336453u);
@@ -132,5 +136,6 @@ void main() {
 		multiplier *= 0.5;
 	}
 	
-	FragColor = vec4(color , 1.0f);
+	//FragColor = vec4(color , 1.0f);
+	FragColor = texture(AccumulationTexture, TexCoord) + vec4(color, 1.0f);
 }

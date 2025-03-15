@@ -25,6 +25,7 @@ public:
 
 	// Uniform Functionality (Constants)
 	void setInt(const char* name, int i);
+	void setUInt(const char* name, unsigned int i);
 	void setFloat(const char* name, float f);
 
 	// Uniform Functionality (Vectors)
