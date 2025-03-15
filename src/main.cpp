@@ -130,7 +130,7 @@ int main() {
     sphereRadii.push_back(1.0f);
     sphereRadii.push_back(100.0f);
     roughness.push_back(0.0f);
-    roughness.push_back(0.5f);
+    roughness.push_back(0.8f);
     metallic.push_back(0.5f);
     metallic.push_back(0.5);
 
@@ -168,7 +168,6 @@ int main() {
     long long totalFrames = 0;
 
     glBindTexture(GL_TEXTURE_2D, accumulationTex);
-
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
