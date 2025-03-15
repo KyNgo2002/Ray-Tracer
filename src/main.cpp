@@ -1,5 +1,8 @@
 #include <iostream>
 #include "windows.h"
+#include <chrono>
+#include <time.h>
+#include <cstdlib>
 #include "../include/Shader.h"
 
 #include <glm/glm.hpp>
@@ -11,8 +14,18 @@
 #include "../include/Model.h"
 #include "Cubes.h"
 #include "Planes.h"
-#include <time.h>
-#include <cstdlib>
+
+// Model Code
+/*modelShader.use();
+glm::mat4 model = glm::mat4(1.0f);
+model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+modelShader.setMat4("model", model);
+modelShader.setMat4("view", camera->lookAt);
+modelShader.setMat4("projection", projection);*/
+
+//backpack.Draw(&modelShader);
+
 
 int main() {
     const float SCREEN_SIZE = 900.0f;
@@ -25,6 +38,8 @@ int main() {
     Camera* camera = openGL.getCamera();
 
     srand(time(0));
+
+    std::chrono::high_resolution_clock clock;
     //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
    
     /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
@@ -53,6 +68,8 @@ int main() {
 
     // Model loading
     //Model backpack(path);
+
+
     float vertices[] = {
         // Vertex Coords        Texture Coords
          -1.0f, -1.0f, 0.0f,    0.0f, 0.0f,
@@ -118,7 +135,6 @@ int main() {
     rayShader.setFloatv("Roughness", roughness);
     //rayShader.setFloatv("Metallic", metallic);
 
-
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
@@ -139,59 +155,42 @@ int main() {
         std::cerr << "Framebuffer not complete!" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindVertexArray(rectVAO);
 
-    auto prevTime = GetTickCount64();
-    auto currTime = GetTickCount64();
+    auto prevTime = clock.now();
+    auto currTime = clock.now();
 
+    int frames = 0;
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
-
         // Per frame time logic
-        currTime = GetTickCount64();
-        float deltaTime = currTime - prevTime;
+        currTime = clock.now();
+        auto deltaTime = duration_cast<std::chrono::milliseconds>(currTime - prevTime);
         prevTime = currTime;
 
         // User input
-        processInput(openGL.getWindow(), camera, deltaTime);
+        bool moved = processInput(openGL.getWindow(), camera, deltaTime.count());
 
-        // Bind ray tracing framebuffer
+        // First pass accumulation buffer
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
-        // Clean Frame
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glBindVertexArray(rectVAO);
         rayShader.use();
         rayShader.setVec3("CamPosition", camera->camPosition);
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
         rayShader.setInt("Time", rand());
-
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         screenShader.use();
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        /*modelShader.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-        modelShader.setMat4("model", model);
-        modelShader.setMat4("view", camera->lookAt);
-        modelShader.setMat4("projection", projection);*/
-
-        //backpack.Draw(&modelShader);
-
-        //cubes.draw(lightShader);
-        //planes.draw(lightShader);
-
+        // FPS
         calculateFPS(runningFrameCount, totalFrames);
 
         // Check Events and swap buffers
