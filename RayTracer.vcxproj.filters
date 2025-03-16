@@ -102,12 +102,6 @@
     <None Include="Shaders\Vert.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\LightVert.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\LightFrag.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\Frag.frag">
       <Filter>Shaders</Filter>
     </None>
@@ -140,12 +134,6 @@
     <Library Include="lib\assimp-vc143-mtd.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Textures\container.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Textures\container1.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Textures\checker.png">
       <Filter>Resource Files</Filter>
     </Image>

@@ -180,8 +180,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\LightFrag.frag" />
-    <None Include="Shaders\LightVert.vert" />
     <None Include="Shaders\ModelLoading.frag" />
     <None Include="Shaders\ModelLoading.vert" />
     <None Include="Shaders\Ray.Frag" />
@@ -197,8 +195,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\checker.png" />
-    <Image Include="Textures\container.png" />
-    <Image Include="Textures\container1.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
