@@ -144,7 +144,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Planes.cpp" />
-    <ClCompile Include="src\Spheres.cpp" />
     <ClCompile Include="src\Cubes.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
@@ -167,7 +166,6 @@
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Model.h" />
-    <ClInclude Include="include\Spheres.h" />
     <ClInclude Include="include\Planes.h" />
   </ItemGroup>
   <ItemGroup>

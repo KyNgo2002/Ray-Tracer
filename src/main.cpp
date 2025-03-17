@@ -1,5 +1,4 @@
 #include <iostream>
-#include "windows.h"
 #include <chrono>
 #include <time.h>
 #include <cstdlib>
@@ -203,7 +202,7 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // FPS
-        calculateFPS(runningFrameCount, totalFrames);
+        calculateFPS( runningFrameCount, totalFrames);
 
         // Check Events and swap buffers
         glfwSwapBuffers(openGL.getWindow());

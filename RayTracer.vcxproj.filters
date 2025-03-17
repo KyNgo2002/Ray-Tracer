@@ -48,9 +48,6 @@
     <ClCompile Include="src\Cubes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Spheres.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Planes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +84,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Cubes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Spheres.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Planes.h">
