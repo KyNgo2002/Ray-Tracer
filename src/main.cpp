@@ -1,5 +1,5 @@
 #include <iostream>
-#include <chrono>
+#include <chrono> 
 #include <time.h>
 #include <cstdlib>
 #include "../include/Shader.h"
@@ -110,7 +110,7 @@ int main() {
     rayShader.use();
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("NumSpheres", 2);
+    rayShader.setInt("NumSpheres", 3);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 5);
     rayShader.setInt("Time", rand());
@@ -120,24 +120,41 @@ int main() {
     std::vector<float> sphereRadii;
     std::vector<float> roughness;
     std::vector<float> metallic;
+    std::vector<glm::vec3> emissionColor;
+    std::vector<float> emissionPower;
 
     spherePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     spherePositions.push_back(glm::vec3(0.0f, -101.f, 0.0f));
+    spherePositions.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
     sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
-    sphereColors.push_back(glm::vec3(0.0f, 0.0f, 1.0f));
+    sphereColors.push_back(glm::vec3(0.2f, 0.3f, 1.0f));
+    sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
 
     sphereRadii.push_back(1.0f);
     sphereRadii.push_back(100.0f);
+    sphereRadii.push_back(1.0f);
+
     roughness.push_back(0.0f);
-    roughness.push_back(0.8f);
+    roughness.push_back(0.1f);
+    roughness.push_back(0.1f);
     metallic.push_back(0.5f);
-    metallic.push_back(0.5);
+    metallic.push_back(0.5f);
+    metallic.push_back(0.5f);
+
+    emissionColor.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+    emissionColor.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
+    emissionColor.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
+    emissionPower.push_back(0.0f);
+    emissionPower.push_back(0.0f);
+    emissionPower.push_back(2.0f);
 
     rayShader.setVec3v("SpherePositions", spherePositions);
     rayShader.setVec3v("SphereColors", sphereColors);
     rayShader.setFloatv("SphereRadii", sphereRadii);
-    rayShader.setFloatv("Roughness", roughness);
+    //rayShader.setFloatv("Roughness", roughness);
     //rayShader.setFloatv("Metallic", metallic);
+    rayShader.setVec3v("EmissionColor", emissionColor);
+    rayShader.setFloatv("EmissionPower", emissionPower);
 
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;

@@ -30,10 +30,12 @@ uniform vec2 Resolution;
 uniform int Bounces;
 uniform int Time;
 
-uniform vec3 SpherePositions[2];
-uniform vec3 SphereColors[2];
-uniform float SphereRadii[2];
-uniform float Roughness[2];
+uniform vec3 SpherePositions[3];
+uniform vec3 SphereColors[3];
+uniform float SphereRadii[3];
+//uniform float Roughness[3];
+uniform vec3 EmissionColor[3];
+uniform float EmissionPower[3];
 
 uniform vec3 CamPosition;
 uniform vec3 CamDirection;
@@ -54,12 +56,13 @@ float RandomFloat(inout uint32_t seed) {
 }
 
 vec3 generateRandVec(inout uint32_t seed) {
-	return vec3(
-		RandomFloat(seed) - 0.5f,
-		RandomFloat(seed) - 0.5f,
-		RandomFloat(seed) - 0.5f
-	);
+	return normalize(vec3(
+		RandomFloat(seed) * 2.0f - 1.0f,
+		RandomFloat(seed) * 2.0f - 1.0f,
+		RandomFloat(seed) * 2.0f - 1.0f
+	));
 }
+
 
 HitPayload TraceRay(inout Ray ray) {
 	HitPayload payload;
@@ -104,8 +107,8 @@ HitPayload TraceRay(inout Ray ray) {
 
 void main() {
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
-	vec3 color = vec3(0.0f);
-	float multiplier = 1.0f;
+	vec3 light = vec3(0.0f);
+	vec3 contribution = vec3(1.0f);
 	uint32_t seed = Time + (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y;
 
 	// Ray Creation
@@ -118,24 +121,18 @@ void main() {
 		HitPayload payload = TraceRay(ray);
 		
 		if (payload.hitDistance < 0.0f) {
-			color += vec3(0.6f, 0.7f, 0.9f) * multiplier;
+			light += vec3(0.6f, 0.7f, 0.9f) * contribution;
 			break;
 		}
 		// Add Color contribution
-		vec3 lightDirection = normalize(vec3(-1.0f));
-		float lightIntensity = max(dot(payload.worldNorm, -lightDirection), 0.0f);
-
-		vec3 sphereColor = SphereColors[payload.objInd];
-		sphereColor *= lightIntensity;
-		color += sphereColor * multiplier;
+		contribution *= SphereColors[payload.objInd];
+		light += EmissionColor[payload.objInd] * EmissionPower[payload.objInd];
 
 		// Set new ray parameters
 		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		ray.direction = reflect(ray.direction, payload.worldNorm + Roughness[payload.objInd] * generateRandVec(seed));
-		// Reduce multiplier
-		multiplier *= 0.5;
+		ray.direction = normalize(payload.worldNorm + generateRandVec(seed));
 	}
 	
 	//FragColor = vec4(color , 1.0f);
-	FragColor = texture(AccumulationTexture, TexCoord) + vec4(color, 1.0f);
+	FragColor = texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f);
 }

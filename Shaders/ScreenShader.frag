@@ -8,5 +8,5 @@ uniform uint Frames;
 uniform sampler2D ScreenTexture;
 
 void main() {
-	FragColor = texture(ScreenTexture, TexCoord) / Frames;
+	FragColor = texture(ScreenTexture, TexCoord) / float(Frames);
 }
