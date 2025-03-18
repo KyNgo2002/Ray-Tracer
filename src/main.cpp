@@ -35,7 +35,6 @@ int main() {
     
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
-    Shader skyboxShader("Shaders\\Skybox.vert", "Shaders\\Skybox.frag");
 
     Camera* camera = openGL.getCamera();
 
@@ -71,7 +70,6 @@ int main() {
 
     // Model loading
     //Model backpack(path);
-
 
     float vertices[] = {
         // Vertex Coords        Texture Coords
@@ -179,65 +177,6 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Cube mapping
-    float skyboxVertices[] = {
-        // positions          
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
-    };
-
-    skyboxShader.use();
-    unsigned skyboxVAO, skyboxVBO;
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindVertexArray(0);
-
     std::vector<std::string> faces{
         "Textures\\skybox\\right.jpg",
         "Textures\\skybox\\left.jpg",
@@ -251,7 +190,6 @@ int main() {
     unsigned int cubeMapTextureID = loadCubemap(faces);
     stbi_set_flip_vertically_on_load(true);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
-    skyboxShader.setInt("skybox", 1);
 
     auto prevTime = clock.now();
     auto currTime = clock.now();
@@ -268,27 +206,8 @@ int main() {
         // User input
         processInput(openGL.getWindow(), camera, static_cast<float>(deltaTime.count()));
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        //// Draw skybox
-        glDepthFunc(GL_LEQUAL);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        skyboxShader.use();
-        glm::mat4 newView = glm::mat4(glm::mat3(camera->lookAt));
-        skyboxShader.setMat4("view", newView);
-        skyboxShader.setMat4("projection", camera->perspective);
-        skyboxShader.setInt("skybox", 1);
-
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
-        glDepthFunc(GL_LESS);
-
         // First pass accumulation buffer
-        /*glBindVertexArray(rectVAO);
+        glBindVertexArray(rectVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
         if (camera->moved) {
             glClear(GL_COLOR_BUFFER_BIT);
@@ -302,16 +221,22 @@ int main() {
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
         rayShader.setInt("Time", rand());
-        glDrawArrays(GL_TRIANGLES, 0, 6);*/
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
+        rayShader.setInt("Skybox", 1);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
-        /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClearColor(0.0f, 0.0f, 0.0f, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         screenShader.use();
         screenShader.setUInt("Frames", camera->frames);
-        glDrawArrays(GL_TRIANGLES, 0, 6);*/
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        
         // FPS
         calculateFPS( runningFrameCount, totalFrames);
 

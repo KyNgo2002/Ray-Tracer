@@ -43,6 +43,7 @@ uniform vec3 CamRight;
 uniform vec3 CamUp;
 
 uniform sampler2D AccumulationTexture;
+uniform samplerCube Skybox;
 
 uint32_t PCG_HASH(uint32_t seed) {
 	uint32_t state = seed * (747796405u) + (2891336453u);
@@ -121,7 +122,7 @@ void main() {
 		HitPayload payload = TraceRay(ray);
 		
 		if (payload.hitDistance < 0.0f) {
-			light += vec3(0.6f, 0.7f, 0.9f) * contribution;
+			light += texture(Skybox, ray.direction).rgb * contribution;
 			break;
 		}
 		// Add Color contribution
@@ -133,6 +134,5 @@ void main() {
 		ray.direction = normalize(payload.worldNorm + generateRandVec(seed));
 	}
 	
-	//FragColor = vec4(color , 1.0f);
 	FragColor = texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f);
 }
