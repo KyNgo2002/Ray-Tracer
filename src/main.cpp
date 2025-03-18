@@ -15,6 +15,24 @@
 #include "Cubes.h"
 #include "Planes.h"
 
+//Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
+
+    // MVP matrices
+    /*glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+    modelShader.setMat4("model", model);
+    glm::mat4 projection =
+        glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
+
+    modelShader.setMat4("view", camera->lookAt);
+    modelShader.setMat4("projection", projection);*/
+
+    //char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
+
+    // Model loading
+    //Model backpack(path);
+
 // Model Code
 /*modelShader.use();
 glm::mat4 model = glm::mat4(1.0f);
@@ -41,35 +59,6 @@ int main() {
     srand(time(0));
 
     std::chrono::high_resolution_clock clock;
-
-    //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
-   
-    /*Cubes cubes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
-    cubes.addCube();
-    cubes.addCube();
-    cubes.translateCube(1, glm::vec3(1.0f, 1.0f, 1.0f));
-    cubes.scaleCube(0, glm::vec3(0.5f, 0.1f, 2.2f));*/
-
-    /*Planes planes(camera, openGL.getScreenWidth(), openGL.getScreenHeight());
-    planes.addPlane();
-    planes.scalePlane(0, glm::vec3(200.0f, 200.0f, 200.0f));
-    planes.rotatePlane(0, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));*/
-
-    // MVP matrices
-    /*glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-    modelShader.setMat4("model", model);
-    glm::mat4 projection = 
-        glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
-    
-    modelShader.setMat4("view", camera->lookAt);
-    modelShader.setMat4("projection", projection);*/ 
-
-    //char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
-
-    // Model loading
-    //Model backpack(path);
 
     float vertices[] = {
         // Vertex Coords        Texture Coords
@@ -186,9 +175,7 @@ int main() {
         "Textures\\skybox\\back.jpg"
     };
     
-    stbi_set_flip_vertically_on_load(false);
     unsigned int cubeMapTextureID = loadCubemap(faces);
-    stbi_set_flip_vertically_on_load(true);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
     auto prevTime = clock.now();
@@ -235,7 +222,6 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
         
         // FPS
         calculateFPS( runningFrameCount, totalFrames);
@@ -254,6 +240,7 @@ unsigned int loadCubemap(std::vector<std::string> faces) {
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    stbi_set_flip_vertically_on_load(false);
 
     int width, height, nrChannels;
     for (unsigned int i = 0; i < faces.size(); i++) {
@@ -270,6 +257,8 @@ unsigned int loadCubemap(std::vector<std::string> faces) {
             stbi_image_free(data);
         }
     }
+    stbi_set_flip_vertically_on_load(true);
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
