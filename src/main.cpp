@@ -100,7 +100,7 @@ int main() {
     rayShader.use();
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("NumSpheres", 3);
+    rayShader.setInt("NumSpheres", 4);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 5);
     rayShader.setInt("Time", rand());
@@ -116,17 +116,23 @@ int main() {
     spherePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     spherePositions.push_back(glm::vec3(0.0f, -101.f, 0.0f));
     spherePositions.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
+    spherePositions.push_back(glm::vec3(-3.0f, 2.0f, 3.0f));
     sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
     sphereColors.push_back(glm::vec3(0.2f, 0.3f, 1.0f));
+    sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
     sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
 
     sphereRadii.push_back(1.0f);
     sphereRadii.push_back(100.0f);
     sphereRadii.push_back(1.0f);
+    sphereRadii.push_back(1.0f);
 
     roughness.push_back(0.0f);
-    roughness.push_back(0.1f);
-    roughness.push_back(0.1f);
+    roughness.push_back(1.0f);
+    roughness.push_back(1.0f);
+    roughness.push_back(0.0f);
+
+    metallic.push_back(0.5f);
     metallic.push_back(0.5f);
     metallic.push_back(0.5f);
     metallic.push_back(0.5f);
@@ -134,14 +140,17 @@ int main() {
     emissionColor.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     emissionColor.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     emissionColor.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
+    emissionColor.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
+
     emissionPower.push_back(0.0f);
     emissionPower.push_back(0.0f);
+    emissionPower.push_back(2.0f);
     emissionPower.push_back(2.0f);
 
     rayShader.setVec3v("SpherePositions", spherePositions);
     rayShader.setVec3v("SphereColors", sphereColors);
     rayShader.setFloatv("SphereRadii", sphereRadii);
-    //rayShader.setFloatv("Roughness", roughness);
+    rayShader.setFloatv("Roughness", roughness);
     //rayShader.setFloatv("Metallic", metallic);
     rayShader.setVec3v("EmissionColor", emissionColor);
     rayShader.setFloatv("EmissionPower", emissionPower);
@@ -207,6 +216,8 @@ int main() {
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
+        int time = rand();
+        srand(time);
         rayShader.setInt("Time", rand());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);

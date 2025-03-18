@@ -30,12 +30,12 @@ uniform vec2 Resolution;
 uniform int Bounces;
 uniform int Time;
 
-uniform vec3 SpherePositions[3];
-uniform vec3 SphereColors[3];
-uniform float SphereRadii[3];
-//uniform float Roughness[3];
-uniform vec3 EmissionColor[3];
-uniform float EmissionPower[3];
+uniform vec3 SpherePositions[4];
+uniform vec3 SphereColors[4];
+uniform float SphereRadii[4];
+uniform float Roughness[4];
+uniform vec3 EmissionColor[4];
+uniform float EmissionPower[4];
 
 uniform vec3 CamPosition;
 uniform vec3 CamDirection;
@@ -63,7 +63,6 @@ vec3 generateRandVec(inout uint32_t seed) {
 		RandomFloat(seed) * 2.0f - 1.0f
 	));
 }
-
 
 HitPayload TraceRay(inout Ray ray) {
 	HitPayload payload;
@@ -108,9 +107,11 @@ HitPayload TraceRay(inout Ray ray) {
 
 void main() {
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
+	vec2 uvHash = hash2d(uv);
 	vec3 light = vec3(0.0f);
 	vec3 contribution = vec3(1.0f);
-	uint32_t seed = Time + (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y;
+	uint32_t seed = (uint32_t)(uvHash.x * uvHash.y) + (uint32_t)gl_FragCoord.x * 
+		(uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
 
 	// Ray Creation
 	Ray ray;
@@ -118,7 +119,7 @@ void main() {
 	ray.direction = normalize(CamDirection + uv.x * CamRight + uv.y * CamUp);
 	
 	for (int i = 0; i < Bounces; ++i) {
-		seed += i;
+		seed += Time;
 		HitPayload payload = TraceRay(ray);
 		
 		if (payload.hitDistance < 0.0f) {
@@ -131,7 +132,7 @@ void main() {
 
 		// Set new ray parameters
 		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		ray.direction = normalize(payload.worldNorm + generateRandVec(seed));
+		ray.direction = normalize(payload.worldNorm + Roughness[payload.objInd] * generateRandVec(seed));
 	}
 	
 	FragColor = texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f);
