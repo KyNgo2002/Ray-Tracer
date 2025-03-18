@@ -184,6 +184,8 @@
     <None Include="Shaders\Ray.vert" />
     <None Include="Shaders\ScreenShader.frag" />
     <None Include="Shaders\ScreenShader.vert" />
+    <None Include="Shaders\Skybox.frag" />
+    <None Include="Shaders\Skybox.vert" />
     <None Include="Shaders\Vert.vert" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +195,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Textures\checker.png" />
+    <Image Include="Textures\skybox\back.jpg" />
+    <Image Include="Textures\skybox\bottom.jpg" />
+    <Image Include="Textures\skybox\front.jpg" />
+    <Image Include="Textures\skybox\left.jpg" />
+    <Image Include="Textures\skybox\right.jpg" />
+    <Image Include="Textures\skybox\top.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
