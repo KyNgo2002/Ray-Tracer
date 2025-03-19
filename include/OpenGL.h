@@ -8,7 +8,6 @@
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window, Camera* camera, float deltaTime);
 void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
@@ -26,6 +25,8 @@ public:
 	float lastY;
 	bool firstMouse;
 
+	bool editing;
+
 public:
 	// Constructors/Destructors
 	OpenGL(float SCR_WIDTH, float SCR_HEIGHT);
@@ -34,8 +35,12 @@ public:
 	Camera* getCamera();
 	GLFWwindow* getWindow();
 
+	// Getters/setters
 	float getScreenWidth();
 	float getScreenHeight();
-	
+	void changeEditingMode();
+
+	void processInput(float deltaTime);
+
 };
 

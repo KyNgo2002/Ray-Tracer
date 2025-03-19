@@ -19,7 +19,6 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
     }
@@ -29,13 +28,16 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     lastX = SCR_WIDTH / 2.0f;
     lastY = SCR_HEIGHT / 2.0f;
     firstMouse = true;
+    editing = false;
 
     // Store "this" pointer in GLFW's user pointer
     glfwSetWindowUserPointer(window, this);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (editing)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glEnable(GL_DEPTH_TEST);
@@ -59,11 +61,19 @@ float OpenGL::getScreenHeight() {
     return SCR_HEIGHT;
 }
 
+void OpenGL::changeEditingMode() {
+    editing = !editing;
+    if (editing)
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    else
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window, Camera* camera, float deltaTime) {
+void OpenGL::processInput(float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -89,6 +99,9 @@ void processInput(GLFWwindow* window, Camera* camera, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
         camera->setMoved();
         camera->processKeyboard(DOWN, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        changeEditingMode();
     }
     if (camera->moved) 
         camera->calculateLookAt();
@@ -119,7 +132,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     if (instance->firstMouse)
     {
         instance->lastX = xpos;
-        instance->lastY = ypos;
+        instance->lastY = ypos; 
         instance->firstMouse = false;
     }
 

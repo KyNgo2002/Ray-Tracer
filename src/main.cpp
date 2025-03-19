@@ -191,11 +191,35 @@ int main() {
     unsigned int cubeMapTextureID = loadCubemap(faces);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+    }
+
+    ImGui_ImplGlfw_InitForOpenGL(openGL.getWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 460");
+
     auto prevTime = clock.now();
     auto currTime = clock.now();
 
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
+
+    bool temp = false;
+    float testFloat = 0.0f;
+    glm::vec3 clearColor(1.0f);
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -203,8 +227,21 @@ int main() {
         auto deltaTime = duration_cast<std::chrono::milliseconds>(currTime - prevTime);
         prevTime = currTime;
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        
+        ImGui::Begin("Scene properties");
+        if (ImGui::CollapsingHeader("Sphere properties")) {
+            for (int i = 0; i < spherePositions.size(); ++i) {
+                ImGui::Text("Sphere %d", (i + 1));
+            }
+        }
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::End();
+        
         // User input
-        processInput(openGL.getWindow(), camera, static_cast<float>(deltaTime.count()));
+        openGL.processInput(static_cast<float>(deltaTime.count()));
 
         // First pass accumulation buffer
         glBindVertexArray(rectVAO);
@@ -237,7 +274,10 @@ int main() {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-        
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         // FPS
         calculateFPS( runningFrameCount, totalFrames);
 
@@ -246,6 +286,11 @@ int main() {
         glfwPollEvents();
         camera->frames++;
     }
+    // Cleanup ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glDeleteFramebuffers(1, &accumulationFBO);
     glfwTerminate();
 	return 0;
