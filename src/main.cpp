@@ -15,8 +15,12 @@
 #include "Cubes.h"
 #include "Planes.h"
 
-//Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
+#include "ImGui/imgui.h"
+#include "ImGui/backend/imgui_impl_glfw.h"
+#include "ImGui/backend/imgui_impl_opengl3.h"
 
+//Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
+ 
     // MVP matrices
     /*glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));

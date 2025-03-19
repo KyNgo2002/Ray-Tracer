@@ -17,6 +17,8 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cout << "Failed to initialize GLAD" << std::endl;
