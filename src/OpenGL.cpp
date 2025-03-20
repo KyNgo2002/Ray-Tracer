@@ -1,10 +1,13 @@
 #include "OpenGL.h"
 
+static void glfw_error_callback(int error, const char* description);
+
 OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     SCR_WIDTH{ SCR_WIDTH },
     SCR_HEIGHT{ SCR_HEIGHT },
     camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
 
+    glfwSetErrorCallback(glfw_error_callback);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -144,4 +147,8 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     
     instance->getCamera()->ProcessMouseMovement(xoffset, yoffset);
     instance->getCamera()->moved = true;
+}
+
+static void glfw_error_callback(int error, const char* description) {
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }

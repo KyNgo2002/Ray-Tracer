@@ -217,29 +217,12 @@ int main() {
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
 
-    bool temp = false;
-    float testFloat = 0.0f;
-    glm::vec3 clearColor(1.0f);
-
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
         currTime = clock.now();
         auto deltaTime = duration_cast<std::chrono::milliseconds>(currTime - prevTime);
         prevTime = currTime;
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        
-        ImGui::Begin("Scene properties");
-        if (ImGui::CollapsingHeader("Sphere properties")) {
-            for (int i = 0; i < spherePositions.size(); ++i) {
-                ImGui::Text("Sphere %d", (i + 1));
-            }
-        }
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-        ImGui::End();
-        
         // User input
         openGL.processInput(static_cast<float>(deltaTime.count()));
 
@@ -257,6 +240,13 @@ int main() {
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
+        rayShader.setVec3v("SpherePositions", spherePositions);
+        rayShader.setFloatv("SphereRadii", sphereRadii);
+        rayShader.setVec3v("SphereColors", sphereColors);
+        rayShader.setFloatv("Roughness", roughness);
+        rayShader.setVec3v("EmissionColor", emissionColor);
+        rayShader.setFloatv("EmissionPower", emissionPower);
+
         int time = rand();
         srand(time);
         rayShader.setInt("Time", rand());
@@ -275,8 +265,47 @@ int main() {
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        // If in editing mode, render ImGUI editing components
+        if (openGL.editing) {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            ImGui::Begin("Scene properties");
+
+            //ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+            //ImGui::DockSpace(dockspace_id);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+            ImGui::Separator();
+
+            for (int i = 0; i < spherePositions.size(); ++i) {
+                ImGui::Text("Sphere %d", (i + 1));
+
+                ImGui::PushID(i);
+                ImGui::DragFloat3("Position", glm::value_ptr(spherePositions[i]), 0.1f);
+                ImGui::ColorEdit3("Color", glm::value_ptr(sphereColors[i]));
+                ImGui::DragFloat("Radius", &sphereRadii[i], 0.1f);
+                ImGui::DragFloat("Roughness", &roughness[i], 0.01f, 0.0f, 1.0f);
+                ImGui::ColorEdit3("Emission Color", glm::value_ptr(emissionColor[i]));
+                ImGui::DragFloat("Emission Power", &emissionPower[i], 0.01f, 0.0f, 1.0f);
+                ImGui::Separator();
+                ImGui::PopID();
+            }
+
+            ImGui::End();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+                GLFWwindow* backup_current_context = glfwGetCurrentContext();
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+                glfwMakeContextCurrent(backup_current_context);
+            }
+        }
+        
 
         // FPS
         calculateFPS( runningFrameCount, totalFrames);
