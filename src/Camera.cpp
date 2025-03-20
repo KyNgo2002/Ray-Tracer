@@ -15,6 +15,7 @@ Camera::Camera(float scrWidth, float scrHeight)
     pitch = 0.0f;
     frames = 1;
     moved = false;
+    editing = false;
 
     updateCameraVectors();
 }
@@ -73,4 +74,8 @@ void Camera::updateCameraVectors() {
 
 void Camera::setMoved() {
     moved = true;
+}
+
+void Camera::changeEditingMode() {
+    editing = !editing;
 }

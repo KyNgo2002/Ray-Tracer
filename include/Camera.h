@@ -36,6 +36,7 @@ public:
 	float pitch;
 	int frames;
 	bool moved;
+	bool editing;
 
 public:
 	// Constructor
@@ -49,6 +50,7 @@ public:
 
 	// Modifiers
 	void setMoved();
+	void changeEditingMode();
 
 };
 

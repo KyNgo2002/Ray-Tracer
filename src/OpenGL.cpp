@@ -66,6 +66,7 @@ float OpenGL::getScreenHeight() {
 
 void OpenGL::changeEditingMode() {
     editing = !editing;
+    camera->changeEditingMode();
     if (editing)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     else
@@ -145,8 +146,10 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     instance->lastX = xpos;
     instance->lastY = ypos;
     
-    instance->getCamera()->ProcessMouseMovement(xoffset, yoffset);
-    instance->getCamera()->moved = true;
+    if (!instance->editing) {
+        instance->getCamera()->ProcessMouseMovement(xoffset, yoffset);
+        instance->getCamera()->moved = true;
+    }
 }
 
 static void glfw_error_callback(int error, const char* description) {

@@ -216,6 +216,7 @@ int main() {
 
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
+    bool edited = false;
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -229,7 +230,8 @@ int main() {
         // First pass accumulation buffer
         glBindVertexArray(rectVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
-        if (camera->moved) {
+        if (camera->moved || edited) {
+            edited = false;
             glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
@@ -278,17 +280,17 @@ int main() {
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::Separator();
-
+            
             for (int i = 0; i < spherePositions.size(); ++i) {
                 ImGui::Text("Sphere %d", (i + 1));
 
                 ImGui::PushID(i);
-                ImGui::DragFloat3("Position", glm::value_ptr(spherePositions[i]), 0.1f);
-                ImGui::ColorEdit3("Color", glm::value_ptr(sphereColors[i]));
-                ImGui::DragFloat("Radius", &sphereRadii[i], 0.1f);
-                ImGui::DragFloat("Roughness", &roughness[i], 0.01f, 0.0f, 1.0f);
-                ImGui::ColorEdit3("Emission Color", glm::value_ptr(emissionColor[i]));
-                ImGui::DragFloat("Emission Power", &emissionPower[i], 0.01f, 0.0f, 1.0f);
+                edited |= ImGui::DragFloat3("Position", glm::value_ptr(spherePositions[i]), 0.1f);
+                edited |= ImGui::ColorEdit3("Color", glm::value_ptr(sphereColors[i]));
+                edited |= ImGui::DragFloat("Radius", &sphereRadii[i], 0.1f);
+                edited |= ImGui::DragFloat("Roughness", &roughness[i], 0.01f, 0.0f, 1.0f);
+                edited |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(emissionColor[i]));
+                edited |= ImGui::DragFloat("Emission Power", &emissionPower[i], 0.01f, 0.0f, 1.0f);
                 ImGui::Separator();
                 ImGui::PopID();
             }
