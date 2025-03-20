@@ -39,7 +39,7 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    if (editing)
+    if (!editing)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);

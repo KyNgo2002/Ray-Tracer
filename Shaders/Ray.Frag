@@ -56,11 +56,18 @@ float RandomFloat(inout uint32_t seed) {
 	return (float)seed / (float)(4294967295u);
 }
 
+// Sebastian Lague : Coding Adventure Ray Tracing
+float randomFloatNormalDistribution(inout uint32_t seed) {
+	float theta = 2 * 3.1415926 * RandomFloat(seed);
+	float rho = sqrt(-2 * log(RandomFloat(seed)));
+	return rho * cos(theta);
+}
+
 vec3 generateRandVec(inout uint32_t seed) {
 	return normalize(vec3(
-		RandomFloat(seed) * 2.0f - 1.0f,
-		RandomFloat(seed) * 2.0f - 1.0f,
-		RandomFloat(seed) * 2.0f - 1.0f
+		randomFloatNormalDistribution(seed) * 2.0f - 1.0f,
+		randomFloatNormalDistribution(seed) * 2.0f - 1.0f,
+		randomFloatNormalDistribution(seed) * 2.0f - 1.0f
 	));
 }
 

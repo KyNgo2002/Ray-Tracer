@@ -122,7 +122,7 @@ int main() {
     spherePositions.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
     spherePositions.push_back(glm::vec3(-3.0f, 2.0f, 3.0f));
     sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
-    sphereColors.push_back(glm::vec3(0.2f, 0.3f, 1.0f));
+    sphereColors.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
     sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
     sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
 
@@ -159,6 +159,11 @@ int main() {
     rayShader.setVec3v("EmissionColor", emissionColor);
     rayShader.setFloatv("EmissionPower", emissionPower);
 
+    rayShader.setVec3("CamPosition", camera->camPosition);
+    rayShader.setVec3("CamDirection", camera->camFront);
+    rayShader.setVec3("CamRight", camera->camRight);
+    rayShader.setVec3("CamUp", camera->camUp);
+
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
@@ -191,6 +196,7 @@ int main() {
     unsigned int cubeMapTextureID = loadCubemap(faces);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
+    // ImGUI initialization
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -237,18 +243,20 @@ int main() {
             camera->frames = 1;
             screenShader.setUInt("Frames", camera->frames);
         }
+
         rayShader.use();
         rayShader.setVec3("CamPosition", camera->camPosition);
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
+        
         rayShader.setVec3v("SpherePositions", spherePositions);
         rayShader.setFloatv("SphereRadii", sphereRadii);
         rayShader.setVec3v("SphereColors", sphereColors);
         rayShader.setFloatv("Roughness", roughness);
         rayShader.setVec3v("EmissionColor", emissionColor);
         rayShader.setFloatv("EmissionPower", emissionPower);
-
+        
         int time = rand();
         srand(time);
         rayShader.setInt("Time", rand());
@@ -308,7 +316,6 @@ int main() {
             }
         }
         
-
         // FPS
         calculateFPS( runningFrameCount, totalFrames);
 
