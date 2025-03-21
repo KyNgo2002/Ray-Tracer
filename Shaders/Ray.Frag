@@ -23,8 +23,20 @@ struct Sphere {
 	float emissionPower;
 };
 
+struct Plane {
+    vec3 position;
+    vec3 color;
+	float roughness;
+	vec3 emissionColor;
+	float emissionPower;
+};
+
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
+};
+  
+layout(std430, binding = 0) buffer PlaneBuffer {
+    Plane planes[];
 };
 
 in vec2 TexCoord;
@@ -141,7 +153,9 @@ void main() {
 			// Set new ray parameters
 			ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
 			//ray.origin = payload.worldPos;
-			ray.direction = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
+			vec3 diffuse = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
+			vec3 specular = reflect(ray.direction, payload.worldNorm);
+			ray.direction = mix(specular, diffuse, spheres[payload.objInd].roughness);
 
 			vec3 emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;
 			light += emittedLight * contribution;

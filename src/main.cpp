@@ -28,6 +28,14 @@ struct Sphere {
     glm::vec3 emissionColor;
     float emissionPower;
 };
+
+struct Plane {
+    glm::vec3 position;
+    glm::vec3 color;
+    float roughness;
+    glm::vec3 emissionColor;
+    float emissionPower;
+};
 //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
  
     // MVP matrices
@@ -126,14 +134,13 @@ int main() {
         {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.8f, 0.5f, 0.2f}, 0.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f}
     };
 
-    std::cout << sizeof(Sphere) << std::endl;
+    std::vector<Sphere> planes;
 
     GLuint sphereSSBO;
     glGenBuffers(1, &sphereSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, sphereSSBO);
-    
 
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
@@ -214,6 +221,7 @@ int main() {
             camera->frames = 1;
             screenShader.use();
             screenShader.setUInt("Frames", camera->frames);
+            glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
         }
 
         rayShader.use();
