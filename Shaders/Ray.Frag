@@ -1,13 +1,6 @@
 #version 460
 #extension GL_NV_gpu_shader5 : enable
 
-// https://www.shadertoy.com/view/lldyDn
-vec2 hash2d(vec2 p) {
-	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
-    p3 += dot(p3, p3.yzx+19.19);
-    return fract((p3.xx+p3.yz)*p3.zy);
-}
-
 struct Ray {
 	vec3 origin;
 	vec3 direction;
@@ -19,6 +12,23 @@ struct HitPayload {
 	vec3 worldNorm;
 
 	int objInd;
+};
+
+struct Sphere {
+    vec3 position;
+    float radius;  
+    vec3 color;
+	float roughness;
+	float metallic;
+	vec3 emissionColor;
+	float emissionPower;
+	float padding;
+	float padding1;
+	float padding2;
+};
+
+layout(std430, binding = 0) buffer SphereBuffer {
+    Sphere spheres[];
 };
 
 in vec2 TexCoord;
@@ -44,6 +54,13 @@ uniform vec3 CamUp;
 
 uniform sampler2D AccumulationTexture;
 uniform samplerCube Skybox;
+
+// https://www.shadertoy.com/view/lldyDn
+vec2 hash2d(vec2 p) {
+	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx+19.19);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
 
 float RandomFloat(inout uint32_t seed) {
 	seed = seed * 747796405 + 2891336453;
@@ -75,7 +92,7 @@ HitPayload TraceRay(inout Ray ray) {
 	float hitDistance = 3.402823466e+38;
 
 	for (int i = 0; i < NumSpheres; ++i) {
-		vec3 origin = ray.origin - SpherePositions[i];
+		vec3 origin = ray.origin - spheres[i].position;
 
 		float a = dot(ray.direction, ray.direction);
 		float b = 2.0f * dot(origin, ray.direction);
@@ -112,7 +129,7 @@ void main() {
 	// Random number generation
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
 	vec2 uvHash = hash2d(uv);
-	uint32_t seed = (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
+	uint32_t seed = (uint32_t)(uvHash.x * uvHash.y) + (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
 
 	// Lighting variables
 	vec3 light = vec3(0.0f);
