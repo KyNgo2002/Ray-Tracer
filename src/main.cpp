@@ -106,7 +106,7 @@ int main() {
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 4);
     rayShader.setVec2("Resolution", resolution);
-    rayShader.setInt("Bounces", 5);
+    rayShader.setInt("Bounces", 10);
     rayShader.setInt("Time", rand());
 
     std::vector<glm::vec3> spherePositions;
@@ -120,7 +120,7 @@ int main() {
     spherePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
     spherePositions.push_back(glm::vec3(0.0f, -101.f, 0.0f));
     spherePositions.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
-    spherePositions.push_back(glm::vec3(-3.0f, 2.0f, 3.0f));
+    spherePositions.push_back(glm::vec3(-4.0f, 0.0f, -93.0f));
     sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
     sphereColors.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
     sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
@@ -129,11 +129,11 @@ int main() {
     sphereRadii.push_back(1.0f);
     sphereRadii.push_back(100.0f);
     sphereRadii.push_back(1.0f);
-    sphereRadii.push_back(1.0f);
+    sphereRadii.push_back(56.0f);
 
-    roughness.push_back(0.0f);
-    roughness.push_back(1.0f);
-    roughness.push_back(1.0f);
+    roughness.push_back(0.1f);
+    roughness.push_back(0.99f);
+    roughness.push_back(0.99f);
     roughness.push_back(0.0f);
 
     metallic.push_back(0.5f);
@@ -317,7 +317,7 @@ int main() {
         }
         
         // FPS
-        calculateFPS( runningFrameCount, totalFrames);
+      /*  calculateFPS( runningFrameCount, totalFrames);*/
 
         // Check Events and swap buffers
         glfwSwapBuffers(openGL.getWindow());

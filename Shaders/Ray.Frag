@@ -45,15 +45,11 @@ uniform vec3 CamUp;
 uniform sampler2D AccumulationTexture;
 uniform samplerCube Skybox;
 
-uint32_t PCG_HASH(uint32_t seed) {
-	uint32_t state = seed * (747796405u) + (2891336453u);
-	uint32_t word = ((state >> (( state >> (28u)) + (4u))) ^ state) * (277803737u);
-	return (word >> (22u)) ^ word;
-}
-
 float RandomFloat(inout uint32_t seed) {
-	seed = PCG_HASH(seed);
-	return (float)seed / (float)(4294967295u);
+	seed = seed * 747796405 + 2891336453;
+	uint32_t result = ((seed >> (( seed >> (28)) + (4))) ^ seed) * (277803737);
+	result = (result >> (22)) ^ result;
+	return result / (4294967295.0f);
 }
 
 // Sebastian Lague : Coding Adventure Ray Tracing
@@ -64,11 +60,11 @@ float randomFloatNormalDistribution(inout uint32_t seed) {
 }
 
 vec3 generateRandVec(inout uint32_t seed) {
-	return normalize(vec3(
-		randomFloatNormalDistribution(seed) * 2.0f - 1.0f,
-		randomFloatNormalDistribution(seed) * 2.0f - 1.0f,
-		randomFloatNormalDistribution(seed) * 2.0f - 1.0f
-	));
+	float x = randomFloatNormalDistribution(seed) * 2.0f - 1.0f;
+	float y = randomFloatNormalDistribution(seed) * 2.0f - 1.0f;
+	float z = randomFloatNormalDistribution(seed) * 2.0f - 1.0f;
+	return normalize(vec3(x, y, z));
+
 }
 
 HitPayload TraceRay(inout Ray ray) {
@@ -113,12 +109,14 @@ HitPayload TraceRay(inout Ray ray) {
 }
 
 void main() {
+	// Random number generation
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
 	vec2 uvHash = hash2d(uv);
+	uint32_t seed = (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
+
+	// Lighting variables
 	vec3 light = vec3(0.0f);
 	vec3 contribution = vec3(1.0f);
-	uint32_t seed = (uint32_t)(uvHash.x * uvHash.y) + (uint32_t)gl_FragCoord.x * 
-		(uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
 
 	// Ray Creation
 	Ray ray;
@@ -133,13 +131,18 @@ void main() {
 			light += texture(Skybox, ray.direction).rgb * contribution;
 			break;
 		}
-		// Add Color contribution
-		contribution *= SphereColors[payload.objInd];
-		light += EmissionColor[payload.objInd] * EmissionPower[payload.objInd];
+		else {
+			// Set new ray parameters
+			//ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
+			ray.origin = payload.worldPos;
+			ray.direction = normalize(payload.worldNorm + Roughness[payload.objInd] * generateRandVec(seed));
 
-		// Set new ray parameters
-		ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-		ray.direction = normalize(payload.worldNorm + Roughness[payload.objInd] * generateRandVec(seed));
+			vec3 emittedLight = EmissionColor[payload.objInd] * EmissionPower[payload.objInd];
+			light += emittedLight * contribution;
+			contribution *= SphereColors[payload.objInd];
+
+			
+		}
 	}
 	
 	FragColor = texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f);
