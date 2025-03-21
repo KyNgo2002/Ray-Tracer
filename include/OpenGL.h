@@ -8,7 +8,6 @@
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void calculateFPS(unsigned& runningFrameCount, long long& totalFrames);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 // Class that encapsulates the OpenGL state machine

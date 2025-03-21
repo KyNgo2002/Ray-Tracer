@@ -19,6 +19,15 @@
 #include "ImGui/backend/imgui_impl_glfw.h"
 #include "ImGui/backend/imgui_impl_opengl3.h"
 
+
+struct Sphere {
+    glm::vec3 position;
+    float radius;  
+    glm::vec3 color;
+    float roughness;
+    glm::vec3 emissionColor;
+    float emissionPower;
+};
 //Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
  
     // MVP matrices
@@ -109,60 +118,22 @@ int main() {
     rayShader.setInt("Bounces", 10);
     rayShader.setInt("Time", rand());
 
-    std::vector<glm::vec3> spherePositions;
-    std::vector<glm::vec3> sphereColors;
-    std::vector<float> sphereRadii;
-    std::vector<float> roughness;
-    std::vector<float> metallic;
-    std::vector<glm::vec3> emissionColor;
-    std::vector<float> emissionPower;
+    // SSBO objects
+    std::vector<Sphere> spheres = {
+        {glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f,     glm::vec3{1.0f, 0.0f, 1.0f}, 1.0f,     glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{0.0f, -101.f, 0.0f}, 100.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.99f,    glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 0.99f,    glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f},
+        {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.8f, 0.5f, 0.2f}, 0.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f}
+    };
 
-    spherePositions.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-    spherePositions.push_back(glm::vec3(0.0f, -101.f, 0.0f));
-    spherePositions.push_back(glm::vec3(2.0f, 0.0f, 0.0f));
-    spherePositions.push_back(glm::vec3(-4.0f, 0.0f, -93.0f));
-    sphereColors.push_back(glm::vec3(1.0f, 0.0f, 1.0f));
-    sphereColors.push_back(glm::vec3(1.0f, 1.0f, 1.0f));
-    sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
-    sphereColors.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
+    std::cout << sizeof(Sphere) << std::endl;
 
-    sphereRadii.push_back(1.0f);
-    sphereRadii.push_back(100.0f);
-    sphereRadii.push_back(1.0f);
-    sphereRadii.push_back(56.0f);
-
-    roughness.push_back(0.1f);
-    roughness.push_back(0.99f);
-    roughness.push_back(0.99f);
-    roughness.push_back(0.0f);
-
-    metallic.push_back(0.5f);
-    metallic.push_back(0.5f);
-    metallic.push_back(0.5f);
-    metallic.push_back(0.5f);
-
-    emissionColor.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-    emissionColor.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-    emissionColor.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
-    emissionColor.push_back(glm::vec3(0.8f, 0.5f, 0.2f));
-
-    emissionPower.push_back(0.0f);
-    emissionPower.push_back(0.0f);
-    emissionPower.push_back(2.0f);
-    emissionPower.push_back(2.0f);
-
-    rayShader.setVec3v("SpherePositions", spherePositions);
-    rayShader.setVec3v("SphereColors", sphereColors);
-    rayShader.setFloatv("SphereRadii", sphereRadii);
-    rayShader.setFloatv("Roughness", roughness);
-    //rayShader.setFloatv("Metallic", metallic);
-    rayShader.setVec3v("EmissionColor", emissionColor);
-    rayShader.setFloatv("EmissionPower", emissionPower);
-
-    rayShader.setVec3("CamPosition", camera->camPosition);
-    rayShader.setVec3("CamDirection", camera->camFront);
-    rayShader.setVec3("CamRight", camera->camRight);
-    rayShader.setVec3("CamUp", camera->camUp);
+    GLuint sphereSSBO;
+    glGenBuffers(1, &sphereSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, sphereSSBO);
+    
 
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
@@ -241,6 +212,7 @@ int main() {
             glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
+            screenShader.use();
             screenShader.setUInt("Frames", camera->frames);
         }
 
@@ -250,24 +222,15 @@ int main() {
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
         
-        rayShader.setVec3v("SpherePositions", spherePositions);
-        rayShader.setFloatv("SphereRadii", sphereRadii);
-        rayShader.setVec3v("SphereColors", sphereColors);
-        rayShader.setFloatv("Roughness", roughness);
-        rayShader.setVec3v("EmissionColor", emissionColor);
-        rayShader.setFloatv("EmissionPower", emissionPower);
-        
-        int time = rand();
-        srand(time);
-        rayShader.setInt("Time", rand());
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         rayShader.setInt("Skybox", 1);
+        srand(rand());
+        rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         screenShader.use();
         screenShader.setUInt("Frames", camera->frames);
@@ -283,22 +246,19 @@ int main() {
 
             ImGui::Begin("Scene properties");
 
-            //ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-            //ImGui::DockSpace(dockspace_id);
-
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::Separator();
             
-            for (int i = 0; i < spherePositions.size(); ++i) {
+            for (int i = 0; i < spheres.size(); ++i) {
                 ImGui::Text("Sphere %d", (i + 1));
 
                 ImGui::PushID(i);
-                edited |= ImGui::DragFloat3("Position", glm::value_ptr(spherePositions[i]), 0.1f);
-                edited |= ImGui::ColorEdit3("Color", glm::value_ptr(sphereColors[i]));
-                edited |= ImGui::DragFloat("Radius", &sphereRadii[i], 0.1f);
-                edited |= ImGui::DragFloat("Roughness", &roughness[i], 0.01f, 0.0f, 1.0f);
-                edited |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(emissionColor[i]));
-                edited |= ImGui::DragFloat("Emission Power", &emissionPower[i], 0.01f, 0.0f, 1.0f);
+                edited |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
+                edited |= ImGui::ColorEdit3("Color", glm::value_ptr(spheres[i].color));
+                edited |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
+                edited |= ImGui::DragFloat("Roughness", &spheres[i].roughness, 0.01f, 0.0f, 1.0f);
+                edited |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(spheres[i].emissionColor));
+                edited |= ImGui::DragFloat("Emission Power", &spheres[i].radius, 0.01f, 0.0f, 1.0f);
                 ImGui::Separator();
                 ImGui::PopID();
             }
@@ -316,9 +276,6 @@ int main() {
             }
         }
         
-        // FPS
-      /*  calculateFPS( runningFrameCount, totalFrames);*/
-
         // Check Events and swap buffers
         glfwSwapBuffers(openGL.getWindow());
         glfwPollEvents();

@@ -111,22 +111,6 @@ void OpenGL::processInput(float deltaTime) {
         camera->calculateLookAt();
 }
 
-void calculateFPS(unsigned& runningFrameCount, long long& totalFrames) {
-    static int frames = 0;
-    static float lastTime = 0.0f;
-    auto currentTime = GetTickCount64() * 0.001f;
-
-    frames++;
-    if (currentTime - lastTime >= 1.0f) {
-        totalFrames += frames;
-        runningFrameCount++;
-        std::cout << "FPS: " << frames << std::endl;
-        std::cout << "Average FPS: " << totalFrames / runningFrameCount - 1 << std::endl;
-        lastTime = currentTime;
-        frames = 1;
-    }
-}
-
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     OpenGL* instance = static_cast<OpenGL*>(glfwGetWindowUserPointer(window));
 

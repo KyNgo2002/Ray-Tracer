@@ -19,12 +19,8 @@ struct Sphere {
     float radius;  
     vec3 color;
 	float roughness;
-	float metallic;
 	vec3 emissionColor;
 	float emissionPower;
-	float padding;
-	float padding1;
-	float padding2;
 };
 
 layout(std430, binding = 0) buffer SphereBuffer {
@@ -39,13 +35,6 @@ uniform int NumSpheres;
 uniform vec2 Resolution;
 uniform int Bounces;
 uniform int Time;
-
-uniform vec3 SpherePositions[4];
-uniform vec3 SphereColors[4];
-uniform float SphereRadii[4];
-uniform float Roughness[4];
-uniform vec3 EmissionColor[4];
-uniform float EmissionPower[4];
 
 uniform vec3 CamPosition;
 uniform vec3 CamDirection;
@@ -96,7 +85,7 @@ HitPayload TraceRay(inout Ray ray) {
 
 		float a = dot(ray.direction, ray.direction);
 		float b = 2.0f * dot(origin, ray.direction);
-		float c = dot(origin, origin) - SphereRadii[i] * SphereRadii[i];
+		float c = dot(origin, origin) - spheres[i].radius * spheres[i].radius;
 
 		float discriminant = b * b - 4.0f * a * c;
 
@@ -117,10 +106,10 @@ HitPayload TraceRay(inout Ray ray) {
 	else {
 		payload.objInd = closestInd;
 		payload.hitDistance = hitDistance;
-		vec3 origin = ray.origin - SpherePositions[closestInd];
+		vec3 origin = ray.origin - spheres[closestInd].position;
 		payload.worldPos = origin + ray.direction * hitDistance;
 		payload.worldNorm = normalize(payload.worldPos);
-		payload.worldPos += SpherePositions[closestInd];
+		payload.worldPos += spheres[closestInd].position;
 	}
 	return payload;
 }
@@ -150,15 +139,13 @@ void main() {
 		}
 		else {
 			// Set new ray parameters
-			//ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-			ray.origin = payload.worldPos;
-			ray.direction = normalize(payload.worldNorm + Roughness[payload.objInd] * generateRandVec(seed));
+			ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
+			//ray.origin = payload.worldPos;
+			ray.direction = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
 
-			vec3 emittedLight = EmissionColor[payload.objInd] * EmissionPower[payload.objInd];
+			vec3 emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;
 			light += emittedLight * contribution;
-			contribution *= SphereColors[payload.objInd];
-
-			
+			contribution *= spheres[payload.objInd].color;
 		}
 	}
 	
