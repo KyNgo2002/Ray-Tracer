@@ -118,9 +118,7 @@ HitPayload TraceRay(Ray ray) {
 		}
 	}
 
-	ray = originalRay;
 	for (int i = 0; i < NumPlanes; ++i) {
-		vec3 origin = ray.origin - spheres[i].position;
 
 		float denominator = (dot(planes[i].normal, ray.direction));
 
@@ -131,7 +129,7 @@ HitPayload TraceRay(Ray ray) {
 		float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].distance) / 
 			denominator;
 
-		if (t > 0.0f && t < hitDistance) {
+		if (t > 0.0f && t <= hitDistance) {
 			objType = 1;
 			closestInd = i;
 			hitDistance = t;
@@ -143,24 +141,18 @@ HitPayload TraceRay(Ray ray) {
 		return payload;
 	}
 	
+	payload.objInd = closestInd;
+	payload.hitDistance = hitDistance;
+	payload.objType = objType;
+
 	if (objType == 0) {
-		vec3 origin = ray.origin - spheres[closestInd].position;
-		payload.objInd = closestInd;
-		payload.hitDistance = hitDistance;
-		payload.objType = objType;
-		payload.worldPos = origin + ray.direction * hitDistance;
+		payload.worldPos = (ray.origin - spheres[closestInd].position) + ray.direction * hitDistance;
 		payload.worldNorm = normalize(payload.worldPos);
 		payload.worldPos += spheres[closestInd].position;
-		return payload;
 	}
 	else if (objType == 1) {
-		vec3 origin = ray.origin;
-		payload.objInd = closestInd;
-		payload.hitDistance = hitDistance;
-		payload.objType = objType;
-		payload.worldPos = origin + ray.direction * hitDistance;
-		payload.worldNorm = normalize(payload.worldPos);
-		return payload;
+		payload.worldPos = ray.origin + ray.direction * hitDistance;
+		payload.worldNorm = planes[payload.objInd].normal;
 	}
 	return payload;
 }
@@ -169,7 +161,8 @@ void main() {
 	// Random number generation
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
 	vec2 uvHash = hash2d(uv);
-	uint32_t seed = (uint32_t)(uvHash.x * uvHash.y) + (uint32_t)gl_FragCoord.x * (uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
+	uint32_t seed = (uint32_t)(uvHash.x * uvHash.y) + (uint32_t)gl_FragCoord.x * 
+		(uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
 
 	// Lighting variables
 	vec3 light = vec3(0.0f);
@@ -200,7 +193,7 @@ void main() {
 				emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;
 				ray.direction = mix(specular, diffuse, spheres[payload.objInd].roughness);
 			}
-			else {
+			else if (payload.objType == 1) {
 				diffuse = normalize(payload.worldNorm + planes[payload.objInd].roughness * generateRandVec(seed));
 				emittedLight = planes[payload.objInd].emissionColor * planes[payload.objInd].emissionPower;
 				ray.direction = mix(specular, diffuse, planes[payload.objInd].roughness);

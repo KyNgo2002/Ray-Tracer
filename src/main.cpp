@@ -122,7 +122,7 @@ int main() {
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 4);
-    rayShader.setInt("NumPlanes", 0);
+    rayShader.setInt("NumPlanes", 1);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 10);
     rayShader.setInt("Time", rand());
