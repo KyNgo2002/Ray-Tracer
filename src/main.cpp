@@ -30,13 +30,13 @@ struct Sphere {
 };
 
 struct Plane {
-    glm::vec3 position;
+    glm::vec3 normal;
+    float distance;
     glm::vec3 color;
     float roughness;
     glm::vec3 emissionColor;
     float emissionPower;
 };
-//Shader modelShader("Shaders\\ModelLoading.vert", "Shaders\\ModelLoading.frag");
  
     // MVP matrices
     /*glm::mat4 model = glm::mat4(1.0f);
@@ -122,6 +122,7 @@ int main() {
     // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 4);
+    rayShader.setInt("NumPlanes", 0);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 10);
     rayShader.setInt("Time", rand());
@@ -133,14 +134,22 @@ int main() {
         {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 0.99f,    glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f},
         {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.8f, 0.5f, 0.2f}, 0.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f}
     };
-
-    std::vector<Sphere> planes;
+    
+    std::vector<Plane> planes = {
+        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.01f}
+    };
 
     GLuint sphereSSBO;
     glGenBuffers(1, &sphereSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, sphereSSBO);
+
+    GLuint planeSSBO;
+    glGenBuffers(1, &planeSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Plane), planes.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, planeSSBO);
 
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
@@ -221,6 +230,7 @@ int main() {
             camera->frames = 1;
             screenShader.use();
             screenShader.setUInt("Frames", camera->frames);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
             glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
         }
 
@@ -266,7 +276,7 @@ int main() {
                 edited |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
                 edited |= ImGui::DragFloat("Roughness", &spheres[i].roughness, 0.01f, 0.0f, 1.0f);
                 edited |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(spheres[i].emissionColor));
-                edited |= ImGui::DragFloat("Emission Power", &spheres[i].radius, 0.01f, 0.0f, 1.0f);
+                edited |= ImGui::DragFloat("Emission Power", &spheres[i].emissionPower, 0.01f, 0.0f, 1.0f);
                 ImGui::Separator();
                 ImGui::PopID();
             }

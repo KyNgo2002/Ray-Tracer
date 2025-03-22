@@ -12,6 +12,7 @@ struct HitPayload {
 	vec3 worldNorm;
 
 	int objInd;
+	int objType;
 };
 
 struct Sphere {
@@ -24,18 +25,19 @@ struct Sphere {
 };
 
 struct Plane {
-    vec3 position;
+    vec3 normal;
+    float distance;
     vec3 color;
-	float roughness;
-	vec3 emissionColor;
-	float emissionPower;
+    float roughness;
+    vec3 emissionColor;
+    float emissionPower;
 };
 
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
 };
   
-layout(std430, binding = 0) buffer PlaneBuffer {
+layout(std430, binding = 1) buffer PlaneBuffer {
     Plane planes[];
 };
 
@@ -44,6 +46,7 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform int NumSpheres;
+uniform int NumPlanes;
 uniform vec2 Resolution;
 uniform int Bounces;
 uniform int Time;
@@ -85,9 +88,12 @@ vec3 generateRandVec(inout uint32_t seed) {
 
 }
 
-HitPayload TraceRay(inout Ray ray) {
+HitPayload TraceRay(Ray ray) {
+	Ray originalRay = ray;
+
 	HitPayload payload;
 	payload.hitDistance = -1;
+	int objType = -1;
 
 	int closestInd = -1;
 	float hitDistance = 3.402823466e+38;
@@ -106,22 +112,55 @@ HitPayload TraceRay(inout Ray ray) {
 
 		float closestT = (-b - sqrt(discriminant)) / (2.0f * a);
 		if (closestT > 0.0f && closestT < hitDistance) {
+			objType = 0;
 			closestInd = i;
 			hitDistance = closestT;
 		}
 	}
 
+	ray = originalRay;
+	for (int i = 0; i < NumPlanes; ++i) {
+		vec3 origin = ray.origin - spheres[i].position;
+
+		float denominator = (dot(planes[i].normal, ray.direction));
+
+		// No Intersection ray-plane
+		if (denominator == 0) 
+			FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+		float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].distance) / 
+			denominator;
+
+		if (t > 0.0f && t < hitDistance) {
+			objType = 1;
+			closestInd = i;
+			hitDistance = t;
+		}
+	}
+ 
 	if (closestInd < 0) {
 		payload.hitDistance = -1.0f;
 		return payload;
 	}
-	else {
+	
+	if (objType == 0) {
+		vec3 origin = ray.origin - spheres[closestInd].position;
 		payload.objInd = closestInd;
 		payload.hitDistance = hitDistance;
-		vec3 origin = ray.origin - spheres[closestInd].position;
+		payload.objType = objType;
 		payload.worldPos = origin + ray.direction * hitDistance;
 		payload.worldNorm = normalize(payload.worldPos);
 		payload.worldPos += spheres[closestInd].position;
+		return payload;
+	}
+	else if (objType == 1) {
+		vec3 origin = ray.origin;
+		payload.objInd = closestInd;
+		payload.hitDistance = hitDistance;
+		payload.objType = objType;
+		payload.worldPos = origin + ray.direction * hitDistance;
+		payload.worldNorm = normalize(payload.worldPos);
+		return payload;
 	}
 	return payload;
 }
@@ -135,6 +174,9 @@ void main() {
 	// Lighting variables
 	vec3 light = vec3(0.0f);
 	vec3 contribution = vec3(1.0f);
+	vec3 diffuse = vec3(0.0f);
+	vec3 specular = vec3(0.0f);
+	vec3 emittedLight = vec3(0.0f);
 
 	// Ray Creation
 	Ray ray;
@@ -150,16 +192,22 @@ void main() {
 			break;
 		}
 		else {
-			// Set new ray parameters
-			ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-			//ray.origin = payload.worldPos;
-			vec3 diffuse = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
 			vec3 specular = reflect(ray.direction, payload.worldNorm);
-			ray.direction = mix(specular, diffuse, spheres[payload.objInd].roughness);
+			//ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
+			ray.origin = payload.worldPos;
+			if (payload.objType == 0) {
+				diffuse = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
+				emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;
+				ray.direction = mix(specular, diffuse, spheres[payload.objInd].roughness);
+			}
+			else {
+				diffuse = normalize(payload.worldNorm + planes[payload.objInd].roughness * generateRandVec(seed));
+				emittedLight = planes[payload.objInd].emissionColor * planes[payload.objInd].emissionPower;
+				ray.direction = mix(specular, diffuse, planes[payload.objInd].roughness);
+			}
 
-			vec3 emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;
 			light += emittedLight * contribution;
-			contribution *= spheres[payload.objInd].color;
+			contribution *= payload.objType == 0 ? spheres[payload.objInd].color : planes[payload.objInd].color;
 		}
 	}
 	
