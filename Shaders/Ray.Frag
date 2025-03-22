@@ -26,7 +26,7 @@ struct Sphere {
 
 struct Plane {
     vec3 normal;
-    float distance;
+    float dist;
     vec3 color;
     float roughness;
     vec3 emissionColor;
@@ -117,17 +117,16 @@ HitPayload TraceRay(Ray ray) {
 	}
 
 	for (int i = 0; i < NumPlanes; ++i) {
-
 		float denominator = (dot(planes[i].normal, ray.direction));
 
 		// No Intersection ray-plane
 		if (denominator == 0) 
 			FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
-		float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].distance) / 
+		float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].dist) / 
 			denominator;
 
-		if (t > 0.0f && t <= hitDistance) {
+		if (t > 0.0f && t < hitDistance) {
 			objType = 1;
 			closestInd = i;
 			hitDistance = t;
@@ -139,7 +138,7 @@ HitPayload TraceRay(Ray ray) {
 		payload.objType = -1;
 		return payload;
 	}
-	
+
 	payload.objInd = closestInd;
 	payload.hitDistance = hitDistance;
 	payload.objType = objType;
@@ -185,8 +184,7 @@ void main() {
 		}
 		else {
 			vec3 specularDir = reflect(ray.direction, payload.worldNorm);
-			//ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-			ray.origin = payload.worldPos;
+			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
 			if (payload.objType == 0) {
 				diffuseDir = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
 				emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;

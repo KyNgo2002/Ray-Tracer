@@ -185,6 +185,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
+    <None Include="imgui.ini" />
     <None Include="lib\assimp-vc143-mt.dll" />
     <None Include="lib\assimp-vc143-mtd.dll" />
     <None Include="README.md" />
