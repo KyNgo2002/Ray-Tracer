@@ -209,7 +209,9 @@ int main() {
 
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
-    bool edited = false;
+
+    bool editedSpheres = false;
+    bool editedPlanes = false;
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -223,15 +225,22 @@ int main() {
         // First pass accumulation buffer
         glBindVertexArray(rectVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
-        if (camera->moved || edited) {
-            edited = false;
+        if (camera->moved || editedSpheres || editedPlanes) {
             glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
             screenShader.use();
             screenShader.setUInt("Frames", camera->frames);
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
-            glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
+            if (editedSpheres) {
+                editedSpheres = false;
+                glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
+                glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
+            }
+            else if (editedPlanes){
+                editedPlanes = false;
+                glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
+                glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Sphere), planes.data(), GL_DYNAMIC_DRAW);
+            }
         }
 
         rayShader.use();
@@ -267,18 +276,35 @@ int main() {
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::Separator();
             
-            for (int i = 0; i < spheres.size(); ++i) {
-                ImGui::Text("Sphere %d", (i + 1));
+            if (ImGui::CollapsingHeader("Sphere Properties")) {
+                for (int i = 0; i < spheres.size(); ++i) {
+                    ImGui::Text("Sphere %d", (i + 1));
 
-                ImGui::PushID(i);
-                edited |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
-                edited |= ImGui::ColorEdit3("Color", glm::value_ptr(spheres[i].color));
-                edited |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
-                edited |= ImGui::DragFloat("Roughness", &spheres[i].roughness, 0.01f, 0.0f, 1.0f);
-                edited |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(spheres[i].emissionColor));
-                edited |= ImGui::DragFloat("Emission Power", &spheres[i].emissionPower, 0.01f, 0.0f, 1.0f);
-                ImGui::Separator();
-                ImGui::PopID();
+                    ImGui::PushID(i);
+                    editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
+                    editedSpheres |= ImGui::ColorEdit3("Color", glm::value_ptr(spheres[i].color));
+                    editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
+                    editedSpheres |= ImGui::DragFloat("Roughness", &spheres[i].roughness, 0.01f, 0.0f, 1.0f);
+                    editedSpheres |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(spheres[i].emissionColor));
+                    editedSpheres |= ImGui::DragFloat("Emission Power", &spheres[i].emissionPower, 0.01f, 0.0f, 1.0f);
+                    ImGui::Separator();
+                    ImGui::PopID();
+                }
+            }
+            if (ImGui::CollapsingHeader("Plane Properties")) {
+                for (int i = 0; i < planes.size(); ++i) {
+                    ImGui::Text("Plane %d", (i + 1));
+
+                    ImGui::PushID(i);
+                    editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
+                    editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].distance, 0.1f);
+                    editedPlanes |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(planes[i].color));
+                    editedPlanes |= ImGui::DragFloat("Roughness##xx", &planes[i].roughness, 0.01f, 0.0f, 1.0f);
+                    editedPlanes |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(planes[i].emissionColor));
+                    editedPlanes |= ImGui::DragFloat("Emission Power##xx", &planes[i].emissionPower, 0.01f, 0.0f, 10.0f);
+                    ImGui::Separator();
+                    ImGui::PopID();
+                }
             }
 
             ImGui::End();

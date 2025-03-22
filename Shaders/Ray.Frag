@@ -81,16 +81,14 @@ float randomFloatNormalDistribution(inout uint32_t seed) {
 }
 
 vec3 generateRandVec(inout uint32_t seed) {
-	float x = randomFloatNormalDistribution(seed) * 2.0f - 1.0f;
-	float y = randomFloatNormalDistribution(seed) * 2.0f - 1.0f;
-	float z = randomFloatNormalDistribution(seed) * 2.0f - 1.0f;
+	float x = randomFloatNormalDistribution(seed);
+	float y = randomFloatNormalDistribution(seed);
+	float z = randomFloatNormalDistribution(seed);
 	return normalize(vec3(x, y, z));
 
 }
 
 HitPayload TraceRay(Ray ray) {
-	Ray originalRay = ray;
-
 	HitPayload payload;
 	payload.hitDistance = -1;
 	int objType = -1;
@@ -138,6 +136,7 @@ HitPayload TraceRay(Ray ray) {
  
 	if (closestInd < 0) {
 		payload.hitDistance = -1.0f;
+		payload.objType = -1;
 		return payload;
 	}
 	
@@ -167,8 +166,8 @@ void main() {
 	// Lighting variables
 	vec3 light = vec3(0.0f);
 	vec3 contribution = vec3(1.0f);
-	vec3 diffuse = vec3(0.0f);
-	vec3 specular = vec3(0.0f);
+	vec3 diffuseDir = vec3(0.0f);
+	vec3 specularDir = vec3(0.0f);
 	vec3 emittedLight = vec3(0.0f);
 
 	// Ray Creation
@@ -185,18 +184,18 @@ void main() {
 			break;
 		}
 		else {
-			vec3 specular = reflect(ray.direction, payload.worldNorm);
+			vec3 specularDir = reflect(ray.direction, payload.worldNorm);
 			//ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
 			ray.origin = payload.worldPos;
 			if (payload.objType == 0) {
-				diffuse = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
+				diffuseDir = normalize(payload.worldNorm + spheres[payload.objInd].roughness * generateRandVec(seed));
 				emittedLight = spheres[payload.objInd].emissionColor * spheres[payload.objInd].emissionPower;
-				ray.direction = mix(specular, diffuse, spheres[payload.objInd].roughness);
+				ray.direction = mix(specularDir, diffuseDir, spheres[payload.objInd].roughness);
 			}
 			else if (payload.objType == 1) {
-				diffuse = normalize(payload.worldNorm + planes[payload.objInd].roughness * generateRandVec(seed));
+				diffuseDir = normalize(payload.worldNorm + planes[payload.objInd].roughness * generateRandVec(seed));
 				emittedLight = planes[payload.objInd].emissionColor * planes[payload.objInd].emissionPower;
-				ray.direction = mix(specular, diffuse, planes[payload.objInd].roughness);
+				ray.direction = mix(specularDir, diffuseDir, planes[payload.objInd].roughness);
 			}
 
 			light += emittedLight * contribution;
