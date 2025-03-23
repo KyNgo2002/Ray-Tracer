@@ -37,6 +37,17 @@ struct Plane {
     glm::vec3 emissionColor;
     float emissionPower;
 };
+
+struct Triangle {
+    glm::vec3 x;
+    glm::vec3 y;
+    glm::vec3 z;
+    glm::vec3 normal;
+    glm::vec3 color;
+    float roughness;
+    glm::vec3 emissionColor;
+    float emissionPower;
+};
  
     // MVP matrices
     /*glm::mat4 model = glm::mat4(1.0f);

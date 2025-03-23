@@ -132,6 +132,11 @@ HitPayload TraceRay(Ray ray) {
 			hitDistance = t;
 		}
 	}
+
+	// Ray Triangle Intersection;
+	for (int i = 0; i < 0; ++i) {
+		
+	}
  
 	if (closestInd < 0) {
 		payload.hitDistance = -1.0f;
