@@ -19,35 +19,6 @@
 #include "ImGui/backend/imgui_impl_glfw.h"
 #include "ImGui/backend/imgui_impl_opengl3.h"
 
-
-struct Sphere {
-    glm::vec3 position;
-    float radius;  
-    glm::vec3 color;
-    float roughness;
-    glm::vec3 emissionColor;
-    float emissionPower;
-};
-
-struct Plane {
-    glm::vec3 normal;
-    float distance;
-    glm::vec3 color;
-    float roughness;
-    glm::vec3 emissionColor;
-    float emissionPower;
-};
-
-struct Triangle {
-    glm::vec3 x;
-    glm::vec3 y;
-    glm::vec3 z;
-    glm::vec3 normal;
-    glm::vec3 color;
-    glm::vec3 emissionColor;
-    float roughness;
-    float emissionPower;
-};
  
 // MVP matrices
 /*glm::mat4 model = glm::mat4(1.0f);
@@ -75,6 +46,35 @@ modelShader.setMat4("view", camera->lookAt);
 modelShader.setMat4("projection", projection);*/
 
 //backpack.Draw(&modelShader);
+
+struct Sphere {
+    glm::vec3 position;
+    float radius;
+    glm::vec3 padding;
+    int materialInd;
+};
+
+struct Plane {
+    glm::vec3 normal;
+    float distance;
+    glm::vec3 padding;
+    int materialInd;
+};
+
+struct Triangle {
+    glm::vec3 x;
+    glm::vec3 y;
+    glm::vec3 z;
+    glm::vec3 normal;
+    int materialInd;
+};
+
+struct Material {
+    glm::vec3 color;
+    float emissionPower;
+    glm::vec3 emissionColor;
+    float roughness;
+};
 
 unsigned int loadCubemap(std::vector<std::string> faces);
 
@@ -129,8 +129,19 @@ int main() {
 
     screenShader.setUInt("Frames", camera->frames);
 
+    std::vector<std::string> faces{
+        "Textures\\skybox\\right.jpg",
+        "Textures\\skybox\\left.jpg",
+        "Textures\\skybox\\top.jpg",
+        "Textures\\skybox\\bottom.jpg",
+        "Textures\\skybox\\front.jpg",
+        "Textures\\skybox\\back.jpg"
+    };
+
+    unsigned int cubeMapTextureID = loadCubemap(faces);
+    std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
+
     rayShader.use();
-    // Uniforms
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 4);
     rayShader.setInt("NumPlanes", 1);
@@ -141,19 +152,31 @@ int main() {
 
     // SSBO objects
     std::vector<Sphere> spheres = {
-        {glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f,     glm::vec3{1.0f, 0.0f, 1.0f}, 1.0f,     glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
-        {glm::vec3{0.0f, -101.f, 0.0f}, 100.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.99f,    glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
-        {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 0.99f,    glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f},
-        {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.8f, 0.5f, 0.2f}, 0.0f,     glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f}
+        {glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 2},
+        {glm::vec3{0.0f, -101.f, 0.0f}, 100.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1},
+        {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0},
+        {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
     };
     
     std::vector<Plane> planes = {
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.01f}
+        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
     };
 
     std::vector<Triangle> triangles = {
-        {glm::vec3{-1.5f, 2.0f, -1.0f}, glm::vec3{1.5f, 2.0f, -1.0f}, glm::vec3{0.0f, 5.0f, -1.0f}, glm::vec3{0.0f, 0.0f, 1.0f},
-        glm::vec3{0.8f, 0.8f, 0.2f}, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f, 0.0f}
+        {glm::vec3{-1.5f, 2.0f, 2.0f}, glm::vec3{1.5f, 2.0f, 2.0f}, 
+        glm::vec3{0.0f, 5.0f, 2.0f}, glm::vec3{0.0f, 0.0f, 1.0f}, 0}
+    };
+
+    std::vector<Material> materials = {
+        {glm::vec3{0.8f, 0.5f, 0.2f}, 0.99f, glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f},
+        {glm::vec3{1.0f, 1.0f, 1.0f}, 0.99f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{1.0f, 0.0f, 1.0f}, 1.0f,  glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f}
+    };
+
+    std::vector<std::string> materialNames = {
+        "Emissive",
+        "Rough Under Sphere",
+        "Rough Purple Sphere"
     };
 
     GLuint sphereSSBO;
@@ -174,6 +197,12 @@ int main() {
     glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, triangleSSBO);
 
+    GLuint materialSSBO;
+    glGenBuffers(1, &materialSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, materialSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, materials.size() * sizeof(Material), materials.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, materialSSBO);
+
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
@@ -193,18 +222,6 @@ int main() {
         std::cerr << "Framebuffer not complete!" << std::endl;
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    std::vector<std::string> faces{
-        "Textures\\skybox\\right.jpg",
-        "Textures\\skybox\\left.jpg",
-        "Textures\\skybox\\top.jpg",
-        "Textures\\skybox\\bottom.jpg",
-        "Textures\\skybox\\front.jpg",
-        "Textures\\skybox\\back.jpg"
-    };
-    
-    unsigned int cubeMapTextureID = loadCubemap(faces);
-    std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
     // ImGUI initialization
     IMGUI_CHECKVERSION();
@@ -236,6 +253,7 @@ int main() {
     bool editedSpheres = false;
     bool editedPlanes = false;
     bool editedTriangles = false;
+    bool editedMaterials = false;
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -249,7 +267,7 @@ int main() {
         // First pass accumulation buffer
         glBindVertexArray(rectVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
-        if (camera->moved || editedSpheres || editedPlanes) {
+        if (camera->moved || editedSpheres || editedPlanes || editedTriangles || editedMaterials) {
             glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
@@ -269,6 +287,11 @@ int main() {
                 editedTriangles = false;
                 glBindBuffer(GL_SHADER_STORAGE_BUFFER, triangleSSBO);
                 glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
+            }
+            else if (editedMaterials) {
+                editedMaterials = false;
+                glBindBuffer(GL_SHADER_STORAGE_BUFFER, materialSSBO);
+                glBufferData(GL_SHADER_STORAGE_BUFFER, materials.size() * sizeof(Material), materials.data(), GL_DYNAMIC_DRAW);
             }
         }
 
@@ -311,11 +334,7 @@ int main() {
 
                     ImGui::PushID(i);
                     editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
-                    editedSpheres |= ImGui::ColorEdit3("Color", glm::value_ptr(spheres[i].color));
                     editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
-                    editedSpheres |= ImGui::DragFloat("Roughness", &spheres[i].roughness, 0.01f, 0.0f, 1.0f);
-                    editedSpheres |= ImGui::ColorEdit3("Emission Color", glm::value_ptr(spheres[i].emissionColor));
-                    editedSpheres |= ImGui::DragFloat("Emission Power", &spheres[i].emissionPower, 0.01f, 0.0f, 1.0f);
                     ImGui::Separator();
                     ImGui::PopID();
                 }
@@ -327,10 +346,6 @@ int main() {
                     ImGui::PushID(i);
                     editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
                     editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].distance, 0.1f);
-                    editedPlanes |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(planes[i].color));
-                    editedPlanes |= ImGui::DragFloat("Roughness##xx", &planes[i].roughness, 0.01f, 0.0f, 1.0f);
-                    editedPlanes |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(planes[i].emissionColor));
-                    editedPlanes |= ImGui::DragFloat("Emission Power##xx", &planes[i].emissionPower, 0.01f, 0.0f, 10.0f);
                     ImGui::Separator();
                     ImGui::PopID();
                 }
@@ -344,10 +359,19 @@ int main() {
                     editedTriangles |= ImGui::DragFloat3("X##xx", glm::value_ptr(triangles[i].x), 0.1f);
                     editedTriangles |= ImGui::DragFloat3("Y##xx", glm::value_ptr(triangles[i].y), 0.1f);
                     editedTriangles |= ImGui::DragFloat3("Z##xx", glm::value_ptr(triangles[i].z), 0.1f);
-                    editedTriangles |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(triangles[i].color));
-                    editedTriangles |= ImGui::DragFloat("Roughness##xx", &triangles[i].roughness, 0.01f, 0.0f, 1.0f);
-                    editedTriangles |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(triangles[i].emissionColor));
-                    editedTriangles |= ImGui::DragFloat("Emission Power##xx", &triangles[i].emissionPower, 0.01f, 0.0f, 10.0f);
+                    ImGui::Separator();
+                    ImGui::PopID();
+                }
+            }
+            if (ImGui::CollapsingHeader("Material Properties")) {
+                for (int i = 0; i < materials.size(); ++i) {
+                    ImGui::PushID(i);
+                    ImGui::Text("Material %d", (i + 1));
+                    ImGui::Text("%s", materialNames[i].c_str());
+                    editedMaterials |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(materials[i].color), 0.1f);
+                    editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.1f, 0.0f, 1.0f);
+                    editedMaterials |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(materials[i].emissionColor), 0.1f);
+                    editedMaterials |= ImGui::DragFloat("Emission Power##xx", &materials[i].emissionPower, 0.01f, 0.0f, 10.0f);
                     ImGui::Separator();
                     ImGui::PopID();
                 }
