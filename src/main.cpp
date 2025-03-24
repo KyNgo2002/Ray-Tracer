@@ -63,17 +63,20 @@ struct Plane {
 
 struct Triangle {
     glm::vec3 x;
+    float padding;
     glm::vec3 y;
+    float padding1;
     glm::vec3 z;
+    float padding2;
     glm::vec3 normal;
     int materialInd;
 };
 
 struct Material {
     glm::vec3 color;
-    float emissionPower;
-    glm::vec3 emissionColor;
     float roughness;
+    glm::vec3 emissionColor;
+    float emissionPower;
 };
 
 unsigned int loadCubemap(std::vector<std::string> faces);
@@ -159,12 +162,12 @@ int main() {
     };
     
     std::vector<Plane> planes = {
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
+        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1}
     };
 
     std::vector<Triangle> triangles = {
-        {glm::vec3{-1.5f, 2.0f, 2.0f}, glm::vec3{1.5f, 2.0f, 2.0f}, 
-        glm::vec3{0.0f, 5.0f, 2.0f}, glm::vec3{0.0f, 0.0f, 1.0f}, 0}
+        {glm::vec3{-1.5f, 2.0f, 2.0f}, 0.0f, glm::vec3{1.5f, 2.0f, 2.0f}, 0.0f, 
+        glm::vec3{0.0f, 5.0f, 2.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 1.0f}, 2}
     };
 
     std::vector<Material> materials = {
@@ -369,7 +372,7 @@ int main() {
                     ImGui::Text("Material %d", (i + 1));
                     ImGui::Text("%s", materialNames[i].c_str());
                     editedMaterials |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(materials[i].color), 0.1f);
-                    editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.1f, 0.0f, 1.0f);
+                    editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.02f, 0.0f, 1.0f);
                     editedMaterials |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(materials[i].emissionColor), 0.1f);
                     editedMaterials |= ImGui::DragFloat("Emission Power##xx", &materials[i].emissionPower, 0.01f, 0.0f, 10.0f);
                     ImGui::Separator();

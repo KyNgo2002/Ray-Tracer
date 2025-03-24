@@ -31,8 +31,11 @@ struct Plane {
 
 struct Triangle {
 	vec3 x;
+    float padding;
     vec3 y;
+    float padding1;
     vec3 z;
+    float padding2;
     vec3 normal;
     int materialInd;
 };
@@ -248,7 +251,7 @@ void main() {
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			else if (payload.objType == 2) {
-				Material material = materials[planes[payload.objInd].materialInd];
+				Material material = materials[triangles[payload.objInd].materialInd];
 				diffuseDir = normalize(payload.worldNorm + material.roughness * generateRandVec(seed));
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
