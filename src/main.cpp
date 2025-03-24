@@ -44,26 +44,26 @@ struct Triangle {
     glm::vec3 z;
     glm::vec3 normal;
     glm::vec3 color;
-    float roughness;
     glm::vec3 emissionColor;
+    float roughness;
     float emissionPower;
 };
  
-    // MVP matrices
-    /*glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-    modelShader.setMat4("model", model);
-    glm::mat4 projection =
-        glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
+// MVP matrices
+/*glm::mat4 model = glm::mat4(1.0f);
+model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+modelShader.setMat4("model", model);
+glm::mat4 projection =
+    glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
 
-    modelShader.setMat4("view", camera->lookAt);
-    modelShader.setMat4("projection", projection);*/
+modelShader.setMat4("view", camera->lookAt);
+modelShader.setMat4("projection", projection);*/
 
-    //char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
+//char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
 
-    // Model loading
-    //Model backpack(path);
+// Model loading
+//Model backpack(path);
 
 // Model Code
 /*modelShader.use();
@@ -134,6 +134,7 @@ int main() {
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 4);
     rayShader.setInt("NumPlanes", 1);
+    rayShader.setInt("NumTriangles", 1);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 10);
     rayShader.setInt("Time", rand());
@@ -150,6 +151,11 @@ int main() {
         {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.01f}
     };
 
+    std::vector<Triangle> triangles = {
+        {glm::vec3{-1.5f, 2.0f, -1.0f}, glm::vec3{1.5f, 2.0f, -1.0f}, glm::vec3{0.0f, 5.0f, -1.0f}, glm::vec3{0.0f, 0.0f, 1.0f},
+        glm::vec3{0.8f, 0.8f, 0.2f}, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f, 0.0f}
+    };
+
     GLuint sphereSSBO;
     glGenBuffers(1, &sphereSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
@@ -161,6 +167,12 @@ int main() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Plane), planes.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, planeSSBO);
+
+    GLuint triangleSSBO;
+    glGenBuffers(1, &triangleSSBO);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, triangleSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, triangleSSBO);
 
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
@@ -223,6 +235,7 @@ int main() {
 
     bool editedSpheres = false;
     bool editedPlanes = false;
+    bool editedTriangles = false;
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -250,7 +263,12 @@ int main() {
             else if (editedPlanes){
                 editedPlanes = false;
                 glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
-                glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Sphere), planes.data(), GL_DYNAMIC_DRAW);
+                glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Plane), planes.data(), GL_DYNAMIC_DRAW);
+            }
+            else if (editedTriangles) {
+                editedTriangles = false;
+                glBindBuffer(GL_SHADER_STORAGE_BUFFER, triangleSSBO);
+                glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
             }
         }
 
@@ -313,6 +331,23 @@ int main() {
                     editedPlanes |= ImGui::DragFloat("Roughness##xx", &planes[i].roughness, 0.01f, 0.0f, 1.0f);
                     editedPlanes |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(planes[i].emissionColor));
                     editedPlanes |= ImGui::DragFloat("Emission Power##xx", &planes[i].emissionPower, 0.01f, 0.0f, 10.0f);
+                    ImGui::Separator();
+                    ImGui::PopID();
+                }
+            }
+
+            if (ImGui::CollapsingHeader("Triangle Properties")) {
+                for (int i = 0; i < triangles.size(); ++i) {
+                    ImGui::Text("Triangle %d", (i + 1));
+
+                    ImGui::PushID(i);
+                    editedTriangles |= ImGui::DragFloat3("X##xx", glm::value_ptr(triangles[i].x), 0.1f);
+                    editedTriangles |= ImGui::DragFloat3("Y##xx", glm::value_ptr(triangles[i].y), 0.1f);
+                    editedTriangles |= ImGui::DragFloat3("Z##xx", glm::value_ptr(triangles[i].z), 0.1f);
+                    editedTriangles |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(triangles[i].color));
+                    editedTriangles |= ImGui::DragFloat("Roughness##xx", &triangles[i].roughness, 0.01f, 0.0f, 1.0f);
+                    editedTriangles |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(triangles[i].emissionColor));
+                    editedTriangles |= ImGui::DragFloat("Emission Power##xx", &triangles[i].emissionPower, 0.01f, 0.0f, 10.0f);
                     ImGui::Separator();
                     ImGui::PopID();
                 }

@@ -33,6 +33,17 @@ struct Plane {
     float emissionPower;
 };
 
+struct Triangle {
+    vec3 x;
+    vec3 y;
+    vec3 z;
+	vec3 normal;
+    vec3 color;
+    vec3 emissionColor;
+    float roughness;
+    float emissionPower;
+};
+
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
 };
@@ -41,12 +52,17 @@ layout(std430, binding = 1) buffer PlaneBuffer {
     Plane planes[];
 };
 
+layout(std430, binding = 2) buffer TriangleBuffer {
+    Triangle triangles[];
+};
+
 in vec2 TexCoord;
 
 out vec4 FragColor;
 
 uniform int NumSpheres;
 uniform int NumPlanes;
+uniform int NumTriangles;
 uniform vec2 Resolution;
 uniform int Bounces;
 uniform int Time;
@@ -60,6 +76,7 @@ uniform sampler2D AccumulationTexture;
 uniform samplerCube Skybox;
 
 // https://www.shadertoy.com/view/lldyDn
+// https://www.shadertoy.com/view/MlGcDz
 vec2 hash2d(vec2 p) {
 	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
     p3 += dot(p3, p3.yzx+19.19);
@@ -85,7 +102,6 @@ vec3 generateRandVec(inout uint32_t seed) {
 	float y = randomFloatNormalDistribution(seed);
 	float z = randomFloatNormalDistribution(seed);
 	return normalize(vec3(x, y, z));
-
 }
 
 HitPayload TraceRay(Ray ray) {
@@ -96,6 +112,7 @@ HitPayload TraceRay(Ray ray) {
 	int closestInd = -1;
 	float hitDistance = 3.402823466e+38;
 
+	// Ray-Sphere intersection
 	for (int i = 0; i < NumSpheres; ++i) {
 		vec3 origin = ray.origin - spheres[i].position;
 
@@ -116,6 +133,7 @@ HitPayload TraceRay(Ray ray) {
 		}
 	}
 
+	// Ray-Plane Intersection
 	for (int i = 0; i < NumPlanes; ++i) {
 		float denominator = (dot(planes[i].normal, ray.direction));
 
@@ -133,11 +151,29 @@ HitPayload TraceRay(Ray ray) {
 		}
 	}
 
-	// Ray Triangle Intersection;
-	for (int i = 0; i < 0; ++i) {
-		
+	// Ray-Triangle Intersection;
+	for (int i = 0; i < NumTriangles; ++i) {
+		// Mollere Trumbore Triangle Intersection
+		Triangle triangle = triangles[i];
+		vec3 v1v0 = triangle.y - triangle.x;
+		vec3 v2v0 = triangle.z - triangle.x;
+		vec3 rov0 = ray.origin - triangle.x;
+		vec3  n = cross(v1v0, v2v0);
+		vec3  q = cross(rov0, ray.direction);
+		float d = 1.0 / dot(ray.direction, n);
+		float u = d * dot(-q, v2v0);
+		float v = d * dot(q, v1v0);
+		float t = d * dot(-n, rov0);
+
+		if( u<0.0 || v<0.0 || (u+v)>1.0 ) t = -1.0;
+		//t = min(u, min(v, min(1.0 - (u + v), t)));
+		if (t > 0.0f && t < hitDistance) {
+			objType = 2;
+			closestInd = i;
+			hitDistance = t;
+		}
 	}
- 
+	
 	if (closestInd < 0) {
 		payload.hitDistance = -1.0f;
 		payload.objType = -1;
@@ -155,7 +191,11 @@ HitPayload TraceRay(Ray ray) {
 	}
 	else if (objType == 1) {
 		payload.worldPos = ray.origin + ray.direction * hitDistance;
-		payload.worldNorm = planes[payload.objInd].normal;
+		payload.worldNorm = planes[closestInd].normal;
+	}
+	else if (objType == 2) {
+		payload.worldPos = ray.origin + ray.direction * hitDistance;
+		payload.worldNorm = triangles[closestInd].normal;
 	}
 	return payload;
 }
@@ -200,9 +240,15 @@ void main() {
 				emittedLight = planes[payload.objInd].emissionColor * planes[payload.objInd].emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, planes[payload.objInd].roughness);
 			}
+			else if (payload.objType == 2) {
+				diffuseDir = normalize(payload.worldNorm + triangles[payload.objInd].roughness * generateRandVec(seed));
+				emittedLight = triangles[payload.objInd].emissionColor * triangles[payload.objInd].emissionPower;
+				ray.direction = mix(specularDir, diffuseDir, triangles[payload.objInd].roughness);
+			}
 
 			light += emittedLight * contribution;
-			contribution *= payload.objType == 0 ? spheres[payload.objInd].color : planes[payload.objInd].color;
+			contribution *= payload.objType == 0 ? spheres[payload.objInd].color : payload.objType == 1 ? 
+				planes[payload.objInd].color : triangles[payload.objInd].color;
 		}
 	}
 	
