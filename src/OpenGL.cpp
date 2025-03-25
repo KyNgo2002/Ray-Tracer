@@ -31,7 +31,7 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     lastX = SCR_WIDTH / 2.0f;
     lastY = SCR_HEIGHT / 2.0f;
     firstMouse = true;
-    editing = false;
+    editingMode = false;
 
     // Store "this" pointer in GLFW's user pointer
     glfwSetWindowUserPointer(window, this);
@@ -39,7 +39,7 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    if (!editing)
+    if (!editingMode)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
@@ -65,9 +65,9 @@ float OpenGL::getScreenHeight() {
 }
 
 void OpenGL::changeEditingMode() {
-    editing = !editing;
+    editingMode = !editingMode;
     camera->changeEditingMode();
-    if (editing)
+    if (editingMode)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     else
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -130,7 +130,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     instance->lastX = xpos;
     instance->lastY = ypos;
     
-    if (!instance->editing) {
+    if (!instance->editingMode) {
         instance->getCamera()->ProcessMouseMovement(xoffset, yoffset);
         instance->getCamera()->moved = true;
     }

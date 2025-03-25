@@ -30,13 +30,10 @@ struct Plane {
 };
 
 struct Triangle {
-	vec3 x;
-    float padding;
-    vec3 y;
-    float padding1;
-    vec3 z;
-    float padding2;
-    vec3 normal;
+	vec4 x;
+    vec4 y;
+    vec4 z;
+    vec4 normal;
     int materialInd;
 };
 
@@ -163,9 +160,9 @@ HitPayload TraceRay(Ray ray) {
 	for (int i = 0; i < NumTriangles; ++i) {
 		// Mollere Trumbore Triangle Intersection
 		Triangle triangle = triangles[i];
-		vec3 v1v0 = triangle.y - triangle.x;
-		vec3 v2v0 = triangle.z - triangle.x;
-		vec3 rov0 = ray.origin - triangle.x;
+		vec3 v1v0 = triangle.y.xyz - triangle.x.xyz;
+		vec3 v2v0 = triangle.z.xyz - triangle.x.xyz;
+		vec3 rov0 = ray.origin - triangle.x.xyz;
 		vec3  n = cross(v1v0, v2v0);
 		vec3  q = cross(rov0, ray.direction);
 		float d = 1.0 / dot(ray.direction, n);
@@ -197,14 +194,11 @@ HitPayload TraceRay(Ray ray) {
 		payload.worldNorm = normalize(payload.worldPos);
 		payload.worldPos += spheres[closestInd].position;
 	}
-	else if (objType == 1) {
+	else {
 		payload.worldPos = ray.origin + ray.direction * hitDistance;
-		payload.worldNorm = planes[closestInd].normal;
+		payload.worldNorm = objType == 1 ? planes[closestInd].normal : triangles[closestInd].normal.xyz;
 	}
-	else if (objType == 2) {
-		payload.worldPos = ray.origin + ray.direction * hitDistance;
-		payload.worldNorm = triangles[closestInd].normal;
-	}
+	
 	return payload;
 }
 
@@ -240,19 +234,19 @@ void main() {
 			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
 			if (payload.objType == 0) {
 				Material material = materials[spheres[payload.objInd].materialInd];
-				diffuseDir = normalize(payload.worldNorm + material.roughness * generateRandVec(seed));
+				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			else if (payload.objType == 1) {
 				Material material = materials[planes[payload.objInd].materialInd];
-				diffuseDir = normalize(payload.worldNorm + material.roughness * generateRandVec(seed));
+				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			else if (payload.objType == 2) {
 				Material material = materials[triangles[payload.objInd].materialInd];
-				diffuseDir = normalize(payload.worldNorm + material.roughness * generateRandVec(seed));
+				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}

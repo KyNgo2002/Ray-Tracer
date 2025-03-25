@@ -62,13 +62,10 @@ struct Plane {
 };
 
 struct Triangle {
-    glm::vec3 x;
-    float padding;
-    glm::vec3 y;
-    float padding1;
-    glm::vec3 z;
-    float padding2;
-    glm::vec3 normal;
+    glm::vec4 x;
+    glm::vec4 y;
+    glm::vec4 z;
+    glm::vec4 normal;
     int materialInd;
 };
 
@@ -146,16 +143,18 @@ int main() {
 
     rayShader.use();
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("NumSpheres", 4);
+    rayShader.setInt("NumSpheres", 6);
     rayShader.setInt("NumPlanes", 1);
     rayShader.setInt("NumTriangles", 1);
     rayShader.setVec2("Resolution", resolution);
-    rayShader.setInt("Bounces", 10);
+    rayShader.setInt("Bounces", 5);
     rayShader.setInt("Time", rand());
 
     // SSBO objects
     std::vector<Sphere> spheres = {
-        {glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 2},
+        {glm::vec3{-6.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 2},
+        {glm::vec3{-3.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 3},
+        {glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 4},
         {glm::vec3{0.0f, -101.f, 0.0f}, 100.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1},
         {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0},
         {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
@@ -165,21 +164,30 @@ int main() {
         {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1}
     };
 
-    std::vector<Triangle> triangles = {
+    /*std::vector<Triangle> triangles = {
         {glm::vec3{-1.5f, 2.0f, 2.0f}, 0.0f, glm::vec3{1.5f, 2.0f, 2.0f}, 0.0f, 
         glm::vec3{0.0f, 5.0f, 2.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 1.0f}, 2}
+    };*/
+
+    std::vector<Triangle> triangles = {
+        {glm::vec4{-1.5f, 2.0f, 2.0f, -1.0f}, glm::vec4{1.5f, 2.0f, 2.0f, -1.0f},
+        glm::vec4{0.0f, 5.0f, 2.0f, -1.0f}, glm::vec4{0.0f, 0.0f, 1.0f, -1.0f}, 2}
     };
 
     std::vector<Material> materials = {
-        {glm::vec3{0.8f, 0.5f, 0.2f}, 0.99f, glm::vec3{0.8f, 0.5f, 0.2f}, 2.0f},
-        {glm::vec3{1.0f, 1.0f, 1.0f}, 0.99f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
-        {glm::vec3{1.0f, 0.0f, 1.0f}, 1.0f,  glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f}
+        {glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 2.0f},
+        {glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{1.0f, 0.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{1.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f}
     };
 
     std::vector<std::string> materialNames = {
         "Emissive",
-        "Rough Under Sphere",
-        "Rough Purple Sphere"
+        "Plane",
+        "Purple Sphere",
+        "Green Sphere",
+        "Red Sphere"
     };
 
     GLuint sphereSSBO;
@@ -321,7 +329,7 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components
-        if (openGL.editing) {
+        if (openGL.editingMode) {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
@@ -375,6 +383,8 @@ int main() {
                     editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.02f, 0.0f, 1.0f);
                     editedMaterials |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(materials[i].emissionColor), 0.1f);
                     editedMaterials |= ImGui::DragFloat("Emission Power##xx", &materials[i].emissionPower, 0.01f, 0.0f, 10.0f);
+
+                    
                     ImGui::Separator();
                     ImGui::PopID();
                 }

@@ -24,7 +24,7 @@ public:
 	float lastY;
 	bool firstMouse;
 
-	bool editing;
+	bool editingMode;
 
 public:
 	// Constructors/Destructors
