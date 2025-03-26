@@ -211,7 +211,7 @@ void main() {
 
 	// Lighting variables
 	vec3 light = vec3(0.0f);
-	vec3 contribution = vec3(0.9f);
+	vec3 rayColor = vec3(0.9f);
 	vec3 diffuseDir = vec3(0.0f);
 	vec3 specularDir = vec3(0.0f);
 	vec3 emittedLight = vec3(0.0f);
@@ -226,43 +226,33 @@ void main() {
 		HitPayload payload = TraceRay(ray);
 		
 		if (payload.hitDistance < 0.0f) {
-			light += texture(Skybox, ray.direction).rgb * contribution;
+			light += texture(Skybox, ray.direction).rgb * rayColor;
 			break;
 		}
 		else {
 			Material material;
 			vec3 specularDir = reflect(ray.direction, payload.worldNorm);
 			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
-			vec3 randomRay = generateRandVec(seed);
+			diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
+
 			if (payload.objType == 0) {
 				material = materials[spheres[payload.objInd].materialInd];
-				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
-				//diffuseDir = normalize(randomRay * dot(payload.worldNorm, randomRay));
-
-				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			else if (payload.objType == 1) {
 				material = materials[planes[payload.objInd].materialInd];
-				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
-				//diffuseDir = normalize(randomRay * dot(payload.worldNorm, randomRay));
-
-				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			
 			else if (payload.objType == 2) {
 				material = materials[triangles[payload.objInd].materialInd];
-				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
-				//diffuseDir = normalize(randomRay * dot(payload.worldNorm, randomRay));
-
-				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 
-			light += emittedLight * contribution;
-			
-			contribution *= material.color;
+			emittedLight = material.emissionColor * material.emissionPower;
+			light += emittedLight * rayColor;
+			rayColor *= material.color;
+			//rayColor *= normalize(rayColor * material.color + 0.1f);
 		}
 	}
 	

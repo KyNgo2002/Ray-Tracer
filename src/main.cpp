@@ -144,8 +144,8 @@ int main() {
     rayShader.use();
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 6);
-    rayShader.setInt("NumPlanes", 0);
-    rayShader.setInt("NumTriangles", 0);
+    rayShader.setInt("NumPlanes", 1);
+    rayShader.setInt("NumTriangles", 1);
     rayShader.setVec2("Resolution", resolution);
     rayShader.setInt("Bounces", 30);
     rayShader.setInt("Time", rand());
@@ -171,10 +171,10 @@ int main() {
 
     std::vector<Material> materials = {
         {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 2.0f},
-        {glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
-        {glm::vec3{0.5f, 0.0f, 0.5f}, 0.1f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
-        {glm::vec3{0.0f, 0.5f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
-        {glm::vec3{0.5f, 0.0f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f}
+        {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
+        {glm::vec3{1.0f, 0.0f, 1.0f}, 0.1f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
+        {glm::vec3{0.0f, 1.0f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
+        {glm::vec3{1.0f, 0.0f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f}
     };
 
     std::vector<std::string> materialNames = {
