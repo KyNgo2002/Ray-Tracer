@@ -56,9 +56,11 @@ struct Sphere {
 
 struct Plane {
     glm::vec3 normal;
-    float distance;
-    glm::vec3 padding;
     int materialInd;
+    glm::vec2 xMax;
+    glm::vec2 yMax;
+    glm::vec2 zMax;
+    float dist;
 };
 
 struct Triangle {
@@ -160,8 +162,16 @@ int main() {
         {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
     };
     
+    glm::vec3 normal;
+    float dist;
+    glm::vec2 xMax;
+    glm::vec2 yMax;
+    glm::vec2 zMax;
+    int materialInd;
+
     std::vector<Plane> planes = {
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1}
+        {glm::vec3{0.0f, 1.0f, 0.0f}, 1, glm::vec2{-10.0f, 10.0f}, 
+            glm::vec2{-10.0f, 10.0f}, glm::vec2{-10.0f, 10.0f}, 1.0f}
     };
 
     std::vector<Triangle> triangles = {
@@ -351,7 +361,7 @@ int main() {
 
                     ImGui::PushID(i);
                     editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
-                    editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].distance, 0.1f);
+                    editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].dist, 0.1f);
                     ImGui::Separator();
                     ImGui::PopID();
                 }

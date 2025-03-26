@@ -24,9 +24,11 @@ struct Sphere {
 
 struct Plane {
     vec3 normal;
-    float dist;
-    vec3 padding;
 	int materialInd;
+    vec2 xMax;
+    vec2 yMax;
+	vec2 zMax;
+    float dist;
 };
 
 struct Triangle {
@@ -146,9 +148,10 @@ HitPayload TraceRay(Ray ray) {
 		if (denominator == 0) 
 			FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
+
 		float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].dist) / 
 			denominator;
-
+		
 		if (t > 0.0f && t < hitDistance) {
 			objType = 1;
 			closestInd = i;
@@ -237,18 +240,14 @@ void main() {
 
 			if (payload.objType == 0) {
 				material = materials[spheres[payload.objInd].materialInd];
-				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			else if (payload.objType == 1) {
 				material = materials[planes[payload.objInd].materialInd];
-				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
-			
 			else if (payload.objType == 2) {
 				material = materials[triangles[payload.objInd].materialInd];
-				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
-
+			ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			emittedLight = material.emissionColor * material.emissionPower;
 			light += emittedLight * rayColor;
 			rayColor *= normalize(rayColor * material.color + 0.1f);
