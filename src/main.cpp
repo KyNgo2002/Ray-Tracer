@@ -144,10 +144,10 @@ int main() {
     rayShader.use();
     glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 6);
-    rayShader.setInt("NumPlanes", 1);
-    rayShader.setInt("NumTriangles", 1);
+    rayShader.setInt("NumPlanes", 0);
+    rayShader.setInt("NumTriangles", 0);
     rayShader.setVec2("Resolution", resolution);
-    rayShader.setInt("Bounces", 5);
+    rayShader.setInt("Bounces", 30);
     rayShader.setInt("Time", rand());
 
     // SSBO objects
@@ -164,18 +164,13 @@ int main() {
         {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1}
     };
 
-    /*std::vector<Triangle> triangles = {
-        {glm::vec3{-1.5f, 2.0f, 2.0f}, 0.0f, glm::vec3{1.5f, 2.0f, 2.0f}, 0.0f, 
-        glm::vec3{0.0f, 5.0f, 2.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 1.0f}, 2}
-    };*/
-
     std::vector<Triangle> triangles = {
         {glm::vec4{-1.5f, 2.0f, 2.0f, -1.0f}, glm::vec4{1.5f, 2.0f, 2.0f, -1.0f},
         glm::vec4{0.0f, 5.0f, 2.0f, -1.0f}, glm::vec4{0.0f, 0.0f, 1.0f, -1.0f}, 2}
     };
 
     std::vector<Material> materials = {
-        {glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 2.0f},
+        {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 2.0f},
         {glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
         {glm::vec3{1.0f, 0.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
         {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
@@ -315,7 +310,7 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         rayShader.setInt("Skybox", 1);
-        srand(rand());
+        //srand(rand());
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 

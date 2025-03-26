@@ -207,11 +207,11 @@ void main() {
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
 	vec2 uvHash = hash2d(uv);
 	uint32_t seed = (uint32_t)(uvHash.x * uvHash.y) + (uint32_t)gl_FragCoord.x * 
-		(uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y + Time;
+		(uint32_t)Resolution.y + (uint32_t)gl_FragCoord.y * Time;
 
 	// Lighting variables
 	vec3 light = vec3(0.0f);
-	vec3 contribution = vec3(1.0f);
+	vec3 contribution = vec3(0.9f);
 	vec3 diffuseDir = vec3(0.0f);
 	vec3 specularDir = vec3(0.0f);
 	vec3 emittedLight = vec3(0.0f);
@@ -221,7 +221,7 @@ void main() {
 	ray.origin = CamPosition;
 	ray.direction = normalize(CamDirection + uv.x * CamRight + uv.y * CamUp);
 	
-	for (int i = 0; i < Bounces; ++i) {
+	for (int i = 0; i <= Bounces; ++i) {
 		seed += Time;
 		HitPayload payload = TraceRay(ray);
 		
@@ -230,30 +230,39 @@ void main() {
 			break;
 		}
 		else {
+			Material material;
 			vec3 specularDir = reflect(ray.direction, payload.worldNorm);
 			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
+			vec3 randomRay = generateRandVec(seed);
 			if (payload.objType == 0) {
-				Material material = materials[spheres[payload.objInd].materialInd];
+				material = materials[spheres[payload.objInd].materialInd];
 				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
+				//diffuseDir = normalize(randomRay * dot(payload.worldNorm, randomRay));
+
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 			else if (payload.objType == 1) {
-				Material material = materials[planes[payload.objInd].materialInd];
+				material = materials[planes[payload.objInd].materialInd];
 				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
+				//diffuseDir = normalize(randomRay * dot(payload.worldNorm, randomRay));
+
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
+			
 			else if (payload.objType == 2) {
-				Material material = materials[triangles[payload.objInd].materialInd];
+				material = materials[triangles[payload.objInd].materialInd];
 				diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
+				//diffuseDir = normalize(randomRay * dot(payload.worldNorm, randomRay));
+
 				emittedLight = material.emissionColor * material.emissionPower;
 				ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			}
 
 			light += emittedLight * contribution;
-			contribution *= payload.objType == 0 ? materials[spheres[payload.objInd].materialInd].color : payload.objType == 1 ? 
-				materials[planes[payload.objInd].materialInd].color : materials[triangles[payload.objInd].materialInd].color;
+			
+			contribution *= material.color;
 		}
 	}
 	

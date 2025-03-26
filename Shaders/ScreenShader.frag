@@ -1,4 +1,5 @@
 #version 460
+#extension GL_NV_gpu_shader5 : enable
 
 in vec2 TexCoord;
 
