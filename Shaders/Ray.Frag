@@ -251,8 +251,10 @@ void main() {
 
 			emittedLight = material.emissionColor * material.emissionPower;
 			light += emittedLight * rayColor;
-			rayColor *= material.color;
-			//rayColor *= normalize(rayColor * material.color + 0.1f);
+			rayColor *= normalize(rayColor * material.color + 0.1f);
+
+			float p = max(rayColor.r, max(rayColor.g, rayColor.b));
+			rayColor *= 1.0f / p;
 		}
 	}
 	
