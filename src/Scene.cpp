@@ -34,7 +34,7 @@ Scene::Scene() {
         {glm::vec3{1.0f, 0.0f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f}
     };
 
-    std::vector<std::string> materialNames = {
+    materialNames = {
         "Emissive",
         "Plane",
         "Purple Sphere",
@@ -77,17 +77,17 @@ void Scene::createBuffers() {
 void Scene::createImGuiEditor(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    io = ImGui::GetIO(); (void)io;
+    io = &ImGui::GetIO(); 
 
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io->ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
 
     ImGui::StyleColorsDark();
 
     ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         style.WindowRounding = 0.0f;
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
@@ -97,13 +97,30 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
 }
 
 bool Scene::checkEdits() {
-    return editedTriangles || editedMaterials || editedPlanes || editedSpheres;
+    return editedSpheres || editedPlanes || editedTriangles || editedMaterials;
+}
+
+void Scene::handleEdits() {
+    if (editedSpheres) 
+        sendSpheres();
+    if (editedPlanes)
+        sendPlanes();
+    if (editedTriangles)
+        sendTriangles();
+    if (editedMaterials)
+        sendMaterials();
 }
 
 void Scene::sendSpheres() {
     editedSpheres = false;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
+}
+
+void Scene::sendPlanes() {
+    editedPlanes = false;
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Plane), planes.data(), GL_DYNAMIC_DRAW);
 }
 
 void Scene::sendTriangles() {
@@ -118,17 +135,17 @@ void Scene::sendMaterials() {
     glBufferData(GL_SHADER_STORAGE_BUFFER, materials.size() * sizeof(Material), materials.data(), GL_DYNAMIC_DRAW);
 }
 
-void Scene::dislayEditor() {
+void Scene::displayEditor() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
     ImGui::Begin("Scene properties");
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
     ImGui::Separator();
 
     if (ImGui::CollapsingHeader("Sphere Properties")) {
-        for (int i = 0; i < spheres.size(); ++i) {
+        for (int i = 0; i < numSpheres; ++i) {
             ImGui::Text("Sphere %d", (i + 1));
             ImGui::PushID(i);
             editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
@@ -138,7 +155,7 @@ void Scene::dislayEditor() {
         }
     }
     if (ImGui::CollapsingHeader("Plane Properties")) {
-        for (int i = 0; i < planes.size(); ++i) {
+        for (int i = 0; i < numPlanes; ++i) {
             ImGui::Text("Plane %d", (i + 1));
             ImGui::PushID(i);
             editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
@@ -149,7 +166,7 @@ void Scene::dislayEditor() {
     }
 
     if (ImGui::CollapsingHeader("Triangle Properties")) {
-        for (int i = 0; i < triangles.size(); ++i) {
+        for (int i = 0; i < numTriangles; ++i) {
             ImGui::Text("Triangle %d", (i + 1));
             ImGui::PushID(i);
             editedTriangles |= ImGui::DragFloat3("X##xx", glm::value_ptr(triangles[i].x), 0.1f);
@@ -160,7 +177,7 @@ void Scene::dislayEditor() {
         }
     }
     if (ImGui::CollapsingHeader("Material Properties")) {
-        for (int i = 0; i < materials.size(); ++i) {
+        for (int i = 0; i < numMaterials; ++i) {
             ImGui::PushID(i);
             ImGui::Text("Material %d", (i + 1));
             ImGui::Text("%s", materialNames[i].c_str());
@@ -178,7 +195,7 @@ void Scene::dislayEditor() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    if (io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();

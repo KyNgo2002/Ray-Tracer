@@ -69,7 +69,7 @@ public:
     GLuint triangleSSBO;
     GLuint materialSSBO;
 
-    ImGuiIO io;
+    ImGuiIO* io;
 
 public:
     // Constructors/Destructors/Setup
@@ -85,14 +85,17 @@ public:
     void addMaterial();
 
     bool checkEdits();
+    void handleEdits();
+
 
     // Modifiers
     void sendSpheres();
+    void sendPlanes();
     void sendTriangles();
     void sendMaterials();
 
     // Functionality
-    void dislayEditor();
+    void displayEditor();
 
 };
 

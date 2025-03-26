@@ -4,51 +4,12 @@
 #include <cstdlib>
 #include "../include/Shader.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
 #include "../include/Scene.h"
 
 #include "../include/Model.h"
 #include "../include/stb_image.h"
-
-#include "ImGui/imgui.h"
-#include "ImGui/backend/imgui_impl_glfw.h"
-#include "ImGui/backend/imgui_impl_opengl3.h"
-
-struct Sphere {
-    glm::vec3 position;
-    float radius;
-    glm::vec3 padding;
-    int materialInd;
-};
-
-struct Plane {
-    glm::vec3 normal;
-    int materialInd;
-    glm::vec2 xMax;
-    glm::vec2 yMax;
-    glm::vec2 zMax;
-    float dist;
-};
-
-struct Triangle {
-    glm::vec4 x;
-    glm::vec4 y;
-    glm::vec4 z;
-    glm::vec4 normal;
-    int materialInd;
-};
-
-struct Material {
-    glm::vec3 color;
-    float roughness;
-    glm::vec3 emissionColor;
-    float emissionPower;
-};
 
 unsigned int loadCubemap(std::vector<std::string> faces);
 
@@ -59,8 +20,9 @@ int main() {
     
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
-    //Scene scene;
-    //scene.createImGuiEditor(openGL.getWindow());
+    Scene scene;
+    scene.createImGuiEditor(openGL.getWindow());
+
     Camera* camera = openGL.getCamera();
 
     srand(time(0));
@@ -117,73 +79,12 @@ int main() {
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
     rayShader.use();
-    glm::vec2 resolution(openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("NumSpheres", 6);
     rayShader.setInt("NumPlanes", 1);
     rayShader.setInt("NumTriangles", 1);
-    rayShader.setVec2("Resolution", resolution);
+    rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("Bounces", 30);
     rayShader.setInt("Time", rand());
-
-    // SSBO objects
-    std::vector<Sphere> spheres = {
-        {glm::vec3{-6.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 2},
-        {glm::vec3{-3.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 3},
-        {glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 4},
-        {glm::vec3{0.0f, -101.f, 0.0f}, 100.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1},
-        {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0},
-        {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
-    };
-
-    std::vector<Plane> planes = {
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 1, glm::vec2{-10.0f, 10.0f}, 
-            glm::vec2{-10.0f, 10.0f}, glm::vec2{-10.0f, 10.0f}, 1.0f}
-    };
-
-    std::vector<Triangle> triangles = {
-        {glm::vec4{-1.5f, 2.0f, 2.0f, -1.0f}, glm::vec4{1.5f, 2.0f, 2.0f, -1.0f},
-        glm::vec4{0.0f, 5.0f, 2.0f, -1.0f}, glm::vec4{0.0f, 0.0f, 1.0f, -1.0f}, 2}
-    };
-
-    std::vector<Material> materials = {
-        {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 2.0f},
-        {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
-        {glm::vec3{1.0f, 0.0f, 1.0f}, 0.1f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f},
-        {glm::vec3{1.0f, 0.0f, 0.0f}, 0.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 1.0f}
-    };
-
-    std::vector<std::string> materialNames = {
-        "Emissive",
-        "Plane",
-        "Purple Sphere",
-        "Green Sphere",
-        "Red Sphere"
-    };
-
-    GLuint sphereSSBO;
-    glGenBuffers(1, &sphereSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, sphereSSBO);
-
-    GLuint planeSSBO;
-    glGenBuffers(1, &planeSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Plane), planes.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, planeSSBO);
-
-    GLuint triangleSSBO;
-    glGenBuffers(1, &triangleSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, triangleSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, triangleSSBO);
-
-    GLuint materialSSBO;
-    glGenBuffers(1, &materialSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, materialSSBO);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, materials.size() * sizeof(Material), materials.data(), GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, materialSSBO);
 
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
@@ -205,37 +106,11 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // ImGUI initialization
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
-
-    ImGui::StyleColorsDark();
-
-    ImGuiStyle& style = ImGui::GetStyle();
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-    }
-
-    ImGui_ImplGlfw_InitForOpenGL(openGL.getWindow(), true);
-    ImGui_ImplOpenGL3_Init("#version 460");
-
     auto prevTime = clock.now();
     auto currTime = clock.now();
 
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
-
-    bool editedSpheres = false;
-    bool editedPlanes = false;
-    bool editedTriangles = false;
-    bool editedMaterials = false;
 
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -249,32 +124,13 @@ int main() {
         // First pass accumulation buffer
         glBindVertexArray(rectVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
-        if (camera->moved || editedSpheres || editedPlanes || editedTriangles || editedMaterials) {
+        if (camera->moved || scene.checkEdits()) {
+            scene.handleEdits();
             glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
             screenShader.use();
             screenShader.setUInt("Frames", camera->frames);
-            if (editedSpheres) {
-                editedSpheres = false;
-                glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
-                glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
-            }
-            else if (editedPlanes){
-                editedPlanes = false;
-                glBindBuffer(GL_SHADER_STORAGE_BUFFER, planeSSBO);
-                glBufferData(GL_SHADER_STORAGE_BUFFER, planes.size() * sizeof(Plane), planes.data(), GL_DYNAMIC_DRAW);
-            }
-            else if (editedTriangles) {
-                editedTriangles = false;
-                glBindBuffer(GL_SHADER_STORAGE_BUFFER, triangleSSBO);
-                glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
-            }
-            else if (editedMaterials) {
-                editedMaterials = false;
-                glBindBuffer(GL_SHADER_STORAGE_BUFFER, materialSSBO);
-                glBufferData(GL_SHADER_STORAGE_BUFFER, materials.size() * sizeof(Material), materials.data(), GL_DYNAMIC_DRAW);
-            }
         }
 
         rayShader.use();
@@ -300,73 +156,8 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components
-        if (openGL.editingMode) {
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
-            ImGui::Begin("Scene properties");
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-            ImGui::Separator();
-            
-            if (ImGui::CollapsingHeader("Sphere Properties")) {
-                for (int i = 0; i < spheres.size(); ++i) {
-                    ImGui::Text("Sphere %d", (i + 1));
-                    ImGui::PushID(i);
-                    editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
-                    editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
-                    ImGui::Separator();
-                    ImGui::PopID();
-                }
-            }
-            if (ImGui::CollapsingHeader("Plane Properties")) {
-                for (int i = 0; i < planes.size(); ++i) {
-                    ImGui::Text("Plane %d", (i + 1));
-                    ImGui::PushID(i);
-                    editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
-                    editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].dist, 0.1f);
-                    ImGui::Separator();
-                    ImGui::PopID();
-                }
-            }
-
-            if (ImGui::CollapsingHeader("Triangle Properties")) {
-                for (int i = 0; i < triangles.size(); ++i) {
-                    ImGui::Text("Triangle %d", (i + 1));
-                    ImGui::PushID(i);
-                    editedTriangles |= ImGui::DragFloat3("X##xx", glm::value_ptr(triangles[i].x), 0.1f);
-                    editedTriangles |= ImGui::DragFloat3("Y##xx", glm::value_ptr(triangles[i].y), 0.1f);
-                    editedTriangles |= ImGui::DragFloat3("Z##xx", glm::value_ptr(triangles[i].z), 0.1f);
-                    ImGui::Separator();
-                    ImGui::PopID();
-                }
-            }
-            if (ImGui::CollapsingHeader("Material Properties")) {
-                for (int i = 0; i < materials.size(); ++i) {
-                    ImGui::PushID(i);
-                    ImGui::Text("Material %d", (i + 1));
-                    ImGui::Text("%s", materialNames[i].c_str());
-                    editedMaterials |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(materials[i].color), 0.1f);
-                    editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.02f, 0.0f, 1.0f);
-                    editedMaterials |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(materials[i].emissionColor), 0.1f);
-                    editedMaterials |= ImGui::DragFloat("Emission Power##xx", &materials[i].emissionPower, 0.01f, 0.0f, 10.0f);
-                    ImGui::Separator();
-                    ImGui::PopID();
-                }
-            }
-
-            ImGui::End();
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-                GLFWwindow* backup_current_context = glfwGetCurrentContext();
-                ImGui::UpdatePlatformWindows();
-                ImGui::RenderPlatformWindowsDefault();
-                glfwMakeContextCurrent(backup_current_context);
-            }
-        }
+        if (openGL.editingMode) 
+            scene.displayEditor();
         
         // Check Events and swap buffers
         glfwSwapBuffers(openGL.getWindow());
