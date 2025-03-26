@@ -84,6 +84,8 @@ public:
     void addPlane();
     void addMaterial();
 
+    bool checkEdits();
+
     // Modifiers
     void sendSpheres();
     void sendTriangles();

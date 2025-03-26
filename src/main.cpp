@@ -60,7 +60,7 @@ int main() {
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
     //Scene scene;
-    //scene.createEditor(openGL.getWindow());
+    //scene.createImGuiEditor(openGL.getWindow());
     Camera* camera = openGL.getCamera();
 
     srand(time(0));

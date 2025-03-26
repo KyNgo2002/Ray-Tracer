@@ -96,7 +96,11 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
     ImGui_ImplOpenGL3_Init("#version 460");
 }
 
-void Scene::sendSpheres() {	
+bool Scene::checkEdits() {
+    return editedTriangles || editedMaterials || editedPlanes || editedSpheres;
+}
+
+void Scene::sendSpheres() {
     editedSpheres = false;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
