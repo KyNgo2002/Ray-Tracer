@@ -150,8 +150,7 @@
     <ClCompile Include="include\ImGui\imgui_draw.cpp" />
     <ClCompile Include="include\ImGui\imgui_tables.cpp" />
     <ClCompile Include="include\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Planes.cpp" />
-    <ClCompile Include="src\Cubes.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\OpenGL.cpp" />
@@ -162,7 +161,6 @@
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Cubes.h" />
     <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\glad\glad.h" />
     <ClInclude Include="include\GLFW\glfw3.h" />
@@ -181,7 +179,7 @@
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Model.h" />
-    <ClInclude Include="include\Planes.h" />
+    <ClInclude Include="include\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

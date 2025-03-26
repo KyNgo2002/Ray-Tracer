@@ -10,42 +10,14 @@
 
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
+#include "../include/Scene.h"
+
 #include "../include/Model.h"
 #include "../include/stb_image.h"
-#include "Cubes.h"
-#include "Planes.h"
 
 #include "ImGui/imgui.h"
 #include "ImGui/backend/imgui_impl_glfw.h"
 #include "ImGui/backend/imgui_impl_opengl3.h"
-
- 
-// MVP matrices
-/*glm::mat4 model = glm::mat4(1.0f);
-model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-modelShader.setMat4("model", model);
-glm::mat4 projection =
-    glm::perspective(glm::radians(45.0f), (float)openGL.getScreenWidth() / (float)openGL.getScreenHeight(), 0.1f, 100.0f);
-
-modelShader.setMat4("view", camera->lookAt);
-modelShader.setMat4("projection", projection);*/
-
-//char path[] = "C:\\Users\\kyngo\\Downloads\\backpack\\backpack.obj";
-
-// Model loading
-//Model backpack(path);
-
-// Model Code
-/*modelShader.use();
-glm::mat4 model = glm::mat4(1.0f);
-model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-modelShader.setMat4("model", model);
-modelShader.setMat4("view", camera->lookAt);
-modelShader.setMat4("projection", projection);*/
-
-//backpack.Draw(&modelShader);
 
 struct Sphere {
     glm::vec3 position;
@@ -87,7 +59,8 @@ int main() {
     
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
-
+    //Scene scene;
+    //scene.createEditor(openGL.getWindow());
     Camera* camera = openGL.getCamera();
 
     srand(time(0));
@@ -161,13 +134,6 @@ int main() {
         {glm::vec3{2.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0},
         {glm::vec3{-4.0f, 0.0f, -93.0f}, 56.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0}
     };
-    
-    glm::vec3 normal;
-    float dist;
-    glm::vec2 xMax;
-    glm::vec2 yMax;
-    glm::vec2 zMax;
-    int materialInd;
 
     std::vector<Plane> planes = {
         {glm::vec3{0.0f, 1.0f, 0.0f}, 1, glm::vec2{-10.0f, 10.0f}, 
@@ -340,14 +306,12 @@ int main() {
             ImGui::NewFrame();
 
             ImGui::Begin("Scene properties");
-
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::Separator();
             
             if (ImGui::CollapsingHeader("Sphere Properties")) {
                 for (int i = 0; i < spheres.size(); ++i) {
                     ImGui::Text("Sphere %d", (i + 1));
-
                     ImGui::PushID(i);
                     editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
                     editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
@@ -358,7 +322,6 @@ int main() {
             if (ImGui::CollapsingHeader("Plane Properties")) {
                 for (int i = 0; i < planes.size(); ++i) {
                     ImGui::Text("Plane %d", (i + 1));
-
                     ImGui::PushID(i);
                     editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
                     editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].dist, 0.1f);
@@ -370,7 +333,6 @@ int main() {
             if (ImGui::CollapsingHeader("Triangle Properties")) {
                 for (int i = 0; i < triangles.size(); ++i) {
                     ImGui::Text("Triangle %d", (i + 1));
-
                     ImGui::PushID(i);
                     editedTriangles |= ImGui::DragFloat3("X##xx", glm::value_ptr(triangles[i].x), 0.1f);
                     editedTriangles |= ImGui::DragFloat3("Y##xx", glm::value_ptr(triangles[i].y), 0.1f);
@@ -388,8 +350,6 @@ int main() {
                     editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.02f, 0.0f, 1.0f);
                     editedMaterials |= ImGui::ColorEdit3("Emission Color##xx", glm::value_ptr(materials[i].emissionColor), 0.1f);
                     editedMaterials |= ImGui::DragFloat("Emission Power##xx", &materials[i].emissionPower, 0.01f, 0.0f, 10.0f);
-
-                    
                     ImGui::Separator();
                     ImGui::PopID();
                 }
