@@ -80,7 +80,6 @@ int main() {
 
     rayShader.use();
     rayShader.setInt("NumSpheres", scene.numSpheres);
-    rayShader.setInt("NumPlanes", scene.numPlanes);
     rayShader.setInt("NumTriangles", scene.numTriangles);
     rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("Bounces", 30);

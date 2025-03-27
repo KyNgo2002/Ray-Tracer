@@ -67,7 +67,6 @@ in vec2 TexCoord;
 out vec4 FragColor;
 
 uniform int NumSpheres;
-uniform int NumPlanes;
 uniform int NumTriangles;
 
 uniform vec2 Resolution;

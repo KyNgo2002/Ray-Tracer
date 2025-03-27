@@ -18,8 +18,7 @@ Scene::Scene() {
     };
 
     triangles = {
-        {glm::vec4{-1.5f, 2.0f, 2.0f, -1.0f}, glm::vec4{1.5f, 2.0f, 2.0f, -1.0f},
-        glm::vec4{0.0f, 5.0f, 2.0f, -1.0f}, glm::vec3{0.0f, 0.0f, 1.0f}, 2}
+        
     };
     
     materials = {
@@ -42,6 +41,8 @@ Scene::Scene() {
     numTriangles = triangles.size();
     numPlanes = planes.size();
     numMaterials = materials.size();
+
+    addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2);
 
     createBuffers();
 }
@@ -97,7 +98,7 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
     ImGui_ImplOpenGL3_Init("#version 460");
 }
 
-void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float dist, float materialInd) {
+void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd) {
     Triangle firstTriangle;
     Triangle secondTriangle;
 
@@ -111,7 +112,7 @@ void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight,
 
     // top-left -> bottom-left -> bottom->right
     firstTriangle.x = glm::vec4(topLeft.x, topLeft.y, topLeft.z, 0.0f);
-    firstTriangle.y = glm::vec4(topLeft.x, bottomRight.y, topLeft.z, 0.0f);
+    firstTriangle.y = glm::vec4(topLeft.x, bottomRight.y, bottomRight.z, 0.0f);
     firstTriangle.z = glm::vec4(bottomRight.x, bottomRight.y, bottomRight.z, 0.0f);
     firstTriangle.normal = normal;
     firstTriangle.materialInd = materialInd;
