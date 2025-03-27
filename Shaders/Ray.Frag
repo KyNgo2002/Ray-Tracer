@@ -143,23 +143,23 @@ HitPayload TraceRay(Ray ray) {
 	}
 
 	// Ray-Plane Intersection
-	for (int i = 0; i < NumPlanes; ++i) {
-		float denominator = (dot(planes[i].normal, ray.direction));
-
+	//for (int i = 0; i < NumPlanes; ++i) {
+	//	float denominator = (dot(planes[i].normal, ray.direction));
+	//
 		// No Intersection ray-plane
-		if (denominator == 0) 
-			FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	//	if (denominator == 0) 
+	//		FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 
-		float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].dist) / 
-			denominator;
+	//	float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].dist) / 
+	//		denominator;
 		
-		if (t > 0.0f && t < hitDistance) {
-			objType = 1;
-			closestInd = i;
-			hitDistance = t;
-		}
-	}
+	//	if (t > 0.0f && t < hitDistance) {
+	//		objType = 1;
+	//		closestInd = i;
+	//		hitDistance = t;
+	//	}
+	//}
 
 	// Ray-Triangle Intersection;
 	for (int i = 0; i < NumTriangles; ++i) {

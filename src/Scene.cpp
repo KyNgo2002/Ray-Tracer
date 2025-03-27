@@ -2,10 +2,6 @@
 
 Scene::Scene() {
     // Default Scene
-	numSpheres = 6;
-	numTriangles = 1;
-	numPlanes = 1;
-    numMaterials = 5;
 
     spheres = {
         {glm::vec3{-6.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 2},
@@ -17,8 +13,8 @@ Scene::Scene() {
     };
 
     planes = {
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 1, glm::vec2{-10.0f, 10.0f},
-            glm::vec2{-10.0f, 10.0f}, glm::vec2{-10.0f, 10.0f}, 1.0f}
+        /*{glm::vec3{0.0f, 1.0f, 0.0f}, 1, glm::vec2{-10.0f, 10.0f},
+            glm::vec2{-10.0f, 10.0f}, glm::vec2{-10.0f, 10.0f}, 1.0f}*/
     };
 
     triangles = {
@@ -41,6 +37,11 @@ Scene::Scene() {
         "Green Sphere",
         "Red Sphere"
     };
+
+    numSpheres = spheres.size();
+    numTriangles = triangles.size();
+    numPlanes = planes.size();
+    numMaterials = materials.size();
 
     createBuffers();
 }
@@ -94,6 +95,40 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
+}
+
+void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float dist, float materialInd) {
+    Triangle firstTriangle;
+    Triangle secondTriangle;
+
+    struct Triangle {
+        glm::vec4 x;
+        glm::vec4 y;
+        glm::vec4 z;
+        glm::vec3 normal;
+        int materialInd;
+    };
+
+    // top-left -> bottom-left -> bottom->right
+    firstTriangle.x = glm::vec4(topLeft.x, topLeft.y, topLeft.z, 0.0f);
+    firstTriangle.y = glm::vec4(topLeft.x, bottomRight.y, topLeft.z, 0.0f);
+    firstTriangle.z = glm::vec4(bottomRight.x, bottomRight.y, bottomRight.z, 0.0f);
+    firstTriangle.normal = normal;
+    firstTriangle.materialInd = materialInd;
+
+    // top-left -> top-right -> bottom-right
+    secondTriangle.x = glm::vec4(topLeft.x, topLeft.y, topLeft.z, 0.0f);
+    secondTriangle.y = glm::vec4(bottomRight.x, topLeft.y, topLeft.z, 0.0f);
+    secondTriangle.z = glm::vec4(bottomRight.x, bottomRight.y, bottomRight.z, 0.0f);
+    secondTriangle.normal = normal;
+    secondTriangle.materialInd = materialInd;
+
+    triangles.push_back(firstTriangle);
+    triangles.push_back(secondTriangle);
+
+    numTriangles += 2;
+    numPlanes++;
+    sendTriangles();
 }
 
 bool Scene::checkEdits() {
@@ -182,7 +217,7 @@ void Scene::displayEditor() {
     if (ImGui::CollapsingHeader("Material Properties")) {
         for (int i = 0; i < numMaterials; ++i) {
             ImGui::PushID(i);
-            ImGui::Text("Material %d", (i + 1));
+            ImGui::Text("Material %d", (i));
             ImGui::Text("%s", materialNames[i].c_str());
             editedMaterials |= ImGui::ColorEdit3("Color##xx", glm::value_ptr(materials[i].color), 0.1f);
             editedMaterials |= ImGui::DragFloat("Roughness##xx", &materials[i].roughness, 0.02f, 0.0f, 1.0f);

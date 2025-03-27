@@ -79,9 +79,9 @@ int main() {
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
     rayShader.use();
-    rayShader.setInt("NumSpheres", 6);
-    rayShader.setInt("NumPlanes", 1);
-    rayShader.setInt("NumTriangles", 1);
+    rayShader.setInt("NumSpheres", scene.numSpheres);
+    rayShader.setInt("NumPlanes", scene.numPlanes);
+    rayShader.setInt("NumTriangles", scene.numTriangles);
     rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("Bounces", 30);
     rayShader.setInt("Time", rand());
