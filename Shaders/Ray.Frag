@@ -162,16 +162,17 @@ HitPayload TraceRay(Ray ray) {
 	// Ray-Triangle Intersection;
 	for (int i = 0; i < NumTriangles; ++i) {
 		// Mollere Trumbore Triangle Intersection
+		// https://stackoverflow.com/a/42752998
 		Triangle triangle = triangles[i];
 		vec3 v1v0 = triangle.y.xyz - triangle.x.xyz;
 		vec3 v2v0 = triangle.z.xyz - triangle.x.xyz;
 		vec3 rov0 = ray.origin - triangle.x.xyz;
-		vec3  n = cross(v1v0, v2v0);
-		vec3  q = cross(rov0, ray.direction);
-		float d = 1.0 / dot(ray.direction, n);
+		vec3 normal = cross(v1v0, v2v0);
+		vec3 q = cross(rov0, ray.direction);
+		float d = 1.0 / dot(ray.direction, normal);
 		float u = d * dot(-q, v2v0);
 		float v = d * dot(q, v1v0);
-		float t = d * dot(-n, rov0);
+		float t = d * dot(-normal, rov0);
 
 		if(u < 0.0f || v < 0.0f || (u + v) > 1.0f) t = -1.0;
 		//t = min(u, min(v, min(1.0 - (u + v), t)));

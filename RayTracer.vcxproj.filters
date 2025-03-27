@@ -138,12 +138,6 @@
     <None Include="Shaders\Frag.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\ModelLoading.vert">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\ModelLoading.frag">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="lib\assimp-vc143-mt.dll" />
     <None Include="lib\assimp-vc143-mtd.dll" />
     <None Include="Shaders\Ray.vert">
@@ -168,25 +162,25 @@
     <Library Include="lib\assimp-vc143-mtd.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Textures\checker.png">
+    <Image Include="Assets\checker.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\skybox\back.jpg">
+    <Image Include="Assets\skybox\back.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\skybox\bottom.jpg">
+    <Image Include="Assets\skybox\bottom.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\skybox\front.jpg">
+    <Image Include="Assets\skybox\front.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\skybox\left.jpg">
+    <Image Include="Assets\skybox\left.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\skybox\right.jpg">
+    <Image Include="Assets\skybox\right.jpg">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Textures\skybox\top.jpg">
+    <Image Include="Assets\skybox\top.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

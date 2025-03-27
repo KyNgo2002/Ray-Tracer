@@ -67,12 +67,12 @@ int main() {
     screenShader.setUInt("Frames", camera->frames);
 
     std::vector<std::string> faces{
-        "Textures\\skybox\\right.jpg",
-        "Textures\\skybox\\left.jpg",
-        "Textures\\skybox\\top.jpg",
-        "Textures\\skybox\\bottom.jpg",
-        "Textures\\skybox\\front.jpg",
-        "Textures\\skybox\\back.jpg"
+        "Assets\\skybox\\right.jpg",
+        "Assets\\skybox\\left.jpg",
+        "Assets\\skybox\\top.jpg",
+        "Assets\\skybox\\bottom.jpg",
+        "Assets\\skybox\\front.jpg",
+        "Assets\\skybox\\back.jpg"
     };
 
     unsigned int cubeMapTextureID = loadCubemap(faces);

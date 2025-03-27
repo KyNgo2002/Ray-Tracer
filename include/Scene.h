@@ -79,10 +79,10 @@ public:
     void createImGuiEditor(GLFWwindow* window);
 
     // Getters/Setters
-    void addSphere();
-    void addTriangle();
-    void addPlane();
-    void addMaterial();
+    void addSphere(glm::vec3 position, float radius, int materialInd);
+    void addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd);
+    void addPlane(glm::vec3 normal, glm::vec2 xMax, glm::vec2 yMax, glm::vec2 zMax, float dist, float materialInd);
+    void addMaterial(glm::vec3 color, glm::vec3 emissionColor, float roughness, float emissionPower);
 
     bool checkEdits();
     void handleEdits();

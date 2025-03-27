@@ -150,6 +150,7 @@ void Scene::displayEditor() {
             ImGui::PushID(i);
             editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
             editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
+            editedSpheres |= ImGui::SliderInt("Material #", &spheres[i].materialInd, 0, numMaterials - 1);
             ImGui::Separator();
             ImGui::PopID();
         }
@@ -160,6 +161,7 @@ void Scene::displayEditor() {
             ImGui::PushID(i);
             editedPlanes |= ImGui::DragFloat3("Normal##xx", glm::value_ptr(planes[i].normal), 0.1f);
             editedPlanes |= ImGui::DragFloat("Distance##xx", &planes[i].dist, 0.1f);
+            editedPlanes |= ImGui::SliderInt("Material #", &planes[i].materialInd, 0, numMaterials - 1);
             ImGui::Separator();
             ImGui::PopID();
         }
@@ -172,6 +174,7 @@ void Scene::displayEditor() {
             editedTriangles |= ImGui::DragFloat3("X##xx", glm::value_ptr(triangles[i].x), 0.1f);
             editedTriangles |= ImGui::DragFloat3("Y##xx", glm::value_ptr(triangles[i].y), 0.1f);
             editedTriangles |= ImGui::DragFloat3("Z##xx", glm::value_ptr(triangles[i].z), 0.1f);
+            editedTriangles |= ImGui::SliderInt("Material #", &triangles[i].materialInd, 0, numMaterials - 1);
             ImGui::Separator();
             ImGui::PopID();
         }

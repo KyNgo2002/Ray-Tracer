@@ -192,8 +192,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\ModelLoading.frag" />
-    <None Include="Shaders\ModelLoading.vert" />
     <None Include="Shaders\Ray.Frag" />
     <None Include="Shaders\Ray.vert" />
     <None Include="Shaders\ScreenShader.frag" />
@@ -206,13 +204,13 @@
     <Library Include="lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Textures\checker.png" />
-    <Image Include="Textures\skybox\back.jpg" />
-    <Image Include="Textures\skybox\bottom.jpg" />
-    <Image Include="Textures\skybox\front.jpg" />
-    <Image Include="Textures\skybox\left.jpg" />
-    <Image Include="Textures\skybox\right.jpg" />
-    <Image Include="Textures\skybox\top.jpg" />
+    <Image Include="Assets\checker.png" />
+    <Image Include="Assets\skybox\back.jpg" />
+    <Image Include="Assets\skybox\bottom.jpg" />
+    <Image Include="Assets\skybox\front.jpg" />
+    <Image Include="Assets\skybox\left.jpg" />
+    <Image Include="Assets\skybox\right.jpg" />
+    <Image Include="Assets\skybox\top.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
