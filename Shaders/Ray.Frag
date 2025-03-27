@@ -35,7 +35,7 @@ struct Triangle {
 	vec4 x;
     vec4 y;
     vec4 z;
-    vec4 normal;
+    vec3 normal;
     int materialInd;
 };
 
@@ -119,6 +119,8 @@ HitPayload TraceRay(Ray ray) {
 	int closestInd = -1;
 	float hitDistance = 3.402823466e+38;
 
+	vec3 triangleNormal;
+
 	// Ray-Sphere intersection
 	for (int i = 0; i < NumSpheres; ++i) {
 		vec3 origin = ray.origin - spheres[i].position;
@@ -166,7 +168,7 @@ HitPayload TraceRay(Ray ray) {
 		Triangle triangle = triangles[i];
 		vec3 v1v0 = triangle.y.xyz - triangle.x.xyz;
 		vec3 v2v0 = triangle.z.xyz - triangle.x.xyz;
-		vec3 rov0 = ray.origin - triangle.x.xyz;
+		vec3 rov0 =  ray.origin - triangle.x.xyz;
 		vec3 normal = cross(v1v0, v2v0);
 		vec3 q = cross(rov0, ray.direction);
 		float d = 1.0 / dot(ray.direction, normal);
@@ -175,7 +177,6 @@ HitPayload TraceRay(Ray ray) {
 		float t = d * dot(-normal, rov0);
 
 		if(u < 0.0f || v < 0.0f || (u + v) > 1.0f) t = -1.0;
-		//t = min(u, min(v, min(1.0 - (u + v), t)));
 		if (t > 0.0f && t < hitDistance) {
 			objType = 2;
 			closestInd = i;
@@ -200,7 +201,8 @@ HitPayload TraceRay(Ray ray) {
 	}
 	else {
 		payload.worldPos = ray.origin + ray.direction * hitDistance;
-		payload.worldNorm = objType == 1 ? planes[closestInd].normal : triangles[closestInd].normal.xyz;
+		payload.worldNorm = objType == 1 ? planes[closestInd].normal :
+		triangles[closestInd].normal.xyz;
 	}
 	
 	return payload;

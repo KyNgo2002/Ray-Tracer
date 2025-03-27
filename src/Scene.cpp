@@ -23,7 +23,7 @@ Scene::Scene() {
 
     triangles = {
         {glm::vec4{-1.5f, 2.0f, 2.0f, -1.0f}, glm::vec4{1.5f, 2.0f, 2.0f, -1.0f},
-        glm::vec4{0.0f, 5.0f, 2.0f, -1.0f}, glm::vec4{0.0f, 0.0f, 1.0f, -1.0f}, 2}
+        glm::vec4{0.0f, 5.0f, 2.0f, -1.0f}, glm::vec3{0.0f, 0.0f, 1.0f}, 2}
     };
     
     materials = {

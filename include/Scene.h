@@ -36,7 +36,7 @@ public:
         glm::vec4 x;
         glm::vec4 y;
         glm::vec4 z;
-        glm::vec4 normal;
+        glm::vec3 normal;
         int materialInd;
     };
 
