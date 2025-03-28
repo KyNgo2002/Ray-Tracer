@@ -27,9 +27,9 @@ Scene::Scene() {
     
     materials = {
         {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f},
-        {glm::vec3{1.0f, 0.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
-        {glm::vec3{0.0f, 0.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
-        {glm::vec3{0.0f, 1.0f, 0.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{1.0f, 0.16f, 0.16f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{0.0f, 0.73f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
+        {glm::vec3{0.2f, 1.0f, 0.2f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
         {glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
         {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f},
 
@@ -40,7 +40,7 @@ Scene::Scene() {
         "Red left panel",
         "Blue right panel",
         "Green bottom Panel",
-        "White top panel"
+        "White front/back panel",
         "Reflective not emissive"
     };
 
@@ -52,6 +52,7 @@ Scene::Scene() {
     addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
     addPlane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 20.0f, 10.0f), 0, false);
     addPlane(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, -10.0f), 4, false);
+    addPlane(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(10.0f, 0.0f,  10.0f), 4, false);
     addPlane(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(-10.0f, 0.0f, -10.0f), 1, true);
     addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);
 
@@ -267,5 +268,87 @@ void Scene::displayEditor() {
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
+    }
+}
+
+void Scene::loadModel(const char* path) {
+    std::ifstream ifstream(path);
+    
+    if (!ifstream.is_open()) {
+        std::cout << "ERROR::Failed to open file at " << path << std::endl;
+        return;
+    }
+
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec3> vertexNormals;
+    std::vector<glm::vec3> faces;
+
+    std::string line;
+    int verticeCount = 0;
+    int vertexNormalCount = 0;
+    int faceCount = 0;
+
+    while (getline(ifstream, line)) {
+        std::istringstream sstream(line);
+        std::string token;
+        sstream >> token;
+        // Vertex Normals
+        if (token == "vn") {
+            ++vertexNormalCount;
+            glm::vec3 vertexNormal;
+            sstream >> vertexNormal.x >> vertexNormal.y >> vertexNormal.z;
+            vertexNormals.push_back(vertexNormal);
+            std::cout << line << std::endl;
+        }
+        // Vertices
+        else if (token == "v") {
+            ++verticeCount;
+            glm::vec3 vertex;
+            sstream >> vertex.x >> vertex.y >> vertex.z;
+            vertices.push_back(vertex);
+            std::cout << line << std::endl;
+        }
+        // Faces
+        else if (token == "f") {
+            ++faceCount;
+            std::vector<std::string> tokens;
+            // Split string into tokens.
+            while (sstream >> token) 
+                tokens.push_back(token);
+
+            triangulate(tokens);
+            
+            std::cout << tokens.size() << " : " << line << std::endl;
+        }
+    }
+    std::cout << "Vertice Count: " << verticeCount << " -> Loaded Vertice Count: " << vertices.size() << std::endl;
+    std::cout << "Vertice Normal Count: " << vertexNormalCount << " -> Loaded Vertex Normal Count: " << vertexNormals.size() << std::endl;
+    std::cout << "Face Count: " << faceCount << " -> Loaded Face Count: " << faces.size() << std::endl;
+    
+    ifstream.close();
+    std::cout << "SUCCESS::Loaded model" << path << std::endl;
+}
+
+void Scene::triangulate(std::vector<std::string>& tokens) {
+    if (tokens.size() == 3) {
+        int ind = 0;
+        for (auto& token : tokens) {
+            Friangle friangle;
+            std::istringstream sstream(token);
+            std::string num;
+            getline(sstream, num, '/');
+            std::cout << num << " : ";
+            getline(sstream, num, '/');
+            getline(sstream, num, '/');
+            std::cout << num << std::endl;
+            
+            ++ind;
+        }
+    }
+    else if (tokens.size() == 4) {
+
+    }
+    else if (tokens.size() == 8) {
+
     }
 }
