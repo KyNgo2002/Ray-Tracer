@@ -32,7 +32,7 @@ Scene::Scene() {
         {glm::vec3{0.2f, 1.0f, 0.2f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
         {glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0.0f},
         {glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f},
-
+        {glm::vec3{1.0f, 1.0f, 1.0f}, 1.0f, glm::vec3{1.0f, 1.0f, 1.0f}, 0.0f}
     };
 
     materialNames = {
@@ -41,7 +41,8 @@ Scene::Scene() {
         "Blue right panel",
         "Green bottom Panel",
         "White front/back panel",
-        "Reflective not emissive"
+        "Reflective not emissive",
+        "White Rough not emissive"
     };
 
     numSpheres = spheres.size();
@@ -280,7 +281,7 @@ void Scene::loadModel(const char* path) {
     }
 
     std::vector<glm::vec3> vertices;
-    std::vector<glm::vec3> vertexNormals;
+    std::vector<glm::vec3> normals;
     std::vector<glm::vec3> faces;
 
     std::string line;
@@ -297,7 +298,7 @@ void Scene::loadModel(const char* path) {
             ++vertexNormalCount;
             glm::vec3 vertexNormal;
             sstream >> vertexNormal.x >> vertexNormal.y >> vertexNormal.z;
-            vertexNormals.push_back(vertexNormal);
+            normals.push_back(vertexNormal);
             std::cout << line << std::endl;
         }
         // Vertices
@@ -316,37 +317,63 @@ void Scene::loadModel(const char* path) {
             while (sstream >> token) 
                 tokens.push_back(token);
 
-            triangulate(tokens);
+            triangulate(tokens, vertices, normals);
             
             std::cout << tokens.size() << " : " << line << std::endl;
         }
     }
     std::cout << "Vertice Count: " << verticeCount << " -> Loaded Vertice Count: " << vertices.size() << std::endl;
-    std::cout << "Vertice Normal Count: " << vertexNormalCount << " -> Loaded Vertex Normal Count: " << vertexNormals.size() << std::endl;
+    std::cout << "Vertice Normal Count: " << vertexNormalCount << " -> Loaded Vertex Normal Count: " << normals.size() << std::endl;
     std::cout << "Face Count: " << faceCount << " -> Loaded Face Count: " << faces.size() << std::endl;
     
     ifstream.close();
     std::cout << "SUCCESS::Loaded model" << path << std::endl;
 }
 
-void Scene::triangulate(std::vector<std::string>& tokens) {
+void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals) {
+    std::vector<int> verticeInds;
+    std::vector<int> normalInds;
+    for (auto& token : tokens) {
+        std::istringstream sstream(token);
+        std::string num;
+        getline(sstream, num, '/');
+        verticeInds.push_back(stoi(num));
+        getline(sstream, num, '/');
+        getline(sstream, num, '/');
+        normalInds.push_back(stoi(num));
+    }
+
     if (tokens.size() == 3) {
-        int ind = 0;
-        for (auto& token : tokens) {
-            Friangle friangle;
-            std::istringstream sstream(token);
-            std::string num;
-            getline(sstream, num, '/');
-            std::cout << num << " : ";
-            getline(sstream, num, '/');
-            getline(sstream, num, '/');
-            std::cout << num << std::endl;
-            
-            ++ind;
-        }
+        Friangle triangle;
+        triangle.x = glm::vec4(vertices[verticeInds[0]], 1.0f);
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.y = glm::vec4(vertices[verticeInds[1]], 1.0f);
+        triangle.normalY = normals[verticeInds[1]];
+        triangle.z = glm::vec4(vertices[verticeInds[2]], 1.0f);
+        triangle.normalZ = normals[verticeInds[2]];
+        triangle.materialInd = 6;
+        newTriangles.push_back(triangle);
     }
     else if (tokens.size() == 4) {
+        Friangle triangle;
+        Friangle triangle1;
+        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.y = glm::vec4(vertices[verticeInds[1]], 0.0f);
+        triangle.normalY = normals[verticeInds[1]];
+        triangle.z = glm::vec4(vertices[verticeInds[2]], 0.0f);
+        triangle.normalZ = normals[verticeInds[2]];
+        triangle.materialInd = 6;
+        newTriangles.push_back(triangle);
 
+        triangle1.x = glm::vec4(vertices[verticeInds[2]], 0.0f);
+        triangle1.normalX = normals[verticeInds[2]];
+        triangle1.y = glm::vec4(vertices[verticeInds[3]], 0.0f);
+        triangle1.normalY = normals[verticeInds[3]];
+        triangle1.z = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle1.normalZ = normals[verticeInds[0]];
+        triangle1.materialInd = 6;
+        newTriangles.push_back(triangle1);
     }
     else if (tokens.size() == 8) {
 

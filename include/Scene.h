@@ -69,7 +69,7 @@ public:
 
     std::vector<Sphere> spheres;
     std::vector<Triangle> triangles;
-    std::vector<Triangle> newTriangles;
+    std::vector<Friangle> newTriangles;
     std::vector<bool> triangleIsPlane;
     std::vector<Plane> planes;
     std::vector<Material> materials;
@@ -107,7 +107,7 @@ public:
     // Functionality
     void displayEditor();
     void loadModel(const char* path);
-    void triangulate(std::vector<std::string>& tokens);
+    void triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals);
 
 };
 
