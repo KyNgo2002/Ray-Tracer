@@ -24,12 +24,8 @@ public:
     };
 
     struct Plane {
-        glm::vec3 normal;
-        int materialInd;
-        glm::vec2 xMax;
-        glm::vec2 yMax;
-        glm::vec2 zMax;
-        float dist;
+        int firstTriangleInd;
+        int secondTriangleInd;
     };
 
     struct Triangle {
@@ -60,12 +56,12 @@ public:
 
     std::vector<Sphere> spheres;
     std::vector<Triangle> triangles;
+    std::vector<bool> triangleIsPlane;
     std::vector<Plane> planes;
     std::vector<Material> materials;
     std::vector<std::string> materialNames;
 
     GLuint sphereSSBO;
-    GLuint planeSSBO;
     GLuint triangleSSBO;
     GLuint materialSSBO;
 
@@ -81,7 +77,7 @@ public:
     // Getters/Setters
     void addSphere(glm::vec3 position, float radius, int materialInd);
     void addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd);
-    void addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd);
+    void addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane);
     void addMaterial(glm::vec3 color, glm::vec3 emissionColor, float roughness, float emissionPower);
 
     bool checkEdits();
@@ -90,9 +86,9 @@ public:
 
     // Modifiers
     void sendSpheres();
-    void sendPlanes();
     void sendTriangles();
     void sendMaterials();
+    void updatePlanes();
 
     // Functionality
     void displayEditor();

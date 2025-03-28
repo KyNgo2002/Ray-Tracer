@@ -22,15 +22,6 @@ struct Sphere {
 	int materialInd;
 };
 
-struct Plane {
-    vec3 normal;
-	int materialInd;
-    vec2 xMax;
-    vec2 yMax;
-	vec2 zMax;
-    float dist;
-};
-
 struct Triangle {
 	vec4 x;
     vec4 y;
@@ -49,16 +40,12 @@ struct Material {
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
 };
-  
-layout(std430, binding = 1) buffer PlaneBuffer {
-    Plane planes[];
-};
 
-layout(std430, binding = 2) buffer TriangleBuffer {
+layout(std430, binding = 1) buffer TriangleBuffer {
     Triangle triangles[];
 };
 
-layout(std430, binding = 3) buffer MaterialBuffer {
+layout(std430, binding = 2) buffer MaterialBuffer {
     Material materials[];
 };
 
@@ -141,25 +128,6 @@ HitPayload TraceRay(Ray ray) {
 		}
 	}
 
-	// Ray-Plane Intersection
-	//for (int i = 0; i < NumPlanes; ++i) {
-	//	float denominator = (dot(planes[i].normal, ray.direction));
-	//
-		// No Intersection ray-plane
-	//	if (denominator == 0) 
-	//		FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-
-	//	float t = -(dot(normalize(planes[i].normal), ray.origin) + planes[i].dist) / 
-	//		denominator;
-		
-	//	if (t > 0.0f && t < hitDistance) {
-	//		objType = 1;
-	//		closestInd = i;
-	//		hitDistance = t;
-	//	}
-	//}
-
 	// Ray-Triangle Intersection;
 	for (int i = 0; i < NumTriangles; ++i) {
 		// Mollere Trumbore Triangle Intersection
@@ -177,7 +145,7 @@ HitPayload TraceRay(Ray ray) {
 
 		if(u < 0.0f || v < 0.0f || (u + v) > 1.0f) t = -1.0;
 		if (t > 0.0f && t < hitDistance) {
-			objType = 2;
+			objType = 1;
 			closestInd = i;
 			hitDistance = t;
 		}
@@ -200,8 +168,7 @@ HitPayload TraceRay(Ray ray) {
 	}
 	else {
 		payload.worldPos = ray.origin + ray.direction * hitDistance;
-		payload.worldNorm = objType == 1 ? planes[closestInd].normal :
-		triangles[closestInd].normal.xyz;
+		payload.worldNorm = triangles[closestInd].normal.xyz;
 	}
 	
 	return payload;
@@ -216,7 +183,7 @@ void main() {
 
 	// Lighting variables
 	vec3 light = vec3(0.0f);
-	vec3 rayColor = vec3(0.9f);
+	vec3 rayColor = vec3(1.0f);
 	vec3 diffuseDir = vec3(0.0f);
 	vec3 specularDir = vec3(0.0f);
 	vec3 emittedLight = vec3(0.0f);
@@ -240,22 +207,13 @@ void main() {
 			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
 			diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 
-			if (payload.objType == 0) {
-				material = materials[spheres[payload.objInd].materialInd];
-			}
-			else if (payload.objType == 1) {
-				material = materials[planes[payload.objInd].materialInd];
-			}
-			else if (payload.objType == 2) {
+			material = payload.objType == 0 ? materials[spheres[payload.objInd].materialInd] : 
 				material = materials[triangles[payload.objInd].materialInd];
-			}
+			
 			ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			emittedLight = material.emissionColor * material.emissionPower;
 			light += emittedLight * rayColor;
-			rayColor *= normalize(rayColor * material.color + 0.1f);
-
-			float p = max(rayColor.r, max(rayColor.g, rayColor.b));
-			rayColor *= 1.0f / p;
+			rayColor *= material.color;
 		}
 	}
 	
