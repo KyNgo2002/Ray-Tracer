@@ -348,81 +348,90 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
 
     if (tokens.size() == 3) {
         triangle.x = glm::vec4(vertices[verticeInds[0]], 1.0f);
-        triangle.normalX = normals[verticeInds[0]];
         triangle.y = glm::vec4(vertices[verticeInds[1]], 1.0f);
-        triangle.normalY = normals[verticeInds[1]];
         triangle.z = glm::vec4(vertices[verticeInds[2]], 1.0f);
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.normalY = normals[verticeInds[1]];
         triangle.normalZ = normals[verticeInds[2]];
         newTriangles.push_back(triangle);
     }
     else if (tokens.size() == 4) {
         // First Triangle
         triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
-        triangle.normalX = normals[verticeInds[0]];
         triangle.y = glm::vec4(vertices[verticeInds[1]], 0.0f);
-        triangle.normalY = normals[verticeInds[1]];
         triangle.z = glm::vec4(vertices[verticeInds[2]], 0.0f);
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.normalY = normals[verticeInds[1]];
         triangle.normalZ = normals[verticeInds[2]];
         newTriangles.push_back(triangle);
 
         // Second Triangle
         triangle.x = glm::vec4(vertices[verticeInds[2]], 0.0f);
-        triangle.normalX = normals[verticeInds[2]];
         triangle.y = glm::vec4(vertices[verticeInds[3]], 0.0f);
-        triangle.normalY = normals[verticeInds[3]];
         triangle.z = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.normalX = normals[verticeInds[2]];
+        triangle.normalY = normals[verticeInds[3]];
         triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
     }
     else if (tokens.size() == 8) {
-        // Currently choosing any 
+        glm::vec4 origin(0.0f);
+        triangle.x = origin;
         // First Triangle
-        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.y = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.z = glm::vec4(vertices[verticeInds[1]], 0.0f);
         triangle.normalX = normals[verticeInds[0]];
-        triangle.y = glm::vec4(vertices[verticeInds[1]], 0.0f);
-        triangle.normalY = normals[verticeInds[1]];
-        triangle.z = glm::vec4(vertices[verticeInds[2]], 0.0f);
-        triangle.normalZ = normals[verticeInds[2]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
         // Second Triangle
-        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.y = glm::vec4(vertices[verticeInds[1]], 0.0f);
+        triangle.z = glm::vec4(vertices[verticeInds[2]], 0.0f);
         triangle.normalX = normals[verticeInds[0]];
-        triangle.y = glm::vec4(vertices[verticeInds[2]], 0.0f);
-        triangle.normalY = normals[verticeInds[2]];
-        triangle.z = glm::vec4(vertices[verticeInds[3]], 0.0f);
-        triangle.normalZ = normals[verticeInds[3]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
         // Third Triangle
-        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.y = glm::vec4(vertices[verticeInds[2]], 0.0f);
+        triangle.z = glm::vec4(vertices[verticeInds[3]], 0.0f);
         triangle.normalX = normals[verticeInds[0]];
-        triangle.y = glm::vec4(vertices[verticeInds[3]], 0.0f);
-        triangle.normalY = normals[verticeInds[3]];
-        triangle.z = glm::vec4(vertices[verticeInds[4]], 0.0f);
-        triangle.normalZ = normals[verticeInds[4]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
         // Fourth Triangle
-        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.y = glm::vec4(vertices[verticeInds[3]], 0.0f);
+        triangle.z = glm::vec4(vertices[verticeInds[4]], 0.0f);
         triangle.normalX = normals[verticeInds[0]];
-        triangle.y = glm::vec4(vertices[verticeInds[4]], 0.0f);
-        triangle.normalY = normals[verticeInds[4]];
-        triangle.z = glm::vec4(vertices[verticeInds[5]], 0.0f);
-        triangle.normalZ = normals[verticeInds[5]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
         // Fifth Triangle
-        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
-        triangle.normalX = normals[verticeInds[0]];
+        triangle.z = glm::vec4(vertices[verticeInds[4]], 0.0f);
         triangle.y = glm::vec4(vertices[verticeInds[5]], 0.0f);
-        triangle.normalY = normals[verticeInds[5]];
-        triangle.z = glm::vec4(vertices[verticeInds[6]], 0.0f);
-        triangle.normalZ = normals[verticeInds[6]];
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
         // Sixth Triangle
-        triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.y = glm::vec4(vertices[verticeInds[5]], 0.0f);
+        triangle.z = glm::vec4(vertices[verticeInds[6]], 0.0f);
         triangle.normalX = normals[verticeInds[0]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
+        newTriangles.push_back(triangle);
+
         triangle.y = glm::vec4(vertices[verticeInds[6]], 0.0f);
-        triangle.normalY = normals[verticeInds[6]];
         triangle.z = glm::vec4(vertices[verticeInds[7]], 0.0f);
-        triangle.normalZ = normals[verticeInds[7]];
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
+        newTriangles.push_back(triangle);
+
+        triangle.y = glm::vec4(vertices[verticeInds[7]], 0.0f);
+        triangle.z = glm::vec4(vertices[verticeInds[0]], 0.0f);
+        triangle.normalX = normals[verticeInds[0]];
+        triangle.normalY = normals[verticeInds[0]];
+        triangle.normalZ = normals[verticeInds[0]];
         newTriangles.push_back(triangle);
     }
 }
