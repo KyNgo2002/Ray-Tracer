@@ -153,7 +153,6 @@ HitPayload TraceRay(Ray ray) {
 	
 	if (closestInd < 0) {
 		payload.hitDistance = -1.0f;
-		payload.objType = -1;
 		return payload;
 	}
 
@@ -208,7 +207,7 @@ void main() {
 			diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 
 			material = payload.objType == 0 ? materials[spheres[payload.objInd].materialInd] : 
-				material = materials[triangles[payload.objInd].materialInd];
+				materials[triangles[payload.objInd].materialInd];
 			
 			ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			emittedLight = material.emissionColor * material.emissionPower;
