@@ -299,7 +299,7 @@ void Scene::loadModel(const char* path) {
             glm::vec3 vertexNormal;
             sstream >> vertexNormal.x >> vertexNormal.y >> vertexNormal.z;
             normals.push_back(vertexNormal);
-            std::cout << line << std::endl;
+            //std::cout << line << std::endl;
         }
         // Vertices
         else if (token == "v") {
@@ -307,7 +307,7 @@ void Scene::loadModel(const char* path) {
             glm::vec3 vertex;
             sstream >> vertex.x >> vertex.y >> vertex.z;
             vertices.push_back(vertex);
-            std::cout << line << std::endl;
+            //std::cout << line << std::endl;
         }
         // Faces
         else if (token == "f") {
@@ -318,13 +318,12 @@ void Scene::loadModel(const char* path) {
                 tokens.push_back(token);
 
             triangulate(tokens, vertices, normals);
-            
-            std::cout << tokens.size() << " : " << line << std::endl;
+            //std::cout << tokens.size() << " : " << line << std::endl;
         }
     }
-    std::cout << "Vertice Count: " << verticeCount << " -> Loaded Vertice Count: " << vertices.size() << std::endl;
-    std::cout << "Vertice Normal Count: " << vertexNormalCount << " -> Loaded Vertex Normal Count: " << normals.size() << std::endl;
-    std::cout << "Face Count: " << faceCount << " -> Loaded Face Count: " << faces.size() << std::endl;
+    std::cout << "Vertice Count: " << verticeCount << std::endl;
+    std::cout << "Vertice Normal Count: " << vertexNormalCount << std::endl;
+    std::cout << "Face Count: " << faceCount << std::endl;
     
     ifstream.close();
     std::cout << "SUCCESS::Loaded model" << path << std::endl;

@@ -83,7 +83,7 @@ int main() {
     rayShader.setInt("NumSpheres", scene.numSpheres);
     rayShader.setInt("NumTriangles", scene.numTriangles);
     rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("Bounces", 30);
+    rayShader.setInt("Bounces", 10);
     rayShader.setInt("Time", rand());
 
     // Frame buffer objects
