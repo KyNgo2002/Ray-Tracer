@@ -50,12 +50,12 @@ Scene::Scene() {
     numPlanes = planes.size();
     numMaterials = materials.size();
 
-    addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
+    /*addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
     addPlane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 20.0f, 10.0f), 0, false);
     addPlane(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, -10.0f), 4, false);
     addPlane(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(10.0f, 0.0f,  10.0f), 4, false);
     addPlane(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(-10.0f, 0.0f, -10.0f), 1, true);
-    addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);
+    addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);*/
 
     createBuffers();
 }
@@ -343,17 +343,17 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         std::istringstream sstream(token);
         std::string num;
         getline(sstream, num, '/');
-        verticeInds.push_back(stoi(num));
+        verticeInds.push_back(stoi(num) - 1);
         getline(sstream, num, '/');
         getline(sstream, num, '/');
-        normalInds.push_back(stoi(num));
+        normalInds.push_back(stoi(num) - 1);
     }
 
     if (tokens.size() == 3) {
         triangle.x = glm::vec4(vertices[verticeInds[0]], 1.0f);
         triangle.y = glm::vec4(vertices[verticeInds[1]], 1.0f);
         triangle.z = glm::vec4(vertices[verticeInds[2]], 1.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
     }
@@ -362,7 +362,7 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
         triangle.y = glm::vec4(vertices[verticeInds[1]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[2]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
@@ -370,7 +370,7 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         triangle.x = glm::vec4(vertices[verticeInds[2]], 0.0f);
         triangle.y = glm::vec4(vertices[verticeInds[3]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[0]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
     }
@@ -380,55 +380,55 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         // First Triangle
         triangle.y = glm::vec4(vertices[verticeInds[0]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[1]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
         // Second Triangle
         triangle.y = glm::vec4(vertices[verticeInds[1]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[2]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
         // Third Triangle
         triangle.y = glm::vec4(vertices[verticeInds[2]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[3]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
         // Fourth Triangle
         triangle.y = glm::vec4(vertices[verticeInds[3]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[4]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
         // Fifth Triangle
         triangle.z = glm::vec4(vertices[verticeInds[4]], 0.0f);
         triangle.y = glm::vec4(vertices[verticeInds[5]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         newTriangles.push_back(triangle);
 
         // Sixth Triangle
         triangle.y = glm::vec4(vertices[verticeInds[5]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[6]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
         // Seventh Triangle
         triangle.y = glm::vec4(vertices[verticeInds[6]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[7]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
 
         // Eigth Triangle
         triangle.y = glm::vec4(vertices[verticeInds[7]], 0.0f);
         triangle.z = glm::vec4(vertices[verticeInds[0]], 0.0f);
-        triangle.normal = normals[verticeInds[0]];
+        triangle.normal = normals[normalInds[0]];
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
     }
