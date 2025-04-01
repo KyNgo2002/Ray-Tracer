@@ -69,8 +69,8 @@ public:
 
     std::vector<Sphere> spheres;
     std::vector<Triangle> triangles;
-    std::vector<Friangle> newTriangles;
-    std::vector<bool> triangleIsPlane;
+    std::vector<Triangle> newTriangles;
+    std::vector<bool> isRegularTriangle;
     std::vector<Plane> planes;
     std::vector<Material> materials;
     std::vector<std::string> materialNames;
@@ -96,7 +96,6 @@ public:
 
     bool checkEdits();
     void handleEdits();
-
 
     // Modifiers
     void sendSpheres();

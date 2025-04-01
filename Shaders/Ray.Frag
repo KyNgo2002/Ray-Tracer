@@ -150,8 +150,6 @@ HitPayload TraceRay(Ray ray) {
 			hitDistance = t;
 		}
 
-		// Need to implement triple vertex normal integration
-		
 	}
 	
 	if (closestInd < 0) {
