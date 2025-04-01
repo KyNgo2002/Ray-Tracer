@@ -15,7 +15,7 @@ user can specify.
 - **Scene Editing UI** Straightforward scene editing with dynamic ImGui UI.
 
 
-![Image of a demo scene, infinite reflection](src/DemoImage2.png "DemoImage2.png")
+![Image of a demo scene, infinite reflection](Assets/DemoImage2.png "DemoImage2.png")
 
 
 ## Requirements
