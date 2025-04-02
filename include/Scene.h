@@ -39,16 +39,6 @@ public:
         int materialInd;
     };
 
-    struct Friangle {
-        glm::vec4 x;
-        glm::vec4 y;
-        glm::vec4 z;
-        glm::vec3 normalX;
-        glm::vec3 normalY;
-        glm::vec3 normalZ;
-        int materialInd;
-    };
-
     struct Material {
         glm::vec3 color;
         float roughness;

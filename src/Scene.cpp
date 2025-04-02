@@ -105,6 +105,12 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
     ImGui_ImplOpenGL3_Init("#version 460");
 }
 
+void Scene::addSphere(glm::vec3 position, float radius, int materialInd) {
+    Sphere sphere{ position, radius, glm::vec3(0.0f), materialInd };
+    spheres.push_back(sphere);
+    ++numSpheres;
+}
+
 void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane) {
     Triangle firstTriangle;
     Triangle secondTriangle;
