@@ -82,7 +82,7 @@ public:
     void addSphere(glm::vec3 position, float radius, int materialInd);
     void addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd);
     void addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane);
-    void addMaterial(glm::vec3 color, glm::vec3 emissionColor, float roughness, float emissionPower);
+    void addMaterial(glm::vec3 color, float roughness, glm::vec3 emissionColor, float emissionPower);
 
     bool checkEdits();
     void handleEdits();

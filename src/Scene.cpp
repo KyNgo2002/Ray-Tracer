@@ -111,6 +111,12 @@ void Scene::addSphere(glm::vec3 position, float radius, int materialInd) {
     ++numSpheres;
 }
 
+void Scene::addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd) {
+    Triangle triangle(x, y, z, normal, materialInd);
+    triangles.push_back(triangle);
+    ++numTriangles;
+}
+
 void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane) {
     Triangle firstTriangle;
     Triangle secondTriangle;
@@ -156,6 +162,12 @@ void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight,
     numTriangles += 2;
     numPlanes++;
     sendTriangles();
+}
+
+void Scene::addMaterial(glm::vec3 color, float roughness, glm::vec3 emissionColor, float emissionPower) {
+    Material material(color, roughness, emissionColor, emissionPower);
+    materials.push_back(material);
+    ++numMaterials;
 }
 
 bool Scene::checkEdits() {
