@@ -16,20 +16,25 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 int main() {
     const float SCREEN_SIZE = 900.0f;
 
+    // Set up program context
     OpenGL openGL(SCREEN_SIZE, SCREEN_SIZE);
     
+    // Set up required shaders
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
+
+    // Set up scene
     Scene scene;
     scene.loadModel("Assets\\Pawn.obj");
     scene.createImGuiEditor(openGL.getWindow());
-
     Camera* camera = openGL.getCamera();
 
+    // Set up timing
     srand(time(0));
 
     std::chrono::high_resolution_clock clock;
 
+    // Ray Tracing Shader setup
     float vertices[] = {
         // Vertex Coords        Texture Coords
          -1.0f, -1.0f, 0.0f,    0.0f, 0.0f,
@@ -41,11 +46,11 @@ int main() {
          -1.0f, -1.0f, 0.0f,    0.0f, 0.0f
     };
 
+    // Ray tracing stage shader setup
     rayShader.use();
     unsigned rectVAO, rectVBO;
     glGenVertexArrays(1, &rectVAO);
     glGenBuffers(1, &rectVBO);
-
     glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -55,6 +60,7 @@ int main() {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    // Accumulation stage shader setup
     screenShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -62,11 +68,11 @@ int main() {
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
     glBindVertexArray(0);
 
     screenShader.setUInt("Frames", camera->frames);
 
+    // Set up Sky box
     std::vector<std::string> faces{
         "Assets\\skybox\\right.jpg",
         "Assets\\skybox\\left.jpg",
@@ -79,6 +85,7 @@ int main() {
     unsigned int cubeMapTextureID = loadCubemap(faces);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
+    // Ray tracing uniforms
     rayShader.use();
     rayShader.setInt("NumSpheres", scene.numSpheres);
     rayShader.setInt("NumTriangles", scene.numTriangles);
@@ -90,7 +97,6 @@ int main() {
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
-
     glGenTextures(1, &accumulationTex);
     glBindTexture(GL_TEXTURE_2D, accumulationTex);
     
@@ -106,6 +112,7 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Timing setup
     auto prevTime = clock.now();
     auto currTime = clock.now();
 
@@ -132,7 +139,7 @@ int main() {
             screenShader.use();
             screenShader.setUInt("Frames", camera->frames);
         }
-
+        // Set viewing angle uniforms
         rayShader.use();
         rayShader.setVec3("CamPosition", camera->camPosition);
         rayShader.setVec3("CamDirection", camera->camFront);
@@ -142,7 +149,6 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         rayShader.setInt("Skybox", 1);
-        //srand(rand());
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
