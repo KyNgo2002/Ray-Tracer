@@ -10,8 +10,8 @@ uniform float BrightnessThreshold;
 uniform sampler2D ScreenTexture;
 
 void main() {
-	vec4 color = texture(ScreenTexture, TexCoord);
+	vec4 color = texture(ScreenTexture, TexCoord) / float(Frames);
 	float brightness = (color.r * 0.2126) + (color.g * 0.7152) + (color.b * 0.0722);
 
-	FragColor = texture(ScreenTexture, TexCoord) / float(Frames);
+	FragColor = color * brightness * brightness;
 }
