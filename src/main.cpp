@@ -71,6 +71,7 @@ int main() {
     glBindVertexArray(0);
 
     screenShader.setUInt("Frames", camera->frames);
+    screenShader.setFloat("BrightnessThreshold", 0.7f);
 
     // Set up Sky box
     std::vector<std::string> faces{
@@ -115,7 +116,6 @@ int main() {
     // Timing setup
     auto prevTime = clock.now();
     auto currTime = clock.now();
-
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
 
