@@ -218,5 +218,5 @@ void main() {
 		}
 	}
 	
-	FragColor = (texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f));
+	FragColor = texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f);
 }

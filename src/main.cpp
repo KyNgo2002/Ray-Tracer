@@ -68,12 +68,11 @@ int main() {
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    glBindVertexArray(0);
 
     brightnessShader.setUInt("Frames", camera->frames);
-    brightnessShader.setFloat("BrightnessThreshold", 0.7f);
+    /*brightnessShader.setFloat("BrightnessThreshold", 0.7f);
     std::vector<float> gaussianWeights = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 };
-    brightnessShader.setFloatv("Weights", gaussianWeights);
+    brightnessShader.setFloatv("Weights", gaussianWeights);*/
 
     // Set up Sky box
     std::vector<std::string> faces{
@@ -99,7 +98,7 @@ int main() {
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
+    //glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
     glGenTextures(1, &accumulationTex);
     glBindTexture(GL_TEXTURE_2D, accumulationTex);
     
@@ -113,7 +112,6 @@ int main() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Timing setup
     auto prevTime = clock.now();
@@ -131,15 +129,14 @@ int main() {
         openGL.processInput(static_cast<float>(deltaTime.count()));
 
         // First pass accumulation buffer
-        glBindVertexArray(rectVAO);
-        glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
+        //glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
         if (camera->moved || scene.checkEdits()) {
             scene.handleEdits();
-            glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
-            rayShader.use();
-            rayShader.setUInt("Frames", camera->frames);
+            //rayShader.use();
+            //rayShader.setUInt("Frames", camera->frames);
             brightnessShader.use();
             brightnessShader.setUInt("Frames", camera->frames);
         }
@@ -150,21 +147,23 @@ int main() {
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
         
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        rayShader.setInt("AccumulationTexture", 0);
+
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         rayShader.setInt("Skybox", 1);
         rayShader.setInt("Time", rand());
-        rayShader.setUInt("Frames", camera->frames);
+        //rayShader.setUInt("Frames", camera->frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         brightnessShader.use();
         brightnessShader.setUInt("Frames", camera->frames);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 6);*/
 
         // If in editing mode, render ImGUI editing components
         if (openGL.editingMode) 
