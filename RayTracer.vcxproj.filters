@@ -146,10 +146,10 @@
     <None Include="Shaders\Ray.Frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\ScreenShader.vert">
+    <None Include="Shaders\BrightnessShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\ScreenShader.frag">
+    <None Include="Shaders\BrightnessShader.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="imgui.ini" />

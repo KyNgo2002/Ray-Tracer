@@ -55,6 +55,7 @@ out vec4 FragColor;
 
 uniform int NumSpheres;
 uniform int NumTriangles;
+uniform uint Frames;
 
 uniform vec2 Resolution;
 uniform int Bounces;
@@ -217,5 +218,5 @@ void main() {
 		}
 	}
 	
-	FragColor = texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f);
+	FragColor = (texture(AccumulationTexture, TexCoord) + vec4(light, 1.0f));
 }

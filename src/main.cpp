@@ -21,7 +21,7 @@ int main() {
     
     // Set up required shaders
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
-    Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
+    Shader brightnessShader("Shaders\\BrightnessShader.vert", "Shaders\\BrightnessShader.frag");
 
     // Set up scene
     Scene scene;
@@ -61,7 +61,7 @@ int main() {
     glEnableVertexAttribArray(1);
 
     // Accumulation stage shader setup
-    screenShader.use();
+    brightnessShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -70,8 +70,10 @@ int main() {
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
-    screenShader.setUInt("Frames", camera->frames);
-    screenShader.setFloat("BrightnessThreshold", 0.7f);
+    brightnessShader.setUInt("Frames", camera->frames);
+    brightnessShader.setFloat("BrightnessThreshold", 0.7f);
+    std::vector<float> gaussianWeights = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 };
+    brightnessShader.setFloatv("Weights", gaussianWeights);
 
     // Set up Sky box
     std::vector<std::string> faces{
@@ -133,11 +135,13 @@ int main() {
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
         if (camera->moved || scene.checkEdits()) {
             scene.handleEdits();
-            glClear(GL_COLOR_BUFFER_BIT);
+            glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
-            screenShader.use();
-            screenShader.setUInt("Frames", camera->frames);
+            rayShader.use();
+            rayShader.setUInt("Frames", camera->frames);
+            brightnessShader.use();
+            brightnessShader.setUInt("Frames", camera->frames);
         }
         // Set viewing angle uniforms
         rayShader.use();
@@ -150,13 +154,14 @@ int main() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         rayShader.setInt("Skybox", 1);
         rayShader.setInt("Time", rand());
+        rayShader.setUInt("Frames", camera->frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        screenShader.use();
-        screenShader.setUInt("Frames", camera->frames);
+        brightnessShader.use();
+        brightnessShader.setUInt("Frames", camera->frames);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
         glDrawArrays(GL_TRIANGLES, 0, 6);
