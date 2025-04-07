@@ -147,8 +147,6 @@ int main() {
             glClear(GL_COLOR_BUFFER_BIT);
             camera->moved = false;
             camera->frames = 1;
-            //rayShader.use();
-            //rayShader.setUInt("Frames", camera->frames);
             brightnessShader.use();
             brightnessShader.setUInt("Frames", camera->frames);
         }
@@ -161,22 +159,31 @@ int main() {
         
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        rayShader.setInt("AccumulationTexture", 0);
-
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
+        rayShader.setInt("AccumulationTexture", 0);
         rayShader.setInt("Skybox", 1);
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Second pass with brightness framebuffer
-
+        //// Second pass with brightness framebuffer
+        //glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //brightnessShader.use();
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        //brightnessShader.setInt("AccumulationTexture", 0);
+        //brightnessShader.setUInt("Frames", camera->frames);
+        //glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Third pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        brightnessShader.use();
-        brightnessShader.setUInt("Frames", camera->frames);
+        screenShader.use();
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, brightnessTex);
+        screenShader.setUInt("BrightnessTexture", 2);
+        screenShader.setUInt("Frames", camera->frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components

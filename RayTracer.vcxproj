@@ -196,6 +196,8 @@
     <None Include="Shaders\Ray.vert" />
     <None Include="Shaders\BrightnessShader.frag" />
     <None Include="Shaders\BrightnessShader.vert" />
+    <None Include="Shaders\ScreenShader.frag" />
+    <None Include="Shaders\ScreenShader.vert" />
     <None Include="Shaders\Vert.vert" />
   </ItemGroup>
   <ItemGroup>

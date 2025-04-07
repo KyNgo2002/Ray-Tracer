@@ -153,6 +153,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="imgui.ini" />
+    <None Include="Shaders\ScreenShader.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ScreenShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib">
