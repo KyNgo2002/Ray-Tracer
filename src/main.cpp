@@ -98,7 +98,7 @@ int main() {
     // Frame buffer objects
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
-    //glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
     glGenTextures(1, &accumulationTex);
     glBindTexture(GL_TEXTURE_2D, accumulationTex);
     
@@ -108,10 +108,21 @@ int main() {
 
     // Attach texture to framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumulationTex, 0);
+
+    GLuint brightnessFBO, brightnessTex;
+    glGenFramebuffers(1, &brightnessFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
+    glGenTextures(1, &brightnessTex);
+    glBindTexture(GL_TEXTURE_2D, brightnessTex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brightnessTex, 0);
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
-
 
     // Timing setup
     auto prevTime = clock.now();
@@ -129,7 +140,7 @@ int main() {
         openGL.processInput(static_cast<float>(deltaTime.count()));
 
         // First pass accumulation buffer
-        //glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
         if (camera->moved || scene.checkEdits()) {
             scene.handleEdits();
             glClear(GL_COLOR_BUFFER_BIT);
@@ -159,11 +170,11 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Second pass with default framebuffer
-        /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         brightnessShader.use();
         brightnessShader.setUInt("Frames", camera->frames);
-        glDrawArrays(GL_TRIANGLES, 0, 6);*/
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components
         if (openGL.editingMode) 
