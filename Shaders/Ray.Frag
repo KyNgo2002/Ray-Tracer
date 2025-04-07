@@ -55,7 +55,6 @@ out vec4 FragColor;
 
 uniform int NumSpheres;
 uniform int NumTriangles;
-uniform uint Frames;
 
 uniform vec2 Resolution;
 uniform int Bounces;

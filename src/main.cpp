@@ -22,6 +22,7 @@ int main() {
     // Set up required shaders
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader brightnessShader("Shaders\\BrightnessShader.vert", "Shaders\\BrightnessShader.frag");
+    Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
 
     // Set up scene
     Scene scene;
@@ -166,10 +167,12 @@ int main() {
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         rayShader.setInt("Skybox", 1);
         rayShader.setInt("Time", rand());
-        //rayShader.setUInt("Frames", camera->frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Second pass with default framebuffer
+        // Second pass with brightness framebuffer
+
+
+        // Third pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         brightnessShader.use();
