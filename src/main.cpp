@@ -139,9 +139,6 @@ int main() {
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
     GLenum err;
-    err = glGetError();
-    if (err != GL_NO_ERROR)
-        std::cerr << "send Triangles error: " << std::hex << err << " : before sending triangles" << std::endl;
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
         currTime = clock.now();
@@ -150,7 +147,7 @@ int main() {
 
         // User input
         openGL.processInput(static_cast<float>(deltaTime.count()));
-
+        
         // First pass accumulation buffer
         glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
         if (camera->moved || scene.checkEdits()) {
@@ -177,6 +174,7 @@ int main() {
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
+        
         // Second pass with brightness framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -193,8 +191,7 @@ int main() {
         screenShader.use();
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, brightnessTex);
-        screenShader.setUInt("BrightnessTexture", 2);
-        screenShader.setUInt("Frames", camera->frames);
+        screenShader.setInt("BrightnessTexture", 2);      
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components
@@ -205,6 +202,7 @@ int main() {
         glfwSwapBuffers(openGL.getWindow());
         glfwPollEvents();
         camera->frames++;
+        
     }
     // Cleanup ImGui
     ImGui_ImplOpenGL3_Shutdown();
