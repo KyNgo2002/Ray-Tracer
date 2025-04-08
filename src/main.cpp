@@ -110,6 +110,9 @@ int main() {
     // Attach texture to framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumulationTex, 0);
 
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Framebuffer not complete!" << std::endl;
+
     GLuint brightnessFBO, brightnessTex;
     glGenFramebuffers(1, &brightnessFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
@@ -166,19 +169,19 @@ int main() {
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        //// Second pass with brightness framebuffer
-        //glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //brightnessShader.use();
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        //brightnessShader.setInt("AccumulationTexture", 0);
-        //brightnessShader.setUInt("Frames", camera->frames);
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        // Second pass with brightness framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        brightnessShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        brightnessShader.setUInt("Frames", camera->frames);
+        brightnessShader.setInt("AccumulationTexture", 0);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Third pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
         screenShader.use();
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, brightnessTex);
