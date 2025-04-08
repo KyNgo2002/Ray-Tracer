@@ -99,10 +99,6 @@ void Shader::clean() {
 
 void Shader::use() {
 	glUseProgram(shaderProgramID);
-
-	/*GLenum err = glGetError();
-	if (err != GL_NO_ERROR) 
-		std::cerr << "glUseProgram error: " << std::hex << err << " : " << shaderProgramID << std::endl;*/
 }
 
 int Shader::getUniformLocation(const char* name) {

@@ -19,12 +19,14 @@ int main() {
     // Set up program context
     OpenGL openGL(SCREEN_SIZE, SCREEN_SIZE);
     
+    
+
     // Set up required shaders
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader brightnessShader("Shaders\\BrightnessShader.vert", "Shaders\\BrightnessShader.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
 
-    // Set up scene
+    // Set up 
     Scene scene;
     scene.loadModel("Assets\\Pawn.obj");
     scene.createImGuiEditor(openGL.getWindow());
@@ -44,11 +46,9 @@ int main() {
          -1.0f, -1.0f, 0.0f,    0.0f, 0.0f
     };
 
+    
+    
     // Ray tracing stage shader setup
-    rayShader.use();
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR)
-        std::cerr << "glUseProgram error: " << std::hex << err << std::endl;
     unsigned rectVAO, rectVBO;
     glGenVertexArrays(1, &rectVAO);
     glGenBuffers(1, &rectVBO);
@@ -62,6 +62,7 @@ int main() {
     glEnableVertexAttribArray(1);
 
     // Accumulation stage shader setup
+    
     brightnessShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -137,7 +138,10 @@ int main() {
     auto currTime = clock.now();
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
-
+    GLenum err;
+    err = glGetError();
+    if (err != GL_NO_ERROR)
+        std::cerr << "send Triangles error: " << std::hex << err << " : before sending triangles" << std::endl;
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
         currTime = clock.now();

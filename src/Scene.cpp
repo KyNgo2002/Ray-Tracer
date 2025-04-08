@@ -2,12 +2,6 @@
 
 Scene::Scene() {
     // Default Scene
-    struct Sphere {
-        glm::vec3 position;
-        float radius;
-        glm::vec3 padding;
-        int materialInd;
-    };
     spheres = {
         {glm::vec3{-5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
         {glm::vec3{5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
@@ -44,11 +38,12 @@ Scene::Scene() {
         "Reflective not emissive",
         "White Rough not emissive"
     };
-
     numSpheres = spheres.size();
     numTriangles = triangles.size();
     numPlanes = planes.size();
     numMaterials = materials.size();
+
+    createBuffers();
 
     addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
     addPlane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 20.0f, 10.0f), 0, false);
@@ -56,8 +51,6 @@ Scene::Scene() {
     addPlane(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(10.0f, 0.0f,  10.0f), 4, false);
     addPlane(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(-10.0f, 0.0f, -10.0f), 1, true);
     addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);
-
-    createBuffers();
 }
 
 Scene::~Scene() {
@@ -150,6 +143,7 @@ void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight,
     secondTriangle.normal = normal;
     secondTriangle.materialInd = materialInd;
 
+    editedTriangles = true;
     newPlane.firstTriangleInd = triangles.size();
     triangles.push_back(firstTriangle);
     isRegularTriangle.push_back(false);
@@ -161,6 +155,7 @@ void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight,
 
     numTriangles += 2;
     numPlanes++;
+    
     sendTriangles();
 }
 
