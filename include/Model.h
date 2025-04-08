@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "Shader.h";
+#include "Shader.h"
 #include "Mesh.h"
 #include "stb_image.h"
 

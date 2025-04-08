@@ -30,9 +30,6 @@ int main() {
     scene.createImGuiEditor(openGL.getWindow());
     Camera* camera = openGL.getCamera();
 
-    // Set up timing
-    srand(time(0));
-
     std::chrono::high_resolution_clock clock;
 
     // Ray Tracing Shader setup
@@ -49,6 +46,9 @@ int main() {
 
     // Ray tracing stage shader setup
     rayShader.use();
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR)
+        std::cerr << "glUseProgram error: " << std::hex << err << std::endl;
     unsigned rectVAO, rectVBO;
     glGenVertexArrays(1, &rectVAO);
     glGenBuffers(1, &rectVBO);
@@ -103,7 +103,7 @@ int main() {
     glGenTextures(1, &accumulationTex);
     glBindTexture(GL_TEXTURE_2D, accumulationTex);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -113,13 +113,15 @@ int main() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     GLuint brightnessFBO, brightnessTex;
     glGenFramebuffers(1, &brightnessFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
     glGenTextures(1, &brightnessTex);
     glBindTexture(GL_TEXTURE_2D, brightnessTex);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -127,6 +129,8 @@ int main() {
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Timing setup
     auto prevTime = clock.now();
@@ -175,8 +179,8 @@ int main() {
         brightnessShader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        brightnessShader.setUInt("Frames", camera->frames);
         brightnessShader.setInt("AccumulationTexture", 0);
+        brightnessShader.setUInt("Frames", camera->frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Third pass with default framebuffer
