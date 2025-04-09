@@ -137,18 +137,35 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // Blur framebuffer and texture
-    GLuint blurFBO, blurTex;
-    glGenFramebuffers(1, &blurFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, blurFBO);
-    glGenTextures(1, &blurTex);
-    glBindTexture(GL_TEXTURE_2D, blurTex);
+    // Blur framebuffers and textures
+    GLuint blurFBOH, blurTexH;
+    glGenFramebuffers(1, &blurFBOH);
+    glBindFramebuffer(GL_FRAMEBUFFER, blurFBOH);
+    glGenTextures(1, &blurTexH);
+    glBindTexture(GL_TEXTURE_2D, blurTexH);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurTex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurTexH, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    GLuint blurFBOV, blurTexV;
+    glGenFramebuffers(1, &blurFBOV);
+    glBindFramebuffer(GL_FRAMEBUFFER, blurFBOV);
+    glGenTextures(1, &blurTexV);
+    glBindTexture(GL_TEXTURE_2D, blurTexV);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurTexV, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
@@ -160,6 +177,8 @@ int main() {
     auto currTime = clock.now();
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
+
+
     GLenum err;
     while (!glfwWindowShouldClose(openGL.getWindow())) {
         // Per frame time logic
@@ -207,7 +226,7 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Third pass with blur shader
-        glBindFramebuffer(GL_FRAMEBUFFER, blurFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, blurFBOH);
         glClear(GL_COLOR_BUFFER_BIT);
         blurShader.use();
         glActiveTexture(GL_TEXTURE2);
@@ -215,12 +234,12 @@ int main() {
         blurShader.setInt("BrightnessTexture", 2);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Third pass with default framebuffer
+        // Final pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
         screenShader.use();
         glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, blurTex);
+        glBindTexture(GL_TEXTURE_2D, blurTexH);
         screenShader.setInt("ScreenTexture", 3);      
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
