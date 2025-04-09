@@ -24,6 +24,7 @@ public:
 	int getUniformLocation(const char* name);
 
 	// Uniform Functionality (Constants)
+	void setBool(const char* name, bool b);
 	void setInt(const char* name, int i);
 	void setUInt(const char* name, unsigned int i);
 	void setFloat(const char* name, float f);

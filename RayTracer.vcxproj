@@ -187,6 +187,8 @@
     <None Include="lib\assimp-vc143-mt.dll" />
     <None Include="lib\assimp-vc143-mtd.dll" />
     <None Include="README.md" />
+    <None Include="Shaders\BlurShader.Frag" />
+    <None Include="Shaders\BlurShader.vert" />
     <None Include="Shaders\Frag.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>

@@ -19,13 +19,12 @@ int main() {
     // Set up program context
     OpenGL openGL(SCREEN_SIZE, SCREEN_SIZE);
     
-    
-
     // Set up required shaders
     Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
     Shader brightnessShader("Shaders\\BrightnessShader.vert", "Shaders\\BrightnessShader.frag");
+    Shader blurShader("Shaders\\BlurShader.vert", "Shaders\\BlurShader.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
-
+    
     // Set up 
     Scene scene;
     scene.loadModel("Assets\\Pawn.obj");
@@ -46,8 +45,6 @@ int main() {
          -1.0f, -1.0f, 0.0f,    0.0f, 0.0f
     };
 
-    
-    
     // Ray tracing stage shader setup
     unsigned rectVAO, rectVBO;
     glGenVertexArrays(1, &rectVAO);
@@ -55,14 +52,19 @@ int main() {
     glBindBuffer(GL_ARRAY_BUFFER, rectVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    rayShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // Accumulation stage shader setup
-    
+    rayShader.setInt("NumSpheres", scene.numSpheres);
+    rayShader.setInt("NumTriangles", scene.numTriangles);
+    rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
+    rayShader.setInt("Bounces", 5);
+    rayShader.setInt("Time", rand());
+
     brightnessShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -72,9 +74,19 @@ int main() {
     glEnableVertexAttribArray(1);
 
     brightnessShader.setUInt("Frames", camera->frames);
-    /*brightnessShader.setFloat("BrightnessThreshold", 0.7f);
-    std::vector<float> gaussianWeights = { 0.06136, 0.24477, 0.38774, 0.24477, 0.06136 };
-    brightnessShader.setFloatv("Weights", gaussianWeights);*/
+
+    blurShader.use();
+    glBindVertexArray(rectVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    std::vector<float> gaussianWeights = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    blurShader.setFloatv("Weights", gaussianWeights);
+    blurShader.setBool("Horizantal", true);
+    blurShader.setFloat("TextureOffset", 1.0f / SCREEN_SIZE);
 
     // Set up Sky box
     std::vector<std::string> faces{
@@ -89,15 +101,7 @@ int main() {
     unsigned int cubeMapTextureID = loadCubemap(faces);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
-    // Ray tracing uniforms
-    rayShader.use();
-    rayShader.setInt("NumSpheres", scene.numSpheres);
-    rayShader.setInt("NumTriangles", scene.numTriangles);
-    rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("Bounces", 5);
-    rayShader.setInt("Time", rand());
-
-    // Frame buffer objects
+    // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
@@ -108,7 +112,6 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // Attach texture to framebuffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumulationTex, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -116,6 +119,7 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Brightness framebuffer and texture
     GLuint brightnessFBO, brightnessTex;
     glGenFramebuffers(1, &brightnessFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
@@ -128,6 +132,24 @@ int main() {
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brightnessTex, 0);
     
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // Blur framebuffer and texture
+    GLuint blurFBO, blurTex;
+    glGenFramebuffers(1, &blurFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, blurFBO);
+    glGenTextures(1, &blurTex);
+    glBindTexture(GL_TEXTURE_2D, blurTex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurTex, 0);
+
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
@@ -166,32 +188,40 @@ int main() {
         rayShader.setVec3("CamUp", camera->camUp);
         
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
-        rayShader.setInt("AccumulationTexture", 0);
-        rayShader.setInt("Skybox", 1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, accumulationTex);
+        rayShader.setInt("Skybox", 0);
+        rayShader.setInt("AccumulationTexture", 1);
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        
         // Second pass with brightness framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
         glClear(GL_COLOR_BUFFER_BIT);
         brightnessShader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        brightnessShader.setInt("AccumulationTexture", 0);
+        brightnessShader.setInt("AccumulationTexture", 1);
         brightnessShader.setUInt("Frames", camera->frames);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // Third pass with blur shader
+        glBindFramebuffer(GL_FRAMEBUFFER, blurFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        blurShader.use();
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, brightnessTex);
+        blurShader.setInt("BrightnessTexture", 2);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Third pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
         screenShader.use();
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, brightnessTex);
-        screenShader.setInt("BrightnessTexture", 2);      
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, blurTex);
+        screenShader.setInt("ScreenTexture", 3);      
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components
