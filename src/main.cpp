@@ -140,29 +140,51 @@ int main() {
     // Blur framebuffers and textures
     GLuint blurFBO[2];
     GLuint blurTex[2];
-    glGenFramebuffers(2, blurFBO);
-    glGenTextures(2, blurTex);
     for (int i = 0; i < 2; ++i) {
-        glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[i]);
-        glBindTexture(GL_TEXTURE_2D, blurTex[i]);
+        glGenFramebuffers(1, &blurFBO[i]);
+        glGenTextures(1, &blurTex[i]);
 
+        glBindTexture(GL_TEXTURE_2D, blurTex[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+        glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurTex[i], 0);
+
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cerr << "Framebuffer not complete!" << std::endl;
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    /*GLuint testFBO;
+    GLuint testTex;
+    glGenFramebuffers(1, &testFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, testFBO);
+    glGenTextures(1, &testTex);
+    glBindTexture(GL_TEXTURE_2D, testTex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, testTex, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Framebuffer not complete!" << std::endl;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
+
     // Timing setup
     auto prevTime = clock.now();
     auto currTime = clock.now();
     unsigned runningFrameCount = 0;
     long long totalFrames = 0;
-
 
     GLenum err;
     while (!glfwWindowShouldClose(openGL.getWindow())) {
@@ -204,7 +226,7 @@ int main() {
         glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
         glClear(GL_COLOR_BUFFER_BIT);
         brightnessShader.use();
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
         brightnessShader.setInt("AccumulationTexture", 1);
         brightnessShader.setUInt("Frames", camera->frames);
@@ -212,24 +234,27 @@ int main() {
 
         // Third pass blur framebuffer ping ponging
         bool firstIteration = true;
+        bool horizontal = true;
         for (int i = 0; i < scene.blurPasses * 2; ++i) {
-            glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[i % 2]);
-            glClear(GL_COLOR_BUFFER_BIT);
+            glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[!horizontal]);
             blurShader.use();
-            blurShader.setBool("Horizantal", bool(i % 2));
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, brightnessTex);
-            blurShader.setInt("BrightnessTexture", 2);
+            blurShader.setBool("Horizantal", horizontal);
+            glActiveTexture(firstIteration ? GL_TEXTURE2 : GL_TEXTURE3 + horizontal);
+            glBindTexture(GL_TEXTURE_2D, firstIteration ? brightnessTex : blurTex[horizontal]);
+            blurShader.setInt("Texture", firstIteration ? 2 : 3 + horizontal);
             glDrawArrays(GL_TRIANGLES, 0, 6);
+            if (firstIteration)
+                firstIteration = false;
+            horizontal = !horizontal;
         }
 
         // Final pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
         screenShader.use();
-        glActiveTexture(GL_TEXTURE3);
+        glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, blurTex[1]);
-        screenShader.setInt("ScreenTexture", 3);      
+        screenShader.setInt("ScreenTexture", 4);      
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components

@@ -108,8 +108,6 @@ int Shader::getUniformLocation(const char* name) {
 	return uniformLocation;
 }
 
-
-
 void Shader::setBool(const char* name, bool b) {
 	int boolUniformLocation = getUniformLocation(name);
 	glUniform1i(boolUniformLocation, b);
