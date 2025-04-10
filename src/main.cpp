@@ -45,6 +45,21 @@ int main() {
          -1.0f, -1.0f, 0.0f,    0.0f, 0.0f
     };
 
+    // Set up Sky box
+    std::vector<std::string> faces{
+        "Assets\\skybox\\right.jpg",
+        "Assets\\skybox\\left.jpg",
+        "Assets\\skybox\\top.jpg",
+        "Assets\\skybox\\bottom.jpg",
+        "Assets\\skybox\\front.jpg",
+        "Assets\\skybox\\back.jpg"
+    };
+
+    unsigned int cubeMapTextureID = loadCubemap(faces);
+    std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
+
+    std::vector<float> gaussianWeights = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+
     // Ray tracing stage shader setup
     unsigned rectVAO, rectVBO;
     glGenVertexArrays(1, &rectVAO);
@@ -64,42 +79,26 @@ int main() {
     rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
     rayShader.setInt("Bounces", 5);
     rayShader.setInt("Time", rand());
+    rayShader.setInt("Skybox", 0);
+    rayShader.setInt("AccumulationTexture", 1);
 
     brightnessShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
     brightnessShader.setUInt("Frames", camera->frames);
 
     blurShader.use();
     glBindVertexArray(rectVAO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
-    std::vector<float> gaussianWeights = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
     blurShader.setFloatv("Weights", gaussianWeights);
     blurShader.setBool("Horizantal", true);
     blurShader.setFloat("TextureOffset", 1.0f / SCREEN_SIZE);
-
-    // Set up Sky box
-    std::vector<std::string> faces{
-        "Assets\\skybox\\right.jpg",
-        "Assets\\skybox\\left.jpg",
-        "Assets\\skybox\\top.jpg",
-        "Assets\\skybox\\bottom.jpg",
-        "Assets\\skybox\\front.jpg",
-        "Assets\\skybox\\back.jpg"
-    };
-
-    unsigned int cubeMapTextureID = loadCubemap(faces);
-    std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
 
     // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
@@ -160,26 +159,6 @@ int main() {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    /*GLuint testFBO;
-    GLuint testTex;
-    glGenFramebuffers(1, &testFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, testFBO);
-    glGenTextures(1, &testTex);
-    glBindTexture(GL_TEXTURE_2D, testTex);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, testTex, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "Framebuffer not complete!" << std::endl;
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);*/
-
     // Timing setup
     auto prevTime = clock.now();
     auto currTime = clock.now();
@@ -206,19 +185,17 @@ int main() {
             brightnessShader.use();
             brightnessShader.setUInt("Frames", camera->frames);
         }
+
         // Set viewing angle uniforms
         rayShader.use();
-        rayShader.setVec3("CamPosition", camera->camPosition);
-        rayShader.setVec3("CamDirection", camera->camFront);
-        rayShader.setVec3("CamRight", camera->camRight);
-        rayShader.setVec3("CamUp", camera->camUp);
-        
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTextureID);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, accumulationTex);
-        rayShader.setInt("Skybox", 0);
-        rayShader.setInt("AccumulationTexture", 1);
+        rayShader.setVec3("CamPosition", camera->camPosition);
+        rayShader.setVec3("CamDirection", camera->camFront);
+        rayShader.setVec3("CamRight", camera->camRight);
+        rayShader.setVec3("CamUp", camera->camUp);
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
@@ -265,15 +242,27 @@ int main() {
         glfwSwapBuffers(openGL.getWindow());
         glfwPollEvents();
         camera->frames++;
-        
+
+        err = glGetError();
+        if (err != GL_NO_ERROR) 
+            std::cerr << "OpenGL error: " << std::hex << err << std::endl;
     }
     // Cleanup ImGui
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
+    // Cleanup OpenGL resources
     glDeleteFramebuffers(1, &accumulationFBO);
+    glDeleteFramebuffers(1, &brightnessFBO);
+    glDeleteFramebuffers(2, blurFBO);
+    glDeleteTextures(1, &accumulationTex);
+    glDeleteTextures(1, &brightnessTex);
+    glDeleteTextures(2, blurTex);
+    
+    // Cleanup glfw resources
     glfwTerminate();
+
 	return 0;
 }
 
