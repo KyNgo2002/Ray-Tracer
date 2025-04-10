@@ -272,10 +272,15 @@ void Scene::displayEditor() {
             editedMaterials |= ImGui::DragFloat("Emission Power##xx", &materials[i].emissionPower, 0.01f, 0.0f, 10.0f);
             ImGui::Separator();
             ImGui::PopID();
-        }
+        } 
     }
-
-    ImGui::DragInt("Blur passes", &blurPasses, 1, 1, 10);
+    ImGui::PushItemWidth(80);
+    ImGui::InputInt("Blur passes", &blurPasses);
+    if (blurPasses < 1)
+        blurPasses = 1;
+    if (blurPasses > 10)
+        blurPasses = 10;
+    ImGui::PopItemWidth();
 
     ImGui::End();
 
