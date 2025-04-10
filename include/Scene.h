@@ -47,6 +47,8 @@ public:
     };
 
 public:
+    int blurPasses;
+
 	int numSpheres;
 	int numTriangles;
 	int numPlanes;

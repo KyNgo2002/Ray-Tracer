@@ -38,6 +38,9 @@ Scene::Scene() {
         "Reflective not emissive",
         "White Rough not emissive"
     };
+
+    blurPasses = 1;
+
     numSpheres = spheres.size();
     numTriangles = triangles.size();
     numPlanes = planes.size();
@@ -272,6 +275,8 @@ void Scene::displayEditor() {
         }
     }
 
+    ImGui::DragInt("Blur passes", &blurPasses, 1, 1, 10);
+
     ImGui::End();
 
     ImGui::Render();
@@ -306,13 +311,13 @@ void Scene::loadModel(const char* path) {
         std::istringstream sstream(line);
         std::string token;
         sstream >> token;
+
         // Vertex Normals
         if (token == "vn") {
             ++vertexNormalCount;
             glm::vec3 vertexNormal;
             sstream >> vertexNormal.x >> vertexNormal.y >> vertexNormal.z;
             normals.push_back(vertexNormal);
-            //std::cout << line << std::endl;
         }
         // Vertices
         else if (token == "v") {
@@ -320,7 +325,6 @@ void Scene::loadModel(const char* path) {
             glm::vec3 vertex;
             sstream >> vertex.x >> vertex.y >> vertex.z;
             vertices.push_back(vertex);
-            //std::cout << line << std::endl;
         }
         // Faces
         else if (token == "f") {
@@ -331,7 +335,6 @@ void Scene::loadModel(const char* path) {
                 tokens.push_back(token);
 
             triangulate(tokens, vertices, normals);
-            //std::cout << tokens.size() << " : " << line << std::endl;
         }
     }
     std::cout << "Vertice Count: " << verticeCount << std::endl;

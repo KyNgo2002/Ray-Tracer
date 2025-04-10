@@ -225,7 +225,9 @@ int main() {
         brightnessShader.setUInt("Frames", camera->frames);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Third pass with blur shader
+        // Third pass blur framebuffer ping pong
+        bool firstIteration = true;
+        
         glBindFramebuffer(GL_FRAMEBUFFER, blurFBOH);
         glClear(GL_COLOR_BUFFER_BIT);
         blurShader.use();
