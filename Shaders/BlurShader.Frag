@@ -9,6 +9,7 @@ uniform float Weights[5];
 uniform sampler2D Texture;
 uniform float TextureOffset;
 
+// Shader that handles blurring.
 void main() {
 	vec2 offset = Horizontal ? vec2(TextureOffset, 0.0f) : vec2(0.0f, TextureOffset);
 	vec3 result = texture(Texture, TexCoord).rgb * Weights[0];

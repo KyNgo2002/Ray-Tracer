@@ -2,13 +2,11 @@
 #include <chrono> 
 #include <time.h>
 #include <cstdlib>
-#include "../include/Shader.h"
 
+#include "../include/Shader.h"
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
 #include "../include/Scene.h"
-
-#include "../include/Model.h"
 #include "../include/stb_image.h"
 
 unsigned int loadCubemap(std::vector<std::string> faces);
@@ -58,7 +56,6 @@ int main() {
     // Gaussian weights for blurring shader pass
     std::vector<float> gaussianWeights = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
 
-
     // Sky box texture initialization
     unsigned int cubeMapTextureID = loadCubemap(faces);
     std::cout << "Skybox cube map textureID: " << cubeMapTextureID << std::endl;
@@ -98,68 +95,71 @@ int main() {
     // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
     glGenTextures(1, &accumulationTex);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, accumulationTex);
-    brightnessShader.use();
-    brightnessShader.setInt("AccumulationTexture", 1);
 
+    // Texture configuration
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, accumulationFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, accumulationTex, 0);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Brightness framebuffer and texture
     GLuint brightnessFBO, brightnessTex;
     glGenFramebuffers(1, &brightnessFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
     glGenTextures(1, &brightnessTex);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, brightnessTex);
 
+    // Texture configuration
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brightnessTex, 0);
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Blur framebuffers and textures
     GLuint blurFBO[2];
     GLuint blurTex[2];
     for (int i = 0; i < 2; ++i) {
+        // Create and bind framebuffer and texture
         glGenFramebuffers(1, &blurFBO[i]);
         glGenTextures(1, &blurTex[i]);
         glActiveTexture(GL_TEXTURE3 + i);
         glBindTexture(GL_TEXTURE_2D, blurTex[i]);
 
+        // Texture configuration
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+        // Framebuffer setup
         glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, blurTex[i], 0);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cerr << "Framebuffer not complete!" << std::endl;
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    // Timing setup
+    // Timing variables
     auto prevTime = clock.now();
     auto currTime = clock.now();
     unsigned runningFrameCount = 0;
@@ -207,12 +207,14 @@ int main() {
         bool horizontal = true;
         for (int i = 0; i < scene.blurPasses * 2; ++i) {
             glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[!horizontal]);
+            // Set appropriate blur shader texture for ping ponging
             blurShader.use();
             blurShader.setBool("Horizontal", horizontal);
             glActiveTexture(firstIteration ? GL_TEXTURE2 : GL_TEXTURE3 + horizontal);
             glBindTexture(GL_TEXTURE_2D, firstIteration ? brightnessTex : blurTex[horizontal]);
             blurShader.setInt("Texture", firstIteration ? 2 : 3 + horizontal);
             glDrawArrays(GL_TRIANGLES, 0, 6);
+
             if (firstIteration)
                 firstIteration = false;
             horizontal = !horizontal;
@@ -232,10 +234,12 @@ int main() {
         glfwPollEvents();
         camera->frames++;
 
+        // Check for OpenGL errors
         err = glGetError();
         if (err != GL_NO_ERROR) 
             std::cerr << "OpenGL error: " << std::hex << err << std::endl;
     }
+    
     // Cleanup ImGui
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -255,6 +259,7 @@ int main() {
 	return 0;
 }
 
+// Helper function for loading skybox
 unsigned int loadCubemap(std::vector<std::string> faces) {
     unsigned int textureID;
     glGenTextures(1, &textureID);

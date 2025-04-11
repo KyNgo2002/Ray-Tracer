@@ -7,6 +7,7 @@ out vec4 FragColor;
 uniform uint Frames;
 uniform sampler2D AccumulationTexture;
 
+// Shader that applies a brightness filter to accumulated texture
 void main() {
 	vec4 color = texture(AccumulationTexture, TexCoord) / float(Frames);
 	float brightness = (color.r * 0.2126) + (color.g * 0.7152) + (color.b * 0.0722);
