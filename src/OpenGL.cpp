@@ -2,11 +2,13 @@
 
 static void glfw_error_callback(int error, const char* description);
 
-OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
-    SCR_WIDTH{ SCR_WIDTH },
-    SCR_HEIGHT{ SCR_HEIGHT },
-    camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
+// Constructor
+OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT)
+    : SCR_WIDTH{ SCR_WIDTH },
+      SCR_HEIGHT{ SCR_HEIGHT },
+      camera(new Camera(SCR_WIDTH, SCR_HEIGHT)) {
 
+    // GLFW Initialization
     glfwSetErrorCallback(glfw_error_callback);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -22,32 +24,35 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT) :
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    // Glad Initialization
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
         std::cout << "Failed to initialize GLAD" << std::endl;
-    }
 
     stbi_set_flip_vertically_on_load(true);
 
+    // Mouse state
     lastX = SCR_WIDTH / 2.0f;
     lastY = SCR_HEIGHT / 2.0f;
     firstMouse = true;
     editingMode = false;
 
-    // Store "this" pointer in GLFW's user pointer
+    // Store "this" pointer in GLFW user pointer
     glfwSetWindowUserPointer(window, this);
 
+    // Callbacks
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
 
     if (!editingMode)
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    // OpenGL config
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     glDisable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
-
 }
 
+// Getters
 Camera* OpenGL::getCamera() {
     return camera;
 }
@@ -64,6 +69,7 @@ float OpenGL::getScreenHeight() {
     return SCR_HEIGHT;
 }
 
+// Toggle editing mode
 void OpenGL::changeEditingMode() {
     editingMode = !editingMode;
     camera->changeEditingMode();
@@ -73,10 +79,12 @@ void OpenGL::changeEditingMode() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
+// Framebuffer size callback function
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+// Handle user input
 void OpenGL::processInput(float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -111,21 +119,21 @@ void OpenGL::processInput(float deltaTime) {
         camera->calculateLookAt();
 }
 
+// Mouse movement callback
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     OpenGL* instance = static_cast<OpenGL*>(glfwGetWindowUserPointer(window));
 
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
 
-    if (instance->firstMouse)
-    {
+    if (instance->firstMouse) {
         instance->lastX = xpos;
         instance->lastY = ypos; 
         instance->firstMouse = false;
     }
 
     float xoffset = xpos - instance->lastX;
-    float yoffset = instance->lastY - ypos; // reversed since y-coordinates go from bottom to top
+    float yoffset = instance->lastY - ypos; 
 
     instance->lastX = xpos;
     instance->lastY = ypos;
@@ -136,6 +144,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     }
 }
 
+// GLFW error callback function
 static void glfw_error_callback(int error, const char* description) {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }

@@ -2,10 +2,12 @@
 #include <iostream>
 #include <sstream>
 
+// Default constructor
 Shader::Shader() {
 	shaderProgramID = -1;
 }
 
+// Constructor given 2 paths
 Shader::Shader(const char* vertexSource, const char* fragSource) {
 	std::ifstream vShaderFile;
 	std::ifstream fShaderFile;
@@ -13,6 +15,7 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 	std::string fragString;
 
 	try {
+		// Open shader files given file path
 		vShaderFile.open(vertexSource);
 		fShaderFile.open(fragSource);
 
@@ -41,6 +44,7 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 		std::cerr << "ERROR: Shader file unsuccessfully read" << std::endl;
 	}
 
+	// Retrieve shader code as c string
 	const char* vertCode = vertString.c_str();
 	const char* fragCode = fragString.c_str();
 
@@ -53,7 +57,6 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 	int  success;
 	char infoLog[512];
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
 	if (!success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
@@ -84,23 +87,27 @@ Shader::Shader(const char* vertexSource, const char* fragSource) {
 		std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
 
-	// Clean up shader objects
+	// Clean up shader file objects
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
 
+// Destructor
 Shader::~Shader() {
 	shaderProgramID = -1;
 }
 
+// Clean up openGL shader resources
 void Shader::clean() {
 	glDeleteProgram(shaderProgramID);
 }
 
+// Set current program as active shader
 void Shader::use() {
 	glUseProgram(shaderProgramID);
 }
 
+// Get uniform location helper function
 int Shader::getUniformLocation(const char* name) {
 	int uniformLocation = glGetUniformLocation(shaderProgramID, name);
 	if (uniformLocation == -1) 
@@ -108,6 +115,9 @@ int Shader::getUniformLocation(const char* name) {
 	return uniformLocation;
 }
 
+//
+// Shader uniform setter functions
+//
 void Shader::setBool(const char* name, bool b) {
 	int boolUniformLocation = getUniformLocation(name);
 	glUniform1i(boolUniformLocation, b);

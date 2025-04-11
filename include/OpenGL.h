@@ -33,12 +33,11 @@ public:
 	// Getters/setters
 	Camera* getCamera();
 	GLFWwindow* getWindow();
-
-	// Getters/setters
 	float getScreenWidth();
 	float getScreenHeight();
 	void changeEditingMode();
 
+	// Modifiers
 	void processInput(float deltaTime);
 
 };
