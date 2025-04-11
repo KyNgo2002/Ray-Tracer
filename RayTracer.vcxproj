@@ -175,7 +175,6 @@
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\OpenGL.h" />
     <ClInclude Include="include\stb_image.h" />
-    <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Scene.h" />
   </ItemGroup>
   <ItemGroup>
@@ -186,18 +185,12 @@
     <None Include="README.md" />
     <None Include="Shaders\BlurShader.Frag" />
     <None Include="Shaders\BlurShader.vert" />
-    <None Include="Shaders\Frag.frag">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </None>
     <None Include="Shaders\Ray.Frag" />
     <None Include="Shaders\Ray.vert" />
     <None Include="Shaders\BrightnessShader.frag" />
     <None Include="Shaders\BrightnessShader.vert" />
     <None Include="Shaders\ScreenShader.frag" />
     <None Include="Shaders\ScreenShader.vert" />
-    <None Include="Shaders\Vert.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\assimp-vc143-mt.lib" />

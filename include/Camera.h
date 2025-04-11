@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// Camera movement enumeration
 enum CameraMovement {
 	FORWARD,
 	BACKWARD,
@@ -17,7 +18,7 @@ enum CameraMovement {
 
 class Camera {
 public:
-	// Camera
+	// Camera vectors
 	glm::vec3 camPosition;
 	glm::vec3 camFront;
 	glm::vec3 camUp;
@@ -30,6 +31,7 @@ public:
 	glm::mat4 perspective;
 	glm::mat4 inversePerspective;
 
+	// Camera settings
 	const float cameraSpeed = 0.009f;
 	const float MOUSE_SENSITIVITY = 0.04f;
 	float yaw;

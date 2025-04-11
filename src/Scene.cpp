@@ -1,7 +1,8 @@
 #include "Scene.h"
 
+// Constructor for default scene
 Scene::Scene() {
-    // Default Scene
+    // Initialize basic shapes and scene variables
     spheres = {
         {glm::vec3{-5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
         {glm::vec3{5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
@@ -46,8 +47,10 @@ Scene::Scene() {
     numPlanes = planes.size();
     numMaterials = materials.size();
 
+    // Create buffers for shapes
     createBuffers();
 
+    // Create cornell box
     addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
     addPlane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 20.0f, 10.0f), 0, false);
     addPlane(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, -10.0f), 4, false);
@@ -56,12 +59,14 @@ Scene::Scene() {
     addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);
 }
 
+// Clean up scene
 Scene::~Scene() {
     glDeleteBuffers(1, &sphereSSBO);
     glDeleteBuffers(1, &triangleSSBO);
     glDeleteBuffers(1, &materialSSBO);
 }
 
+// Generates buffers for each type of shape
 void Scene::createBuffers() {
     glGenBuffers(1, &sphereSSBO);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
@@ -79,7 +84,9 @@ void Scene::createBuffers() {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, materialSSBO);
 }
 
+// Sets up ImGui editing UI for future use
 void Scene::createImGuiEditor(GLFWwindow* window) {
+    // Initialize ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     io = &ImGui::GetIO(); 
@@ -101,18 +108,21 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
     ImGui_ImplOpenGL3_Init("#version 460");
 }
 
+// Adds sphere to scene
 void Scene::addSphere(glm::vec3 position, float radius, int materialInd) {
     Sphere sphere{ position, radius, glm::vec3(0.0f), materialInd };
     spheres.push_back(sphere);
     ++numSpheres;
 }
 
+// Adds triangle to scene
 void Scene::addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd) {
     Triangle triangle(x, y, z, normal, materialInd);
     triangles.push_back(triangle);
     ++numTriangles;
 }
 
+// Adds plane to scene
 void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane) {
     Triangle firstTriangle;
     Triangle secondTriangle;
@@ -146,6 +156,7 @@ void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight,
     secondTriangle.normal = normal;
     secondTriangle.materialInd = materialInd;
 
+    // Add newly created triangles and trigger buffer update
     editedTriangles = true;
     newPlane.firstTriangleInd = triangles.size();
     triangles.push_back(firstTriangle);
@@ -159,19 +170,23 @@ void Scene::addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight,
     numTriangles += 2;
     numPlanes++;
     
+    // Send new traingles to shader
     sendTriangles();
 }
 
+// Adds materials to scene
 void Scene::addMaterial(glm::vec3 color, float roughness, glm::vec3 emissionColor, float emissionPower) {
     Material material(color, roughness, emissionColor, emissionPower);
     materials.push_back(material);
     ++numMaterials;
 }
 
+// Checks if edits have been made to scene
 bool Scene::checkEdits() {
     return editedSpheres || editedPlanes || editedTriangles || editedMaterials;
 }
 
+// Handles edits to specific shapes depending on edit history
 void Scene::handleEdits() {
     if (editedSpheres) 
         sendSpheres();
@@ -183,24 +198,28 @@ void Scene::handleEdits() {
         sendMaterials();
 }
 
+// Sends spheres to shader
 void Scene::sendSpheres() {
     editedSpheres = false;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, sphereSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, spheres.size() * sizeof(Sphere), spheres.data(), GL_DYNAMIC_DRAW);
 }
 
+// Sends triangles to shader
 void Scene::sendTriangles() {
     editedTriangles = false;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, triangleSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, triangles.size() * sizeof(Triangle), triangles.data(), GL_DYNAMIC_DRAW);
 }
 
+// Sends materials to shader
 void Scene::sendMaterials() {
     editedMaterials = false;
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, materialSSBO);
     glBufferData(GL_SHADER_STORAGE_BUFFER, materials.size() * sizeof(Material), materials.data(), GL_DYNAMIC_DRAW);
 }
 
+// Updates planes
 void Scene::updatePlanes() {
     editedPlanes = false;
     for (int i = 0; i < numPlanes; ++i) {
@@ -212,7 +231,9 @@ void Scene::updatePlanes() {
     sendTriangles();
 }
 
+// Display ImGui Editor to viewport
 void Scene::displayEditor() {
+    // Create new frmae
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -221,6 +242,7 @@ void Scene::displayEditor() {
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
     ImGui::Separator();
 
+    // Header for sphere properties
     if (ImGui::CollapsingHeader("Sphere Properties")) {
         for (int i = 0; i < numSpheres; ++i) {
             ImGui::Text("Sphere %d", (i + 1));
@@ -233,6 +255,7 @@ void Scene::displayEditor() {
         }
     }
 
+    // Header for triangle properties
     if (ImGui::CollapsingHeader("Triangle Properties")) {
         int ind = 1;
         for (int i = 0; i < numTriangles; ++i) {
@@ -249,6 +272,7 @@ void Scene::displayEditor() {
         }
     }
 
+    // Header for Plane properties
     if (ImGui::CollapsingHeader("Plane Properties")) {
         for (int i = 0; i < numPlanes; ++i) {
             Plane& plane = planes[i];
@@ -262,6 +286,7 @@ void Scene::displayEditor() {
         }
     }
 
+    // Header for material properties
     if (ImGui::CollapsingHeader("Material Properties")) {
         for (int i = 0; i < numMaterials; ++i) {
             ImGui::PushID(i);
@@ -274,6 +299,7 @@ void Scene::displayEditor() {
             ImGui::PopID();
         } 
     }
+    // Slider for setting blur passes
     ImGui::PushItemWidth(80);
     ImGui::InputInt("Blur passes", &blurPasses);
     if (blurPasses < 1)
@@ -282,8 +308,10 @@ void Scene::displayEditor() {
         blurPasses = 10;
     ImGui::PopItemWidth();
 
+    // End of frame
     ImGui::End();
 
+    // Rendering logic
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -295,8 +323,10 @@ void Scene::displayEditor() {
     }
 }
 
+// Loads obj model given path to model
 void Scene::loadModel(const char* path) {
-    std::ifstream ifstream(path);
+    // Open file
+    std::ifstream ifstream(path);   
     
     if (!ifstream.is_open()) {
         std::cout << "ERROR::Failed to open file at " << path << std::endl;
@@ -312,7 +342,10 @@ void Scene::loadModel(const char* path) {
     int vertexNormalCount = 0;
     int faceCount = 0;
 
+    // Parses obj file line by line
+    // Breaks each line into tokens
     while (getline(ifstream, line)) {
+        // Line by line processing
         std::istringstream sstream(line);
         std::string token;
         sstream >> token;
@@ -339,6 +372,7 @@ void Scene::loadModel(const char* path) {
             while (sstream >> token) 
                 tokens.push_back(token);
 
+            // Triangulate face depending on vertices per face
             triangulate(tokens, vertices, normals);
         }
     }
@@ -351,15 +385,18 @@ void Scene::loadModel(const char* path) {
 
     // Model loading completed, send to GPU
     editedTriangles = true;
+    // Trigger buffer updates for new model shapes
     handleEdits();
 }
 
+// Triangulates faces into triangles depending on # of given vertices per face
 void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>& vertices, std::vector<glm::vec3>& normals) {
     std::vector<int> verticeInds;
     std::vector<int> normalInds;
     Triangle triangle;
     triangle.materialInd = 6;
 
+    // Break line down into tokens
     for (auto& token : tokens) {
         std::istringstream sstream(token);
         std::string num;
@@ -370,6 +407,7 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         normalInds.push_back(stoi(num) - 1);
     }
 
+    // Standard triangle with 3 vertices
     if (tokens.size() == 3) {
         triangle.x = glm::vec4(vertices[verticeInds[0]], 1.0f);
         triangle.y = glm::vec4(vertices[verticeInds[1]], 1.0f);
@@ -378,6 +416,7 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
     }
+    // Two triangles comprised from 4 vertices
     else if (tokens.size() == 4) {
         // First Triangle
         triangle.x = glm::vec4(vertices[verticeInds[0]], 0.0f);
@@ -395,6 +434,7 @@ void Scene::triangulate(std::vector<std::string>& tokens, std::vector<glm::vec3>
         triangles.push_back(triangle);
         isRegularTriangle.push_back(false);
     }
+    // 8 Triangles comprised of 8 vertices and an origin
     else if (tokens.size() == 8) {
         glm::vec4 origin(0.0f);
         triangle.x = origin;

@@ -13,6 +13,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 // Class that encapsulates the OpenGL state machine
 class OpenGL {
 private:
+	// OpenGl window and Camera
 	GLFWwindow* window;
 	Camera* camera;
 
@@ -20,10 +21,12 @@ private:
 	const float SCR_HEIGHT;
 
 public:
+	// Mouse variables
 	float lastX;
 	float lastY;
 	bool firstMouse;
 
+	// Editing move flag
 	bool editingMode;
 
 public:

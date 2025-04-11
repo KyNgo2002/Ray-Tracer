@@ -22,7 +22,7 @@ int main() {
     Shader brightnessShader("Shaders\\BrightnessShader.vert", "Shaders\\BrightnessShader.frag");
     Shader blurShader("Shaders\\BlurShader.vert", "Shaders\\BlurShader.frag");
     Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
-    std::cout << "Hello" << std::endl;
+    
     // Set up scene
     Scene scene;
     scene.loadModel("Assets\\Pawn.obj");

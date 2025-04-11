@@ -76,6 +76,7 @@ vec2 hash2d(vec2 p) {
     return fract((p3.xx+p3.yz)*p3.zy);
 }
 
+// Generates a psuedo-random float
 float RandomFloat(inout uint32_t seed) {
 	seed = seed * 747796405 + 2891336453;
 	uint32_t result = ((seed >> (( seed >> (28)) + (4))) ^ seed) * (277803737);
@@ -90,6 +91,7 @@ float randomFloatNormalDistribution(inout uint32_t seed) {
 	return rho * cos(theta);
 }
 
+// Helper function that generates a random vector of floats
 vec3 generateRandVec(inout uint32_t seed) {
 	float x = randomFloatNormalDistribution(seed);
 	float y = randomFloatNormalDistribution(seed);
@@ -97,6 +99,7 @@ vec3 generateRandVec(inout uint32_t seed) {
 	return normalize(vec3(x, y, z));
 }
 
+// Traces ray through all objects in scene
 HitPayload TraceRay(Ray ray) {
 	HitPayload payload;
 	payload.hitDistance = -1;
@@ -104,8 +107,6 @@ HitPayload TraceRay(Ray ray) {
 
 	int closestInd = -1;
 	float hitDistance = 3.402823466e+38;
-
-	vec3 triangleNormal;
 
 	// Ray-Sphere intersection
 	for (int i = 0; i < NumSpheres; ++i) {
@@ -117,9 +118,11 @@ HitPayload TraceRay(Ray ray) {
 
 		float discriminant = b * b - 4.0f * a * c;
 
+		// Did not hit
 		if (discriminant < 0.0f)
 			continue;
 
+		// Did hit, calculate hit distance
 		float closestT = (-b - sqrt(discriminant)) / (2.0f * a);
 		if (closestT > 0.0f && closestT < hitDistance) {
 			objType = 0;
@@ -142,21 +145,25 @@ HitPayload TraceRay(Ray ray) {
 		float u = d * dot(-q, v2v0);
 		float v = d * dot(q, v1v0);
 		float t = d * dot(-normal, rov0);
-
+		
+		// Did not hit
 		if(u < 0.0f || v < 0.0f || (u + v) > 1.0f) t = -1.0;
+
+		// Did hit, calculate hit distance
 		if (t > 0.0f && t < hitDistance) {
 			objType = 1;
 			closestInd = i;
 			hitDistance = t;
 		}
-
 	}
 	
+	// No hits
 	if (closestInd < 0) {
 		payload.hitDistance = -1.0f;
 		return payload;
 	}
 
+	// Hits, configure payload depending on closest object type
 	payload.objInd = closestInd;
 	payload.hitDistance = hitDistance;
 	payload.objType = objType;
@@ -174,6 +181,7 @@ HitPayload TraceRay(Ray ray) {
 	return payload;
 }
 
+// Shader for ray/path tracing
 void main() {
 	// Random number generation
 	vec2 uv = (gl_FragCoord.xy / Resolution) * 2.0f - 1.0f;
@@ -197,19 +205,23 @@ void main() {
 		seed += Time;
 		HitPayload payload = TraceRay(ray);
 		
+		// Hit skybox
 		if (payload.hitDistance < 0.0f) {
 			light += texture(Skybox, ray.direction).rgb * rayColor;
 			break;
 		}
+		// Hit object
 		else {
 			Material material;
 			vec3 specularDir = reflect(ray.direction, payload.worldNorm);
 			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
 			diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 
+			// Material of hit object
 			material = payload.objType == 0 ? materials[spheres[payload.objInd].materialInd] : 
 				materials[triangles[payload.objInd].materialInd];
 			
+			// Lighting calculations
 			ray.direction = mix(specularDir, diffuseDir, material.roughness);
 			emittedLight = material.emissionColor * material.emissionPower;
 			light += emittedLight * rayColor;

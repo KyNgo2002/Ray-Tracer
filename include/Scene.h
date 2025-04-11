@@ -19,6 +19,7 @@
 
 class Scene {
 public:
+    // Structs for unique shapes and materials
     struct Sphere {
         glm::vec3 position;
         float radius;
@@ -47,6 +48,7 @@ public:
     };
 
 public:
+    // Scene variables
     int blurPasses;
 
 	int numSpheres;
@@ -54,6 +56,7 @@ public:
 	int numPlanes;
     int numMaterials;
 
+    // Edited flags
     bool editedSpheres = false;
     bool editedPlanes = false;
     bool editedTriangles = false;
@@ -67,16 +70,20 @@ public:
     std::vector<Material> materials;
     std::vector<std::string> materialNames;
 
+    // Shape buffers
     GLuint sphereSSBO;
     GLuint triangleSSBO;
     GLuint materialSSBO;
 
+    // ImGui context
     ImGuiIO* io;
 
 public:
-    // Constructors/Destructors/Setup
+    // Constructors/Destructors
 	Scene();
     ~Scene();
+
+    // Setup functions
     void createBuffers();
     void createImGuiEditor(GLFWwindow* window);
 

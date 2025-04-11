@@ -1,5 +1,6 @@
 #include "../include/Camera.h"
 
+// Construtor
 Camera::Camera(float scrWidth, float scrHeight)
     : camPosition(glm::vec3(0.0f, 0.0f, 2.0f)),
       camFront(glm::vec3(0.0f, 0.0f, -1.0f)),
@@ -11,20 +12,24 @@ Camera::Camera(float scrWidth, float scrHeight)
       perspective(glm::perspective(glm::radians(45.0f), scrWidth / scrHeight, 0.1f, 100.0f)),
       inversePerspective(glm::inverse(perspective)) {
 
+    // Mouse movement variables
     yaw = -90.0f;
     pitch = 0.0f;
     frames = 1;
     moved = false;
     editing = false;
 
+    // Initialize camera vectors
     updateCameraVectors();
 }
 
+// Calculates look at current matrix 
 void Camera::calculateLookAt() {
 	lookAt = glm::lookAt(camPosition, camPosition + camFront, camUp);
     inverseLookAt = glm::inverse(lookAt);
 }
 
+// Handles user/camera movement
 void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
     if (direction == FORWARD) 
         camPosition += cameraSpeed * deltaTime * glm::normalize(glm::vec3(camFront[0], 0.0f, camFront[2]));
@@ -41,6 +46,7 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime) {
     calculateLookAt();
 }
 
+// Handles mouse movement
 void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch) {
     xoffset *= MOUSE_SENSITIVITY;
     yoffset *= MOUSE_SENSITIVITY;
@@ -60,8 +66,10 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, GLboolean constr
     updateCameraVectors();
 }
 
+
+// Updates camera vectors
 void Camera::updateCameraVectors() {
-    // calculate the new Front vector
+    // calculate new Front vector
     glm::vec3 front;
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     front.y = sin(glm::radians(pitch));
@@ -72,10 +80,12 @@ void Camera::updateCameraVectors() {
     camUp = glm::normalize(glm::cross(camRight, camFront));
 }
 
+// Set camera movement flag for future updates
 void Camera::setMoved() {
     moved = true;
 }
 
+// Changes editing mode to lock or unlock camera
 void Camera::changeEditingMode() {
     editing = !editing;
 }

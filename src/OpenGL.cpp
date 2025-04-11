@@ -16,6 +16,7 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
+    // Window creation
     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Ray Tracer", NULL, NULL);
     if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -52,7 +53,7 @@ OpenGL::OpenGL(float SCR_WIDTH, float SCR_HEIGHT)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0);
 }
 
-// Getters
+// Getters functions
 Camera* OpenGL::getCamera() {
     return camera;
 }
