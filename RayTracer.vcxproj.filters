@@ -122,26 +122,17 @@
     <None Include="README.md" />
     <None Include="lib\assimp-vc143-mt.dll" />
     <None Include="lib\assimp-vc143-mtd.dll" />
-    <None Include="Shaders\Ray.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\Ray.Frag">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\BrightnessShader.vert">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\BrightnessShader.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="imgui.ini" />
-    <None Include="Shaders\ScreenShader.vert">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\ScreenShader.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\BlurShader.vert">
+    <None Include="Shaders\QuadShader.vert">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\BlurShader.Frag">

@@ -18,10 +18,10 @@ int main() {
     OpenGL openGL(SCREEN_SIZE, SCREEN_SIZE);
     
     // Shader initialization
-    Shader rayShader("Shaders\\Ray.vert", "Shaders\\Ray.frag");
-    Shader brightnessShader("Shaders\\BrightnessShader.vert", "Shaders\\BrightnessShader.frag");
-    Shader blurShader("Shaders\\BlurShader.vert", "Shaders\\BlurShader.frag");
-    Shader screenShader("Shaders\\ScreenShader.vert", "Shaders\\ScreenShader.frag");
+    Shader rayShader("Shaders\\QuadShader.vert", "Shaders\\Ray.frag");
+    Shader brightnessShader("Shaders\\QuadShader.vert", "Shaders\\BrightnessShader.frag");
+    Shader blurShader("Shaders\\QuadShader.vert", "Shaders\\BlurShader.frag");
+    Shader screenShader("Shaders\\QuadShader.vert", "Shaders\\ScreenShader.frag");
     
     // Set up scene
     Scene scene;
@@ -112,7 +112,6 @@ int main() {
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
-
     // Brightness framebuffer and texture
     GLuint brightnessFBO, brightnessTex;
     glGenFramebuffers(1, &brightnessFBO);
@@ -132,7 +131,6 @@ int main() {
     
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
-
 
     // Blur framebuffers and textures
     GLuint blurFBO[2];
@@ -158,6 +156,26 @@ int main() {
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             std::cerr << "Framebuffer not complete!" << std::endl;
     }
+
+    // Blur framebuffer and texture
+    GLuint bloomFBO, bloomTex;
+    glGenFramebuffers(1, &bloomFBO);
+    glGenTextures(1, &bloomTex);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, bloomTex);
+
+    // Texture configuration
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_SIZE, SCREEN_SIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomTex, 0);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cerr << "Framebuffer not complete!" << std::endl;
 
     // Timing variables
     auto prevTime = clock.now();
@@ -219,6 +237,7 @@ int main() {
                 firstIteration = false;
             horizontal = !horizontal;
         }
+        // Fourth pass apply bloom shader
 
         // Final pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
