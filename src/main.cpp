@@ -209,8 +209,6 @@ int main() {
             scene.handleEdits();
             camera->moved = false;
             camera->frames = 1;
-            brightnessShader.use();
-            brightnessShader.setUInt("Frames", camera->frames);
         }
 
         // Set viewing angle uniforms
