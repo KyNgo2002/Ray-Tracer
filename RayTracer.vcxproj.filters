@@ -138,6 +138,9 @@
     <None Include="Shaders\BlurShader.Frag">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\BloomShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Library Include="lib\glfw3.lib">

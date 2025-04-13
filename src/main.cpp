@@ -21,6 +21,7 @@ int main() {
     Shader rayShader("Shaders\\QuadShader.vert", "Shaders\\Ray.frag");
     Shader brightnessShader("Shaders\\QuadShader.vert", "Shaders\\BrightnessShader.frag");
     Shader blurShader("Shaders\\QuadShader.vert", "Shaders\\BlurShader.frag");
+    Shader bloomShader("Shaders\\QuadShader.vert", "Shaders\\BloomShader.frag");
     Shader screenShader("Shaders\\QuadShader.vert", "Shaders\\ScreenShader.frag");
     
     // Set up scene
@@ -91,6 +92,14 @@ int main() {
     blurShader.setFloatv("Weights", gaussianWeights);
     blurShader.setBool("Horizontal", true);
     blurShader.setFloat("TextureOffset", 1.0f / SCREEN_SIZE);
+
+    bloomShader.use();
+    bloomShader.setUInt("Frames", camera->frames);
+    bloomShader.setInt("AccumulationTexture", 1);
+    bloomShader.setInt("BlurTexture", 4);
+
+    screenShader.use();
+    screenShader.setInt("ScreenTexture", 5);
 
     // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
@@ -238,6 +247,11 @@ int main() {
             horizontal = !horizontal;
         }
         // Fourth pass apply bloom shader
+        glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO);
+        glClear(GL_COLOR_BUFFER_BIT);
+        bloomShader.use();
+        bloomShader.setUInt("Frames", camera->frames);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // Final pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
