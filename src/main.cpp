@@ -7,6 +7,7 @@
 #include <../include/Camera.h>
 #include "../include/OpenGL.h"
 #include "../include/Scene.h"
+#include "../include/TexturedBuffer.h"
 #include "../include/stb_image.h"
 
 unsigned int loadCubemap(std::vector<std::string> faces);
@@ -100,6 +101,8 @@ int main() {
 
     screenShader.use();
     screenShader.setInt("ScreenTexture", 5);
+
+    TexturedBuffer accumulationBuffer(SCREEN_SIZE, SCREEN_SIZE);
 
     // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
