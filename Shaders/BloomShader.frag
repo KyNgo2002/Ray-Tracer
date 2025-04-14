@@ -8,7 +8,7 @@ uniform uint Frames;
 uniform sampler2D AccumulationTexture;
 uniform sampler2D BlurTexture;
 
-// Shader that applies a brightness filter to accumulated texture
+// Shader that applies bloom effect to original texture.
 void main() {
 	vec3 result = texture(AccumulationTexture, TexCoord).rgb / float(Frames) + texture(BlurTexture, TexCoord).rgb;
 	vec3 gammaCorrection = pow(result, vec3(1.0f / 2.2f));

@@ -79,7 +79,7 @@ int main() {
     rayShader.setInt("NumSpheres", scene.numSpheres);
     rayShader.setInt("NumTriangles", scene.numTriangles);
     rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("Bounces", 5);
+    rayShader.setInt("Bounces", 3);
     rayShader.setInt("Time", rand());
     rayShader.setInt("Skybox", 0);
     rayShader.setInt("AccumulationTexture", 1);
