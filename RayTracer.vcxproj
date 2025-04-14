@@ -157,6 +157,7 @@
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="src\TexturedBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.h" />
@@ -176,6 +177,7 @@
     <ClInclude Include="include\OpenGL.h" />
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\TexturedBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />

@@ -299,6 +299,9 @@ void Scene::displayEditor() {
             ImGui::PopID();
         } 
     }
+
+    ImGui::Spacing();
+
     // Slider for setting blur passes
     ImGui::PushItemWidth(80);
     ImGui::InputInt("Blur passes", &blurPasses);
@@ -307,6 +310,11 @@ void Scene::displayEditor() {
     if (blurPasses > 10)
         blurPasses = 10;
     ImGui::PopItemWidth();
+    
+    ImGui::Spacing();
+
+    // Checkbox for bloom shader
+    ImGui::Checkbox("Bloom", &doBloom);
 
     // End of frame
     ImGui::End();

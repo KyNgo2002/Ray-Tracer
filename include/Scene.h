@@ -62,6 +62,8 @@ public:
     bool editedTriangles = false;
     bool editedMaterials = false;
 
+    bool doBloom = true;
+
     std::vector<Sphere> spheres;
     std::vector<Triangle> triangles;
     std::vector<Triangle> newTriangles;

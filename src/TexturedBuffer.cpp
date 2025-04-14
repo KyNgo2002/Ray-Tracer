@@ -7,7 +7,7 @@ TexturedBuffer::TexturedBuffer(float SCR_WIDTH, float SCR_HEIGHT) {
 
     glGenFramebuffers(1, &bufferID);
     glGenTextures(1, &textureID);
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, textureID);
 
     // Texture configuration

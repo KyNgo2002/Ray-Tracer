@@ -102,7 +102,7 @@ int main() {
     screenShader.use();
     screenShader.setInt("ScreenTexture", 5);
 
-    TexturedBuffer accumulationBuffer(SCREEN_SIZE, SCREEN_SIZE);
+    //TexturedBuffer accumulationBuffer(SCREEN_SIZE, SCREEN_SIZE);
 
     // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
@@ -173,7 +173,7 @@ int main() {
     GLuint bloomFBO, bloomTex;
     glGenFramebuffers(1, &bloomFBO);
     glGenTextures(1, &bloomTex);
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, bloomTex);
 
     // Texture configuration
@@ -223,40 +223,49 @@ int main() {
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        // Second pass with brightness framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        brightnessShader.use();
-        brightnessShader.setUInt("Frames", camera->frames);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        // Third pass blur framebuffer ping ponging
-        bool firstIteration = true;
-        bool horizontal = true;
-        for (int i = 0; i < scene.blurPasses * 2; ++i) {
-            glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[!horizontal]);
-            // Set appropriate blur shader texture for ping ponging
-            blurShader.use();
-            blurShader.setBool("Horizontal", horizontal);
-            glActiveTexture(firstIteration ? GL_TEXTURE2 : GL_TEXTURE3 + horizontal);
-            glBindTexture(GL_TEXTURE_2D, firstIteration ? brightnessTex : blurTex[horizontal]);
-            blurShader.setInt("Texture", firstIteration ? 2 : 3 + horizontal);
+        if (scene.doBloom) {
+            // Second pass with brightness framebuffer
+            glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
+            glClear(GL_COLOR_BUFFER_BIT);
+            brightnessShader.use();
+            brightnessShader.setUInt("Frames", camera->frames);
             glDrawArrays(GL_TRIANGLES, 0, 6);
 
-            if (firstIteration)
-                firstIteration = false;
-            horizontal = !horizontal;
-        }
-        // Fourth pass apply bloom shader
-        glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO);
-        glClear(GL_COLOR_BUFFER_BIT);
-        bloomShader.use();
-        bloomShader.setUInt("Frames", camera->frames);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+            // Third pass blur framebuffer ping ponging
+            bool firstIteration = true;
+            bool horizontal = true;
+            for (int i = 0; i < scene.blurPasses * 2; ++i) {
+                glBindFramebuffer(GL_FRAMEBUFFER, blurFBO[!horizontal]);
+                // Set appropriate blur shader texture for ping ponging
+                blurShader.use();
+                blurShader.setBool("Horizontal", horizontal);
+                glActiveTexture(firstIteration ? GL_TEXTURE2 : GL_TEXTURE3 + horizontal);
+                glBindTexture(GL_TEXTURE_2D, firstIteration ? brightnessTex : blurTex[horizontal]);
+                blurShader.setInt("Texture", firstIteration ? 2 : 3 + horizontal);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
 
+                if (firstIteration)
+                    firstIteration = false;
+                horizontal = !horizontal;
+            }
+            // Fourth pass apply bloom shader
+            glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO);
+            glClear(GL_COLOR_BUFFER_BIT);
+            bloomShader.use();
+            bloomShader.setUInt("Frames", camera->frames);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+        
         // Final pass with default framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
+        screenShader.use();
+        screenShader.setFloat("Frames", camera->frames);
+        screenShader.setBool("DoBloom", scene.doBloom);
+        if (scene.doBloom)
+            screenShader.setInt("ScreenTexture", 5);
+        else
+            screenShader.setInt("ScreenTexture", 1);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // If in editing mode, render ImGUI editing components
