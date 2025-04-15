@@ -17,6 +17,8 @@ user can specify.
 
 ![Image of a demo scene, infinite reflection](Assets/DemoImage2.png "DemoImage2.png")
 
+## Bloom Shading and gamma correction
+![Image of a demo scene, Bloom Shader](Assets/DemoImage3.png "Bloom Shading and gamma correction")
 
 ## Requirements
 ### Software
