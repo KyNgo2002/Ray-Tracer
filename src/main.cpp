@@ -17,7 +17,8 @@ int main() {
 
     // Set up program context
     OpenGL openGL(SCREEN_SIZE, SCREEN_SIZE);
-    
+    Camera* camera = openGL.getCamera();
+
     // Shader initialization
     Shader rayShader("Shaders\\QuadShader.vert", "Shaders\\Ray.frag");
     Shader brightnessShader("Shaders\\QuadShader.vert", "Shaders\\BrightnessShader.frag");
@@ -26,10 +27,9 @@ int main() {
     Shader screenShader("Shaders\\QuadShader.vert", "Shaders\\ScreenShader.frag");
     
     // Set up scene
-    Scene scene;
+    Scene scene(camera);
     scene.loadModel("Assets\\Pawn.obj");
     scene.createImGuiEditor(openGL.getWindow());
-    Camera* camera = openGL.getCamera();
 
     std::chrono::high_resolution_clock clock;
 
@@ -220,6 +220,7 @@ int main() {
         rayShader.setVec3("CamDirection", camera->camFront);
         rayShader.setVec3("CamRight", camera->camRight);
         rayShader.setVec3("CamUp", camera->camUp);
+        rayShader.setInt("NumSpheres", scene.numSpheres);
         rayShader.setInt("Time", rand());
         glDrawArrays(GL_TRIANGLES, 0, 6);
 

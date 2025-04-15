@@ -17,6 +17,8 @@
 #include "ImGui/backend/imgui_impl_glfw.h"
 #include "ImGui/backend/imgui_impl_opengl3.h"
 
+#include "Camera.h"
+
 class Scene {
 public:
     // Structs for unique shapes and materials
@@ -80,9 +82,11 @@ public:
     // ImGui context
     ImGuiIO* io;
 
+    // Camera pointer
+    Camera* camera;
 public:
     // Constructors/Destructors
-	Scene();
+	Scene(Camera* camera);
     ~Scene();
 
     // Setup functions
@@ -90,7 +94,7 @@ public:
     void createImGuiEditor(GLFWwindow* window);
 
     // Getters/Setters
-    void addSphere(glm::vec3 position, float radius, int materialInd);
+    void addSphere();
     void addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd);
     void addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane);
     void addMaterial(glm::vec3 color, float roughness, glm::vec3 emissionColor, float emissionPower);

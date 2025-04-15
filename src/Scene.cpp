@@ -1,7 +1,8 @@
 #include "Scene.h"
 
 // Constructor for default scene
-Scene::Scene() {
+Scene::Scene(Camera* camera) {
+    this->camera = camera;
     // Initialize basic shapes and scene variables
     spheres = {
         {glm::vec3{-5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
@@ -109,10 +110,16 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
 }
 
 // Adds sphere to scene
-void Scene::addSphere(glm::vec3 position, float radius, int materialInd) {
-    Sphere sphere{ position, radius, glm::vec3(0.0f), materialInd };
+void Scene::addSphere() {
+    // Create sphere
+    glm::vec3 spherePosition = camera->camPosition + glm::normalize(camera->camFront) * 20.0f;
+
+    Sphere sphere{ spherePosition, 5.0f, glm::vec3(0.0f), 1 };
     spheres.push_back(sphere);
     ++numSpheres;
+
+    // Handle new sphere
+    editedSpheres = true;
 }
 
 // Adds triangle to scene
@@ -248,11 +255,15 @@ void Scene::displayEditor() {
             ImGui::Text("Sphere %d", (i + 1));
             ImGui::PushID(i);
             editedSpheres |= ImGui::DragFloat3("Position", glm::value_ptr(spheres[i].position), 0.1f);
-            editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f);
+            editedSpheres |= ImGui::DragFloat("Radius", &spheres[i].radius, 0.1f, 0.1f, 100.0f);
             editedSpheres |= ImGui::SliderInt("Material #", &spheres[i].materialInd, 0, numMaterials - 1);
             ImGui::Separator();
             ImGui::PopID();
         }
+        ImGui::Spacing();
+        if (ImGui::Button("Add Sphere"))
+            addSphere();
+        ImGui::Spacing();
     }
 
     // Header for triangle properties
