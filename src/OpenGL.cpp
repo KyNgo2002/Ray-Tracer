@@ -114,7 +114,13 @@ void OpenGL::processInput(float deltaTime) {
         camera->processKeyboard(DOWN, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        changeEditingMode();
+        if (ePressed == false) {
+            ePressed = true;
+            changeEditingMode();
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE) {
+        ePressed = false;
     }
     if (camera->moved) 
         camera->calculateLookAt();

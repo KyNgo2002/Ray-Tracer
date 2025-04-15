@@ -28,6 +28,7 @@ public:
 
 	// Editing move flag
 	bool editingMode;
+	bool ePressed = false;
 
 public:
 	// Constructors/Destructors
