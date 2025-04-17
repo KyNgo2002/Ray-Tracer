@@ -140,7 +140,7 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brightnessTex, 0);
-    
+    //
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
