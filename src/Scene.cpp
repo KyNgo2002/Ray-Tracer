@@ -113,7 +113,6 @@ void Scene::createImGuiEditor(GLFWwindow* window) {
 void Scene::addSphere() {
     // Create sphere
     glm::vec3 spherePosition = camera->camPosition + glm::normalize(camera->camFront) * 20.0f;
-
     Sphere sphere{ spherePosition, 5.0f, glm::vec3(0.0f), 1 };
     spheres.push_back(sphere);
     ++numSpheres;
@@ -123,10 +122,20 @@ void Scene::addSphere() {
 }
 
 // Adds triangle to scene
-void Scene::addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd) {
-    Triangle triangle(x, y, z, normal, materialInd);
+void Scene::addTriangle() {
+    // Position and direction
+    glm::vec3 triangleCenter = camera->camPosition + glm::normalize(camera->camFront) * 20.0f;
+    glm::vec4 bottomLeft = glm::vec4(triangleCenter + glm::vec3(-20.0f, -20.0f, 0.0f), 1.0f);
+    glm::vec4 bottomRight = glm::vec4(triangleCenter + glm::vec3(20.0f, -20.0f, 0.0f), 1.0f);
+    glm::vec4 top = glm::vec4(triangleCenter + glm::vec3(0.0f, 0.0f, 20.0f), 1.0f);
+
+    // Create Triangle
+    Triangle triangle(bottomLeft, bottomRight, top, -glm::normalize(camera->camFront), 0);
     triangles.push_back(triangle);
     ++numTriangles;
+
+    // Handle new sphere
+    editedTriangles = true;
 }
 
 // Adds plane to scene

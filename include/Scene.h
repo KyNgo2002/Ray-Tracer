@@ -95,7 +95,7 @@ public:
 
     // Getters/Setters
     void addSphere();
-    void addTriangle(glm::vec4 x, glm::vec4 y, glm::vec4 z, glm::vec4 normal, int materialInd);
+    void addTriangle();
     void addPlane(glm::vec3 normal, glm::vec3 topLeft, glm::vec3 bottomRight, float materialInd, bool sidePlane);
     void addMaterial(glm::vec3 color, float roughness, glm::vec3 emissionColor, float emissionPower);
 
