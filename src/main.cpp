@@ -102,8 +102,6 @@ int main() {
     screenShader.use();
     screenShader.setInt("ScreenTexture", 5);
 
-    //TexturedBuffer accumulationBuffer(SCREEN_SIZE, SCREEN_SIZE);
-
     // Accumulation framebuffer and texture
     GLuint accumulationFBO, accumulationTex;
     glGenFramebuffers(1, &accumulationFBO);
@@ -140,7 +138,7 @@ int main() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, brightnessFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brightnessTex, 0);
-    //
+    
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cerr << "Framebuffer not complete!" << std::endl;
 
@@ -300,6 +298,7 @@ int main() {
     // Cleanup glfw resources
     glfwTerminate();
 
+    // Terminate
 	return 0;
 }
 
