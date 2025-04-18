@@ -124,18 +124,18 @@ void Scene::addSphere() {
 // Adds triangle to scene
 void Scene::addTriangle() {
     // Position and direction
-    glm::vec3 triangleCenter = camera->camPosition + glm::normalize(camera->camFront) * 20.0f;
-    glm::vec4 bottomLeft = glm::vec4(triangleCenter + glm::vec3(-20.0f, -20.0f, 0.0f), 1.0f);
-    glm::vec4 bottomRight = glm::vec4(triangleCenter + glm::vec3(20.0f, -20.0f, 0.0f), 1.0f);
-    glm::vec4 top = glm::vec4(triangleCenter + glm::vec3(0.0f, 0.0f, 20.0f), 1.0f);
+    glm::vec4 bottomLeft = glm::vec4(-20.0f, -10.0f, -5.0f, 1.0f);
+    glm::vec4 bottomRight = glm::vec4(20.0f, -10.0f, -5.0f, 1.0f);
+    glm::vec4 top = glm::vec4(0.0f, 10.0f, -5.0f, 1.0f);
 
     // Create Triangle
-    Triangle triangle(bottomLeft, bottomRight, top, -glm::normalize(camera->camFront), 0);
+    Triangle triangle(bottomLeft, bottomRight, top, glm::vec3(0.0f, 0.0f, 1.0f), 1);
     triangles.push_back(triangle);
     ++numTriangles;
 
     // Handle new sphere
     editedTriangles = true;
+    isRegularTriangle.push_back(true);
 }
 
 // Adds plane to scene
@@ -290,6 +290,10 @@ void Scene::displayEditor() {
                 ImGui::PopID();
             }
         }
+        ImGui::Spacing();
+        if (ImGui::Button("Add Triangle"))
+            addTriangle();
+        ImGui::Spacing();
     }
 
     // Header for Plane properties
