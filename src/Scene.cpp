@@ -198,6 +198,7 @@ void Scene::addMaterial(glm::vec3 color, float roughness, glm::vec3 emissionColo
 }
 
 // Checks if edits have been made to scene
+// Another Troll comment
 bool Scene::checkEdits() {
     return editedSpheres || editedPlanes || editedTriangles || editedMaterials;
 }
