@@ -186,10 +186,11 @@
     <None Include="lib\assimp-vc143-mtd.dll" />
     <None Include="README.md" />
     <None Include="Shaders\BloomShader.frag" />
-    <None Include="Shaders\BlurShader.Frag" />
+    <None Include="Shaders\BlurShader.frag" />
     <None Include="Shaders\QuadShader.vert" />
-    <None Include="Shaders\Ray.Frag" />
+    <None Include="Shaders\Ray.frag" />
     <None Include="Shaders\BrightnessShader.frag" />
+    <None Include="Shaders\RayDemo.frag" />
     <None Include="Shaders\ScreenShader.frag" />
   </ItemGroup>
   <ItemGroup>

@@ -128,7 +128,7 @@
     <None Include="README.md" />
     <None Include="lib\assimp-vc143-mt.dll" />
     <None Include="lib\assimp-vc143-mtd.dll" />
-    <None Include="Shaders\Ray.Frag">
+    <None Include="Shaders\Ray.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\BrightnessShader.frag">
@@ -141,10 +141,13 @@
     <None Include="Shaders\QuadShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\BlurShader.Frag">
+    <None Include="Shaders\BlurShader.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\BloomShader.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\RayDemo.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

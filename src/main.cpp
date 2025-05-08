@@ -20,15 +20,17 @@ int main() {
     Camera* camera = openGL.getCamera();
 
     // Shader initialization
-    Shader rayShader("Shaders\\QuadShader.vert", "Shaders\\Ray.frag");
+    //Shader rayShader("Shaders\\QuadShader.vert", "Shaders\\Ray.frag");
+    Shader rayShader("Shaders\\QuadShader.vert", "Shaders\\RayDemo.frag");
     Shader brightnessShader("Shaders\\QuadShader.vert", "Shaders\\BrightnessShader.frag");
     Shader blurShader("Shaders\\QuadShader.vert", "Shaders\\BlurShader.frag");
     Shader bloomShader("Shaders\\QuadShader.vert", "Shaders\\BloomShader.frag");
     Shader screenShader("Shaders\\QuadShader.vert", "Shaders\\ScreenShader.frag");
     
+
     // Set up scene
     Scene scene(camera);
-    scene.loadModel("Assets\\Pawn.obj");
+    //scene.loadModel("Assets\\Pawn.obj");
     scene.createImGuiEditor(openGL.getWindow());
 
     std::chrono::high_resolution_clock clock;
@@ -56,7 +58,7 @@ int main() {
     };
 
     // Gaussian weights for blurring shader pass
-    std::vector<float> gaussianWeights = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    std::vector<float> gaussianWeights = { 0.227027f, 0.1945946f, 0.1216216f, 0.054054f, 0.016216f };
 
     // Sky box texture initialization
     unsigned int cubeMapTextureID = loadCubemap(faces);
@@ -80,7 +82,7 @@ int main() {
     rayShader.setInt("NumSpheres", scene.numSpheres);
     rayShader.setInt("NumTriangles", scene.numTriangles);
     rayShader.setVec2("Resolution", openGL.getScreenWidth(), openGL.getScreenHeight());
-    rayShader.setInt("Bounces", 3);
+    rayShader.setInt("Bounces", 1);
     rayShader.setInt("Time", rand());
     rayShader.setInt("Skybox", 0);
     rayShader.setInt("AccumulationTexture", 1);
