@@ -202,32 +202,6 @@ void main() {
 	Ray ray;
 	ray.origin = CamPosition;
 	ray.direction = normalize(CamDirection + uv.x * CamRight + uv.y * CamUp);
-	
-	vec4 color = vec4(0.0f);
-	float multiplier = 1.0f;
-	for (int i = 0; i <= Bounces; ++i) {
-		HitPayload payload = TraceRay(ray);
-		vec3 normal = payload.worldNorm;
-
-		if (payload.hitDistance < 0.0f) {
-			// Hit nothing, return black
-			FragColor = texture(AccumulationTexture, TexCoord) + vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
-		else {
-			// Hit sphere, return sphere color
-			vec3 lightDir = normalize(vec3(-1.0f, -1.0f, -1.0f));
-			float lightIntensity = max(0.0f, dot(payload.worldNorm, -lightDir));
-			
-			vec4 sphereColor = vec4(materials[spheres[payload.objInd].materialInd].color, 1.0f) * lightIntensity;
-			color += sphereColor * multiplier;
-			multiplier *= 0.7f;
-
-			ray.origin = payload.worldPos + payload.worldNorm * 0.0001f;
-			ray.direction = reflect(ray.direction, payload.worldNorm);
-		}
-	}
-	FragColor = texture(AccumulationTexture, TexCoord) + color;
-	return;
 
 	for (int i = 0; i <= Bounces; ++i) {
 		seed += Time;
@@ -236,8 +210,7 @@ void main() {
 
 		// Hit skybox
 		if (payload.hitDistance < 0.0f) {
-			FragColor = texture(AccumulationTexture, TexCoord) + vec4(1.0f, 0.0f, 0.0f, 1.0f);
-			return;
+			FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 		}
 		// Hit object
 		else {
@@ -246,17 +219,26 @@ void main() {
 			ray.origin = payload.worldPos + payload.worldNorm * 0.00001f;
 			diffuseDir = normalize(payload.worldNorm + generateRandVec(seed));
 
+			vec4 sphereColor = vec4(1.0f);
+
+
+			vec3 lightDirection = normalize(vec3(-1.0f));
+			float lightIntensity = max(0.0f, dot(normal, -lightDirection));
+
+			FragColor = sphereColor * lightIntensity;
+
+
 			// Material of hit object
 			material = payload.objType == 0 ? materials[spheres[payload.objInd].materialInd] : 
 				materials[triangles[payload.objInd].materialInd];
 			
 			// Lighting calculations
 			ray.direction = mix(specularDir, diffuseDir, material.roughness);
+
 			emittedLight = material.emissionColor * material.emissionPower;
 			light += emittedLight * rayColor;
 			rayColor *= material.color;
-			FragColor = texture(AccumulationTexture, TexCoord) + vec4(1.0f, 0.0f, 1.0f, 1.0f);
-			return;
+
 		}
 	}
 	

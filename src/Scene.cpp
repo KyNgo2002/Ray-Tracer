@@ -4,14 +4,23 @@
 Scene::Scene(Camera* camera) {
     this->camera = camera;
     // Initialize basic shapes and scene variables
-    /*spheres = {
-        {glm::vec3{-5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
-        {glm::vec3{5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
-    };*/
     spheres = {
-        {glm::vec3{0.0f, 0.0f, -2.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 7},
-        {glm::vec3{1.0f, 1.0f, -8.0f}, 3.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 8},
+        {glm::vec3{-5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 5},
+        {glm::vec3{5.0f, 10.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 8},
     };
+
+
+    /*spheres = {
+        {glm::vec3{0.0f, 0.0f, 0.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 7},
+        {glm::vec3{5.0f, 5.0f, 5.0f}, 3.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 8},
+        {glm::vec3{9.0f, 9.0f, 9.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 0.0f}, 0},
+    };*/
+
+    //spheres = {
+    //    {glm::vec3{0.0f, 0.0f, -2.0f}, 2.0f, glm::vec3{0.0f, 1.0f, 0.0f}, 7},
+    //    {glm::vec3{1.0f, 1.0f, -5.0f}, 2.0f, glm::vec3{0.0f, 0.0f, 1.0f}, 7},
+    //};
+
 
     planes = {
         
@@ -60,12 +69,12 @@ Scene::Scene(Camera* camera) {
     createBuffers();
 
     // Create cornell box
-    /*addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
+    addPlane(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(-10.0f, 0.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 3, false);
     addPlane(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 20.0f, 10.0f), 0, false);
     addPlane(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(-10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, -10.0f), 4, false);
     addPlane(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(10.0f, 0.0f,  10.0f), 4, false);
     addPlane(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(-10.0f, 20.0f, 10.0f), glm::vec3(-10.0f, 0.0f, -10.0f), 1, true);
-    addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);*/
+    addPlane(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(10.0f, 20.0f, -10.0f), glm::vec3(10.0f, 0.0f, 10.0f), 2, true);
 }
 
 // Clean up scene
